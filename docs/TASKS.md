@@ -29,7 +29,7 @@
   - **Deliverable**: Utility function ready for use
 
 ### 1.3 Project Structure
-- [ ] **Task 1.3.1**: Create folder structure
+- [x] **Task 1.3.1**: Create folder structure
   - Create directories:
     ```
     src/
