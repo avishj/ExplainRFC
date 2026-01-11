@@ -1,0 +1,179 @@
+/* 
+ * Global CSS Custom Properties and Utility Classes
+ * These extend Tailwind with custom effects for the Explain RFC design system
+ */
+
+/* ===== CSS Custom Properties ===== */
+:root {
+  /* Glow Colors (with transparency for effects) */
+  --glow-cyan: rgba(0, 245, 212, 0.5);
+  --glow-violet: rgba(155, 93, 229, 0.5);
+  --glow-coral: rgba(241, 91, 181, 0.5);
+  --glow-yellow: rgba(254, 228, 64, 0.5);
+  
+  /* Shadow Intensities */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+  
+  /* Glassmorphism Properties */
+  --glass-bg: rgba(13, 31, 60, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 12px;
+}
+
+/* ===== Glow Utility Classes ===== */
+
+/* Cyan Glow */
+.glow-cyan {
+  box-shadow: 0 0 20px var(--glow-cyan), 0 0 40px var(--glow-cyan);
+}
+
+.glow-cyan-sm {
+  box-shadow: 0 0 10px var(--glow-cyan);
+}
+
+.glow-cyan-lg {
+  box-shadow: 0 0 30px var(--glow-cyan), 0 0 60px var(--glow-cyan), 0 0 90px var(--glow-cyan);
+}
+
+/* Violet Glow */
+.glow-violet {
+  box-shadow: 0 0 20px var(--glow-violet), 0 0 40px var(--glow-violet);
+}
+
+.glow-violet-sm {
+  box-shadow: 0 0 10px var(--glow-violet);
+}
+
+.glow-violet-lg {
+  box-shadow: 0 0 30px var(--glow-violet), 0 0 60px var(--glow-violet), 0 0 90px var(--glow-violet);
+}
+
+/* Coral Glow */
+.glow-coral {
+  box-shadow: 0 0 20px var(--glow-coral), 0 0 40px var(--glow-coral);
+}
+
+.glow-coral-sm {
+  box-shadow: 0 0 10px var(--glow-coral);
+}
+
+.glow-coral-lg {
+  box-shadow: 0 0 30px var(--glow-coral), 0 0 60px var(--glow-coral), 0 0 90px var(--glow-coral);
+}
+
+/* Yellow Glow */
+.glow-yellow {
+  box-shadow: 0 0 20px var(--glow-yellow), 0 0 40px var(--glow-yellow);
+}
+
+.glow-yellow-sm {
+  box-shadow: 0 0 10px var(--glow-yellow);
+}
+
+.glow-yellow-lg {
+  box-shadow: 0 0 30px var(--glow-yellow), 0 0 60px var(--glow-yellow), 0 0 90px var(--glow-yellow);
+}
+
+/* Text Glow Effects */
+.text-glow-cyan {
+  text-shadow: 0 0 10px var(--glow-cyan), 0 0 20px var(--glow-cyan);
+}
+
+.text-glow-violet {
+  text-shadow: 0 0 10px var(--glow-violet), 0 0 20px var(--glow-violet);
+}
+
+.text-glow-coral {
+  text-shadow: 0 0 10px var(--glow-coral), 0 0 20px var(--glow-coral);
+}
+
+/* ===== Glassmorphism Utility Class ===== */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+}
+
+.glass-sm {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+}
+
+.glass-lg {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+}
+
+/* Glass with colored border glow */
+.glass-cyan {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(0, 245, 212, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 245, 212, 0.1);
+}
+
+.glass-violet {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(155, 93, 229, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(155, 93, 229, 0.1);
+}
+
+/* ===== Hover Glow Transitions ===== */
+.hover-glow-cyan {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow-cyan:hover {
+  box-shadow: 0 0 20px var(--glow-cyan), 0 0 40px var(--glow-cyan);
+}
+
+.hover-glow-violet {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow-violet:hover {
+  box-shadow: 0 0 20px var(--glow-violet), 0 0 40px var(--glow-violet);
+}
+
+/* ===== Animation Utilities ===== */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}

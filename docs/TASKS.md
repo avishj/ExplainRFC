@@ -66,7 +66,7 @@
   - Add Google Fonts import in `src/app/layout.tsx`
   - **Deliverable**: Tailwind configured with brand colors and fonts
 
-- [ ] **Task 2.1.2**: Create CSS custom properties for theme
+- [x] **Task 2.1.2**: Create CSS custom properties for theme
   - Create `src/styles/globals.css` with CSS variables for colors
   - Add glow/shadow utilities as CSS classes
   - Add glassmorphism utility class (`.glass`)
