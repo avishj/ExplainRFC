@@ -23,7 +23,7 @@
   - Install: `framer-motion`, `gsap`, `zustand`
   - **Deliverable**: Animation/state packages in dependencies
 
-- [ ] **Task 1.2.3**: Install utility packages
+- [x] **Task 1.2.3**: Install utility packages
   - Install: `clsx`, `tailwind-merge`, `lucide-react` (icons)
   - Create a `src/lib/utils.ts` with a `cn()` function for class merging
   - **Deliverable**: Utility function ready for use
