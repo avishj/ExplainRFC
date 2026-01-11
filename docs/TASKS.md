@@ -14,7 +14,7 @@
   - **Deliverable**: Empty Next.js app running with TypeScript
 
 ### 1.2 Dependencies Installation
-- [ ] **Task 1.2.1**: Install Three.js ecosystem packages
+- [x] **Task 1.2.1**: Install Three.js ecosystem packages
   - Install: `three`, `@react-three/fiber`, `@react-three/drei`, `@types/three`
   - Verify installation by checking `package.json`
   - **Deliverable**: Three.js packages in dependencies
