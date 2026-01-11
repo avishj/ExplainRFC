@@ -1,0 +1,5 @@
+Explain RFC is going to be a website that helps people understand the gist of a given RFC by IETF. It will be having a dashboard first and foremost, which should allow people to see popular ones, search or be recommended some ones like every day randomly or smt. it also should also have. asectiont hat tells how many supported rfcs. i want to use 3.js maximially, to create beautiful visualisations of different RFCs and how they work in a very very creative manner. the entire website should focus on beauty and well designed and aesthetic. pick a unique style, nothing common and vibe with it. each rfc should be well made and explained via a very strong design for the entire thing, very creative. someone new can use it to learn, there can maybe also be a text summary or smt idk. 
+
+I want you to think about what other features might be useful and create a BRD/PRD to start off with. Think in depth about how those features would come to life as well and what might people using this app find useful as well.
+
+based on this create a PRD.md in docs folder.
