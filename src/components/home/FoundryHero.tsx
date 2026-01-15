@@ -178,32 +178,35 @@ export function FoundryHero() {
       scene.add(bracket2);
     });
     
-    // Particle system (floating ember particles)
-    const particleCount = 100;
-    const particlePositions = new Float32Array(particleCount * 3);
-    const particleSizes = new Float32Array(particleCount);
+    // Floating RFC number cubes (instead of generic particles)
+    const floatingRFCs = [793, 791, 1035, 8446, 768, 2616, 7540, 9000];
+    const rfcCubes: THREE.Mesh[] = [];
     
-    for (let i = 0; i < particleCount; i++) {
-      particlePositions[i * 3] = (Math.random() - 0.5) * 8;
-      particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 8;
-      particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 4 + 2;
-      particleSizes[i] = Math.random() * 3 + 1;
-    }
-    
-    const particleGeometry = new THREE.BufferGeometry();
-    particleGeometry.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
-    particleGeometry.setAttribute("size", new THREE.BufferAttribute(particleSizes, 1));
-    
-    const particleMaterial = new THREE.PointsMaterial({
-      color: 0xffaa00,
-      size: 0.02,
-      transparent: true,
-      opacity: 0.6,
-      sizeAttenuation: true,
+    floatingRFCs.forEach((rfcNum, i) => {
+      const cubeGeometry = new THREE.BoxGeometry(0.4, 0.25, 0.05);
+      const cubeMaterial = new THREE.MeshStandardMaterial({
+        color: 0x1a1a1a,
+        roughness: 0.5,
+        metalness: 0.8,
+        transparent: true,
+        opacity: 0.3 + Math.random() * 0.2,
+      });
+      const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+      
+      // Position in a loose orbit
+      const angle = (i / floatingRFCs.length) * Math.PI * 2;
+      const radius = 2.5 + Math.random() * 1.5;
+      cube.position.set(
+        Math.cos(angle) * radius,
+        (Math.random() - 0.5) * 3,
+        Math.sin(angle) * radius - 2
+      );
+      cube.rotation.y = angle;
+      cube.userData = { angle, radius, speed: 0.1 + Math.random() * 0.1, yOffset: cube.position.y };
+      
+      scene.add(cube);
+      rfcCubes.push(cube);
     });
-    
-    const particles = new THREE.Points(particleGeometry, particleMaterial);
-    scene.add(particles);
     
     // Animation
     const clock = new THREE.Clock();
@@ -218,9 +221,9 @@ export function FoundryHero() {
       slab.rotation.x = Math.sin(elapsed * 0.3) * 0.02;
       slab.rotation.y = Math.sin(elapsed * 0.2) * 0.03;
       
-      // Frame and ring rotation
-      frame.rotation.z = elapsed * 0.1;
-      innerRing.rotation.z = -elapsed * 0.15;
+      // Frame and ring rotation (more noticeable)
+      frame.rotation.z = elapsed * 0.3;
+      innerRing.rotation.z = -elapsed * 0.5;
       
       // Node pulsing
       const pulse = 1 + Math.sin(elapsed * 2) * 0.1;
@@ -246,13 +249,15 @@ export function FoundryHero() {
         mat.emissiveIntensity = 0.8 + Math.sin(elapsed * 5 + i) * 0.2;
       });
       
-      // Particle drift
-      const positions = particleGeometry.attributes.position.array as Float32Array;
-      for (let i = 0; i < particleCount; i++) {
-        positions[i * 3 + 1] += 0.002;
-        if (positions[i * 3 + 1] > 4) positions[i * 3 + 1] = -4;
-      }
-      particleGeometry.attributes.position.needsUpdate = true;
+      // Animate floating RFC cubes
+      rfcCubes.forEach((cube) => {
+        const { angle, radius, speed, yOffset } = cube.userData;
+        const newAngle = angle + elapsed * speed * 0.1;
+        cube.position.x = Math.cos(newAngle) * radius;
+        cube.position.z = Math.sin(newAngle) * radius - 2;
+        cube.position.y = yOffset + Math.sin(elapsed * speed * 2) * 0.3;
+        cube.rotation.y = newAngle + Math.PI;
+      });
       
       // Light flickering (like fire)
       mainLight.intensity = 2 + Math.sin(elapsed * 3) * 0.2;
