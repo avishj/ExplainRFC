@@ -10,7 +10,7 @@ export const rfcData: RFC = {
   estimatedMinutes: 12,
   concepts: ["handshake", "reliable-delivery", "flow-control", "connection-oriented"],
   prereqs: [791],
-  accentColors: ["#00f5d4", "#9b5de5"],
+  accentColors: ["#ffaa00", "#ff6b00"],
   description: "TCP is the backbone of reliable internet communication. It ensures your data arrives complete, in order, and error-free.",
 };
 

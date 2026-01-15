@@ -18,7 +18,7 @@ export async function init(
   
   // Scene setup
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x050a12, 10, 50);
+  scene.fog = new THREE.Fog(0x050505, 10, 50);
   
   // Camera
   const camera = new THREE.PerspectiveCamera(
@@ -38,7 +38,7 @@ export async function init(
   });
   renderer.setSize(canvas.clientWidth, canvas.clientHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x050a12, 1);
+  renderer.setClearColor(0x000000, 1);
   
   // Lighting
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
@@ -55,8 +55,8 @@ export async function init(
   // Create entities
   const entities = createEntities(scene, primaryColor, secondaryColor);
   
-  // Grid floor
-  const gridHelper = new THREE.GridHelper(20, 20, 0x1e3048, 0x0f1a2a);
+  // Grid floor - amber/ochre tones
+  const gridHelper = new THREE.GridHelper(20, 20, 0x3d2a14, 0x1a1206);
   gridHelper.position.y = -3;
   scene.add(gridHelper);
   

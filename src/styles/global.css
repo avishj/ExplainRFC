@@ -1,42 +1,44 @@
 @import "tailwindcss";
 
 @theme {
-  /* === Base Colors — Dark Museum === */
-  --color-void: #050a12;
-  --color-deep: #0a1220;
-  --color-surface: #0f1a2a;
-  --color-elevated: #152238;
-  --color-border: #1e3048;
+  /* === The Obsidian Foundry — Color System === */
   
-  /* === Accent Colors — Holographic === */
-  --color-cyan: #00f5d4;
-  --color-violet: #9b5de5;
-  --color-coral: #f15bb5;
-  --color-amber: #fbbf24;
-  --color-emerald: #10b981;
+  /* Base: Pure obsidian blacks */
+  --color-obsidian: #000000;
+  --color-void: #050505;
+  --color-slate: #0a0a0a;
+  --color-stone: #111111;
+  --color-carbon: #1a1a1a;
   
-  /* === Text Colors === */
-  --color-text-primary: #f0f4f8;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
+  /* Accent: Molten amber/ochre spectrum */
+  --color-ember: #ff6b00;
+  --color-molten: #ff8c00;
+  --color-amber: #ffaa00;
+  --color-gold: #ffc71f;
+  --color-brass: #d4a44c;
+  --color-patina: #8b7355;
   
-  /* === Light Mode Overrides === */
-  --color-light-bg: #f8fafc;
-  --color-light-surface: #ffffff;
-  --color-light-text: #0f172a;
-  --color-light-muted: #64748b;
+  /* Text hierarchy */
+  --color-text-bright: #fff8e7;
+  --color-text-primary: #e8dcc8;
+  --color-text-secondary: #a89880;
+  --color-text-muted: #5c5347;
   
-  /* === Fonts === */
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  /* Semantic */
+  --color-heat: #ff4400;
+  --color-cool: #4a90a4;
   
-  /* === Animation Timing === */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  /* Typography */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  
+  /* Timing */
+  --ease-foundry: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-mechanical: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* === Base Styles === */
+/* === Global Reset & Base === */
 * {
   box-sizing: border-box;
 }
@@ -47,130 +49,226 @@ html {
 
 body {
   font-family: var(--font-body);
-  background: var(--color-void);
+  background: var(--color-obsidian);
   color: var(--color-text-primary);
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* === Noise Texture Overlay === */
+/* === Stone Grain Texture === */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
   pointer-events: none;
   z-index: 9999;
 }
 
 /* === Selection === */
 ::selection {
-  background: var(--color-cyan);
-  color: var(--color-void);
+  background: var(--color-amber);
+  color: var(--color-obsidian);
 }
 
-/* === Scrollbar === */
+/* === Custom Scrollbar === */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-deep);
+  background: var(--color-void);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 4px;
+  background: var(--color-patina);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-cyan);
+  background: var(--color-brass);
 }
 
-/* === Utility Classes === */
-.glass {
-  background: rgba(15, 26, 42, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
+/* === Foundry Effects === */
+
+/* Molten glow */
+.glow-molten {
+  box-shadow: 
+    0 0 20px rgba(255, 140, 0, 0.4),
+    0 0 40px rgba(255, 107, 0, 0.2),
+    0 0 60px rgba(255, 68, 0, 0.1);
 }
 
-.glow-cyan {
-  box-shadow: 0 0 20px rgba(0, 245, 212, 0.3), 0 0 40px rgba(0, 245, 212, 0.1);
+.glow-ember {
+  box-shadow: 
+    0 0 10px rgba(255, 107, 0, 0.5),
+    0 0 20px rgba(255, 68, 0, 0.3);
 }
 
-.glow-violet {
-  box-shadow: 0 0 20px rgba(155, 93, 229, 0.3), 0 0 40px rgba(155, 93, 229, 0.1);
+/* Text heat glow */
+.text-glow-gold {
+  text-shadow: 
+    0 0 10px rgba(255, 199, 31, 0.5),
+    0 0 20px rgba(255, 170, 0, 0.3),
+    0 0 40px rgba(255, 140, 0, 0.2);
 }
 
-.text-glow-cyan {
-  text-shadow: 0 0 20px rgba(0, 245, 212, 0.5), 0 0 40px rgba(0, 245, 212, 0.2);
+.text-glow-ember {
+  text-shadow: 
+    0 0 20px rgba(255, 107, 0, 0.8),
+    0 0 40px rgba(255, 68, 0, 0.5);
 }
 
-.text-glow-violet {
-  text-shadow: 0 0 20px rgba(155, 93, 229, 0.5), 0 0 40px rgba(155, 93, 229, 0.2);
+/* Engraved effect */
+.engraved {
+  background: linear-gradient(135deg, var(--color-carbon) 0%, var(--color-void) 100%);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.8),
+    inset -1px -1px 2px rgba(255, 199, 31, 0.05);
 }
 
-/* === Blueprint Grid === */
-.blueprint-grid {
-  background-image: 
-    linear-gradient(rgba(0, 245, 212, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 245, 212, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
+/* Gilded surface */
+.gilded {
+  background: linear-gradient(
+    135deg,
+    var(--color-brass) 0%,
+    var(--color-gold) 25%,
+    var(--color-amber) 50%,
+    var(--color-gold) 75%,
+    var(--color-brass) 100%
+  );
+  background-size: 200% 200%;
 }
 
-/* === Gradient Text === */
-.gradient-text {
-  background: linear-gradient(135deg, var(--color-cyan) 0%, var(--color-violet) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Metal plate */
+.metal-plate {
+  background: linear-gradient(
+    180deg,
+    rgba(26, 26, 26, 1) 0%,
+    rgba(17, 17, 17, 1) 50%,
+    rgba(10, 10, 10, 1) 100%
+  );
+  border: 1px solid var(--color-carbon);
+  box-shadow:
+    0 1px 0 rgba(255, 199, 31, 0.05),
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+/* Incised line */
+.incised {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-amber) 50%,
+    transparent 100%
+  );
+  height: 1px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* === Animations === */
-@keyframes pulse-glow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+@keyframes pour {
+  0% { 
+    clip-path: inset(0 100% 0 0);
+    filter: brightness(2);
+  }
+  100% { 
+    clip-path: inset(0 0 0 0);
+    filter: brightness(1);
+  }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+@keyframes heat-pulse {
+  0%, 100% { 
+    filter: brightness(1);
+    text-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
+  }
+  50% { 
+    filter: brightness(1.2);
+    text-shadow: 0 0 20px rgba(255, 170, 0, 0.6);
+  }
 }
 
-@keyframes scan-line {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
+@keyframes glint {
+  0% { 
+    background-position: -200% center;
+  }
+  100% { 
+    background-position: 200% center;
+  }
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(0.5deg); }
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@keyframes mechanical-settle {
+  0% { transform: translateY(-5px); opacity: 0; }
+  60% { transform: translateY(2px); }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-pour {
+  animation: pour 1.5s var(--ease-foundry) forwards;
+}
+
+.animate-heat-pulse {
+  animation: heat-pulse 3s ease-in-out infinite;
 }
 
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: float-slow 8s ease-in-out infinite;
 }
 
-/* === Light Mode === */
-.light body {
-  background: var(--color-light-bg);
-  color: var(--color-light-text);
+.animate-glint {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 199, 31, 0.4) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: glint 3s ease-in-out infinite;
 }
 
-.light body::before {
-  opacity: 0.01;
+.animate-settle {
+  animation: mechanical-settle 0.6s var(--ease-mechanical) forwards;
 }
 
-.light .glass {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(0, 0, 0, 0.1);
+/* === Utility Classes === */
+
+.font-display {
+  font-family: var(--font-display);
 }
 
-.light ::selection {
-  background: var(--color-violet);
-  color: white;
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Stamp/emboss effect for text */
+.stamped {
+  text-shadow: 
+    1px 1px 0 rgba(0, 0, 0, 0.8),
+    -0.5px -0.5px 0 rgba(255, 199, 31, 0.1);
+}
+
+/* Museum label style */
+.museum-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 /* === Reduced Motion === */

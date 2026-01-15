@@ -59,19 +59,19 @@ export function SceneCanvas({ rfcId, accentColors, onControllerReady }: SceneCan
       
       {/* Loading state */}
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-void/80">
+        <div className="absolute inset-0 flex items-center justify-center bg-obsidian/90">
           <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 border-2 border-cyan border-t-transparent rounded-full animate-spin" />
-            <span className="text-text-secondary text-sm">Loading visualization...</span>
+            <div className="w-12 h-12 border-2 border-amber border-t-transparent rounded-full animate-spin" />
+            <span className="text-text-secondary text-sm font-mono">Forging visualization...</span>
           </div>
         </div>
       )}
       
       {/* Error state */}
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-void/80">
+        <div className="absolute inset-0 flex items-center justify-center bg-obsidian/90">
           <div className="text-center">
-            <p className="text-coral mb-2">{error}</p>
+            <p className="text-ember mb-2">{error}</p>
             <p className="text-text-muted text-sm">The visualization will appear here</p>
           </div>
         </div>

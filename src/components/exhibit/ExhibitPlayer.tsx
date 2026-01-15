@@ -109,8 +109,8 @@ export function ExhibitPlayer({ rfc, storyboard }: ExhibitPlayerProps) {
           
           {/* Scene overlay with step title */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
-            <div className="glass px-4 py-2 rounded-full">
-              <span className="font-mono text-sm text-text-secondary">
+            <div className="metal-plate px-5 py-2.5 rounded-lg">
+              <span className="font-mono text-sm text-brass">
                 {step?.title}
               </span>
             </div>
@@ -120,12 +120,12 @@ export function ExhibitPlayer({ rfc, storyboard }: ExhibitPlayerProps) {
           <button
             onClick={() => setShowInstruments(prev => !prev)}
             className={cn(
-              "absolute top-4 right-4 p-2 rounded-lg",
-              "glass text-text-secondary hover:text-cyan transition-colors"
+              "absolute top-4 right-4 p-2.5 rounded-lg",
+              "metal-plate text-text-muted hover:text-gold transition-colors"
             )}
             aria-label={showInstruments ? "Hide instruments" : "Show instruments"}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <path d={showInstruments ? "M15 3v18" : "M9 3v18"} />
             </svg>
