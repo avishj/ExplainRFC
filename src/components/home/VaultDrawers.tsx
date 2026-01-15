@@ -28,16 +28,16 @@ const rfcs: RFC[] = [
 ];
 
 const bookColors = [
-  { leather: "#4a1c1c", accent: "#8b4513", foil: "#d4a44c" },
-  { leather: "#1a2f1a", accent: "#2d4a2d", foil: "#c9b037" },
-  { leather: "#1a1a3a", accent: "#2d2d5a", foil: "#b4a7d6" },
-  { leather: "#3a1a1a", accent: "#5a2d2d", foil: "#e6c87a" },
-  { leather: "#2a1a0a", accent: "#4a3520", foil: "#d4af37" },
-  { leather: "#0a1a2a", accent: "#1a3a5a", foil: "#87ceeb" },
-  { leather: "#2a0a2a", accent: "#4a1a4a", foil: "#dda0dd" },
-  { leather: "#1a1a1a", accent: "#2a2a2a", foil: "#c0c0c0" },
-  { leather: "#3a2a1a", accent: "#5a4a3a", foil: "#ffd700" },
-  { leather: "#1a2a2a", accent: "#2a4a4a", foil: "#40e0d0" },
+  { leather: "#6b2c2c", spine: "#4a1c1c", foil: "#d4a44c" },
+  { leather: "#2d4a2d", spine: "#1a2f1a", foil: "#c9b037" },
+  { leather: "#3d3d6d", spine: "#1a1a3a", foil: "#b4a7d6" },
+  { leather: "#5a3030", spine: "#3a1a1a", foil: "#e6c87a" },
+  { leather: "#5a4520", spine: "#2a1a0a", foil: "#d4af37" },
+  { leather: "#2a4a5a", spine: "#0a1a2a", foil: "#87ceeb" },
+  { leather: "#4a2a4a", spine: "#2a0a2a", foil: "#dda0dd" },
+  { leather: "#3a3a3a", spine: "#1a1a1a", foil: "#c0c0c0" },
+  { leather: "#5a4a3a", spine: "#3a2a1a", foil: "#ffd700" },
+  { leather: "#3a5a5a", spine: "#1a2a2a", foil: "#40e0d0" },
 ];
 
 export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
@@ -65,16 +65,8 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
       
       {/* Bookshelf */}
       <div className="max-w-7xl mx-auto relative">
-        {/* Shelf shadow behind books */}
-        <div 
-          className="absolute bottom-0 left-0 right-0 h-8 rounded-b-lg"
-          style={{
-            background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.4))",
-          }}
-        />
-        
         {/* Books container */}
-        <div className="flex justify-center gap-3 flex-wrap pb-8">
+        <div className="flex justify-center gap-2 md:gap-3 flex-wrap pb-8 px-4">
           {rfcs.map((rfc, index) => {
             const colors = bookColors[index % bookColors.length];
             const isOpen = openBook === rfc.id;
@@ -85,398 +77,429 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                 key={rfc.id}
                 className="relative"
                 style={{ 
-                  perspective: "1200px",
-                  zIndex: isOpen ? 100 : 10 - index,
+                  perspective: "1000px",
+                  zIndex: isOpen ? 200 : hoveredBook === rfc.id ? 50 : 10,
                 }}
-                onMouseEnter={() => setHoveredBook(rfc.id)}
+                onMouseEnter={() => !isOpen && setHoveredBook(rfc.id)}
                 onMouseLeave={() => setHoveredBook(null)}
               >
-                {/* Book container */}
+                {/* Closed book on shelf */}
                 <div
                   onClick={() => handleBookClick(rfc)}
                   className={`
-                    relative cursor-pointer transition-all duration-700
-                    ${!rfc.available ? "opacity-60 cursor-not-allowed grayscale" : ""}
+                    relative cursor-pointer transition-all duration-500 ease-out
+                    ${!rfc.available ? "opacity-50 cursor-not-allowed" : ""}
+                    ${isOpen ? "opacity-0 pointer-events-none" : ""}
                   `}
                   style={{
+                    width: "65px",
+                    height: "200px",
                     transformStyle: "preserve-3d",
-                    transform: isOpen 
-                      ? "rotateY(-30deg) rotateX(10deg) translateZ(60px) translateY(-20px)" 
-                      : isHovered && rfc.available
-                        ? "translateY(-8px) rotateY(-5deg)"
-                        : "translateY(0)",
+                    transform: isHovered && rfc.available && !isOpen
+                      ? "translateY(-12px) rotateY(-8deg)"
+                      : "translateY(0) rotateY(0deg)",
                   }}
                 >
-                  {/* Book spine (visible when closed) */}
-                  <div 
-                    className="relative transition-all duration-700"
+                  {/* Book spine (front face) */}
+                  <div
+                    className="absolute inset-0 rounded-sm overflow-hidden"
                     style={{
-                      width: isOpen ? "180px" : "70px",
-                      height: "220px",
-                      transformStyle: "preserve-3d",
+                      background: `linear-gradient(90deg, ${colors.spine} 0%, ${colors.leather} 30%, ${colors.leather} 70%, ${colors.spine} 100%)`,
+                      boxShadow: isHovered && rfc.available
+                        ? `3px 3px 15px rgba(0,0,0,0.5), 0 0 20px ${colors.foil}30`
+                        : "2px 2px 10px rgba(0,0,0,0.4)",
                     }}
                   >
-                    {/* Front cover / Spine face */}
-                    <div
-                      className="absolute inset-0 rounded-sm overflow-hidden"
+                    {/* Leather grain texture */}
+                    <div 
+                      className="absolute inset-0 opacity-20"
                       style={{
-                        background: `linear-gradient(135deg, ${colors.leather} 0%, ${colors.accent} 50%, ${colors.leather} 100%)`,
-                        boxShadow: isHovered && rfc.available
-                          ? `4px 4px 20px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.3), 0 0 15px ${colors.foil}40`
-                          : "4px 4px 15px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3)",
-                        transform: isOpen ? "rotateY(0deg)" : "rotateY(0deg)",
-                        backfaceVisibility: "hidden",
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
                       }}
-                    >
-                      {/* Leather texture */}
-                      <div 
-                        className="absolute inset-0 opacity-30"
+                    />
+                    
+                    {/* Binding ridges */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1.5"
+                      style={{ background: `linear-gradient(90deg, #000 0%, ${colors.spine} 100%)` }}
+                    />
+                    <div className="absolute right-0 top-0 bottom-0 w-0.5"
+                      style={{ background: `linear-gradient(90deg, ${colors.leather} 0%, ${colors.spine}80 100%)` }}
+                    />
+                    
+                    {/* Horizontal bands */}
+                    {[15, 85].map((pos) => (
+                      <div
+                        key={pos}
+                        className="absolute left-1 right-1"
                         style={{
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                          top: `${pos}%`,
+                          height: "6px",
+                          background: `linear-gradient(180deg, ${colors.foil}40 0%, ${colors.foil} 50%, ${colors.foil}40 100%)`,
+                          borderRadius: "1px",
                         }}
                       />
-                      
-                      {/* Spine decorations when closed */}
-                      {!isOpen && (
-                        <>
-                          {/* Top ornament */}
-                          <div 
-                            className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-px"
-                            style={{ background: colors.foil }}
-                          />
-                          <div 
-                            className="absolute top-5 left-1/2 -translate-x-1/2 w-8 h-px"
-                            style={{ background: colors.foil }}
-                          />
-                          
-                          {/* RFC number - vertical */}
-                          <div 
-                            className="absolute top-12 left-1/2 -translate-x-1/2"
-                            style={{
-                              writingMode: "vertical-rl",
-                              textOrientation: "mixed",
-                              color: colors.foil,
-                              fontFamily: "var(--font-display)",
-                              fontSize: "1.5rem",
-                              fontWeight: "bold",
-                              letterSpacing: "0.1em",
-                              textShadow: `0 0 10px ${colors.foil}60`,
-                            }}
-                          >
-                            {rfc.id}
-                          </div>
-                          
-                          {/* Protocol name - vertical */}
-                          <div 
-                            className="absolute bottom-16 left-1/2 -translate-x-1/2"
-                            style={{
-                              writingMode: "vertical-rl",
-                              textOrientation: "mixed",
-                              color: colors.foil,
-                              fontFamily: "var(--font-display)",
-                              fontSize: "0.9rem",
-                              fontWeight: "600",
-                              letterSpacing: "0.15em",
-                              opacity: 0.9,
-                            }}
-                          >
-                            {rfc.name}
-                          </div>
-                          
-                          {/* Bottom ornament */}
-                          <div 
-                            className="absolute bottom-5 left-1/2 -translate-x-1/2 w-8 h-px"
-                            style={{ background: colors.foil }}
-                          />
-                          <div 
-                            className="absolute bottom-3 left-1/2 -translate-x-1/2 w-12 h-px"
-                            style={{ background: colors.foil }}
-                          />
-                          
-                          {/* Binding ridges */}
-                          {[20, 40, 60, 80].map((pos) => (
-                            <div
-                              key={pos}
-                              className="absolute left-0 right-0 h-1"
-                              style={{
-                                top: `${pos}%`,
-                                background: `linear-gradient(to bottom, transparent, ${colors.accent}80, transparent)`,
-                              }}
-                            />
-                          ))}
-                        </>
-                      )}
-                      
-                      {/* Open book: Left page (angled) */}
-                      {isOpen && (
-                        <div 
-                          className="absolute inset-2 rounded-sm overflow-hidden"
-                          style={{
-                            background: "linear-gradient(135deg, #f5e6d3 0%, #e8d5b7 50%, #dcc9a3 100%)",
-                            boxShadow: "inset 2px 2px 8px rgba(139,69,19,0.2), inset -1px -1px 4px rgba(255,255,255,0.3)",
-                            transform: "rotateY(-15deg) rotateZ(-2deg)",
-                            transformOrigin: "right center",
-                          }}
-                        >
-                          {/* Page lines */}
-                          <div className="absolute inset-4 opacity-20">
-                            {[...Array(12)].map((_, i) => (
-                              <div 
-                                key={i} 
-                                className="h-px mb-3"
-                                style={{ background: "#8b4513" }}
-                              />
-                            ))}
-                          </div>
-                          
-                          {/* Decorative content on left page */}
-                          <div className="relative p-4 h-full flex flex-col justify-between">
-                            <div>
-                              <div 
-                                className="text-center mb-2"
-                                style={{ 
-                                  fontFamily: "var(--font-display)", 
-                                  fontSize: "0.65rem",
-                                  color: "#5a3d2b",
-                                  letterSpacing: "0.2em",
-                                }}
-                              >
-                                RFC SPECIFICATION
-                              </div>
-                              <div 
-                                className="text-center"
-                                style={{
-                                  fontFamily: "var(--font-display)",
-                                  fontSize: "2rem",
-                                  fontWeight: "bold",
-                                  color: "#3d2817",
-                                }}
-                              >
-                                {rfc.id}
-                              </div>
-                            </div>
-                            
-                            <div className="text-center">
-                              <div 
-                                style={{
-                                  fontFamily: "var(--font-display)",
-                                  fontSize: "0.7rem",
-                                  color: "#6b4423",
-                                  fontStyle: "italic",
-                                }}
-                              >
-                                Est. {rfc.year}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    ))}
                     
-                    {/* Right page (face down with content) - only when open */}
-                    {isOpen && (
-                      <div
-                        className="absolute rounded-sm overflow-hidden"
-                        style={{
-                          width: "200px",
-                          height: "220px",
-                          left: "100%",
-                          top: "0",
-                          background: "linear-gradient(180deg, #faf6ed 0%, #f5e6d3 30%, #e8d5b7 100%)",
-                          boxShadow: "4px 4px 20px rgba(0,0,0,0.3), inset -2px 0 8px rgba(139,69,19,0.1)",
-                          transform: "rotateY(15deg) rotateX(-5deg)",
-                          transformOrigin: "left center",
-                          marginLeft: "-10px",
-                        }}
-                      >
-                        {/* Page edge shadow */}
-                        <div 
-                          className="absolute left-0 top-0 bottom-0 w-3"
-                          style={{
-                            background: "linear-gradient(to right, rgba(139,69,19,0.15), transparent)",
-                          }}
-                        />
-                        
-                        {/* Page content */}
-                        <div className="relative p-5 h-full flex flex-col">
-                          {/* Header */}
-                          <div className="mb-3">
-                            <div 
-                              className="text-center mb-1"
-                              style={{ 
-                                fontFamily: "var(--font-mono)", 
-                                fontSize: "0.6rem",
-                                color: "#8b7355",
-                                letterSpacing: "0.15em",
-                              }}
-                            >
-                              {rfc.layer.toUpperCase()} LAYER
-                            </div>
-                            <h3 
-                              style={{
-                                fontFamily: "var(--font-display)",
-                                fontSize: "1.1rem",
-                                fontWeight: "bold",
-                                color: "#2d1810",
-                                textAlign: "center",
-                                lineHeight: 1.2,
-                              }}
-                            >
-                              {rfc.name}
-                            </h3>
-                            <div 
-                              className="text-center mt-1"
-                              style={{
-                                fontFamily: "var(--font-display)",
-                                fontSize: "0.7rem",
-                                color: "#5a4030",
-                                fontStyle: "italic",
-                              }}
-                            >
-                              {rfc.title}
-                            </div>
-                          </div>
-                          
-                          {/* Divider */}
-                          <div 
-                            className="mx-auto mb-3"
-                            style={{
-                              width: "60px",
-                              height: "1px",
-                              background: "linear-gradient(90deg, transparent, #8b4513, transparent)",
-                            }}
-                          />
-                          
-                          {/* Description */}
-                          <p 
-                            className="flex-1"
-                            style={{
-                              fontFamily: "var(--font-body)",
-                              fontSize: "0.75rem",
-                              color: "#4a3828",
-                              lineHeight: 1.6,
-                              textAlign: "justify",
-                            }}
-                          >
-                            {rfc.description}
-                          </p>
-                          
-                          {/* Footer with link */}
-                          <div className="mt-auto pt-3">
-                            <div 
-                              className="mx-auto mb-2"
-                              style={{
-                                width: "40px",
-                                height: "1px",
-                                background: "linear-gradient(90deg, transparent, #8b4513, transparent)",
-                              }}
-                            />
-                            <a
-                              href={`/rfc/${rfc.id}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
-                              className="
-                                block w-full text-center py-2 rounded
-                                transition-all duration-300
-                                hover:scale-105
-                              "
-                              style={{
-                                fontFamily: "var(--font-mono)",
-                                fontSize: "0.65rem",
-                                letterSpacing: "0.1em",
-                                color: "#f5e6d3",
-                                background: "linear-gradient(135deg, #4a1c1c 0%, #2d1810 100%)",
-                                boxShadow: "0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
-                                border: "1px solid #8b4513",
-                              }}
-                            >
-                              OPEN EXHIBIT →
-                            </a>
-                          </div>
-                        </div>
-                        
-                        {/* Page curl effect */}
-                        <div 
-                          className="absolute bottom-0 right-0 w-8 h-8"
-                          style={{
-                            background: "linear-gradient(135deg, transparent 50%, rgba(139,69,19,0.1) 50%)",
-                            borderRadius: "0 0 4px 0",
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Book spine edge (3D effect) */}
-                    <div
-                      className="absolute top-0 h-full"
+                    {/* RFC number - vertical */}
+                    <div 
+                      className="absolute left-1/2 -translate-x-1/2 top-1/4"
                       style={{
-                        width: "20px",
-                        left: "-20px",
-                        background: `linear-gradient(to right, ${colors.leather}cc, ${colors.accent})`,
-                        transform: "rotateY(-90deg)",
-                        transformOrigin: "right center",
-                        boxShadow: "inset 0 0 10px rgba(0,0,0,0.5)",
-                      }}
-                    />
-                    
-                    {/* Book pages edge (3D effect) */}
-                    <div
-                      className="absolute left-0 h-full overflow-hidden"
-                      style={{
-                        width: isOpen ? "40px" : "15px",
-                        right: isOpen ? "-40px" : "-15px",
-                        left: "auto",
-                        background: "linear-gradient(to right, #e8d5b7 0%, #f5e6d3 50%, #dcc9a3 100%)",
-                        transform: "rotateY(90deg)",
-                        transformOrigin: "left center",
-                        transition: "width 0.7s ease",
+                        writingMode: "vertical-rl",
+                        textOrientation: "mixed",
+                        color: colors.foil,
+                        fontFamily: "var(--font-display)",
+                        fontSize: "1.4rem",
+                        fontWeight: "bold",
+                        letterSpacing: "0.05em",
+                        textShadow: `0 0 8px ${colors.foil}60, 0 1px 1px rgba(0,0,0,0.5)`,
                       }}
                     >
-                      {/* Page lines */}
-                      {[...Array(8)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="absolute w-full"
-                          style={{
-                            height: "1px",
-                            top: `${12 + i * 10}%`,
-                            background: "rgba(139,69,19,0.1)",
-                          }}
-                        />
-                      ))}
+                      {rfc.id}
                     </div>
                     
-                    {/* Book bottom */}
-                    <div
-                      className="absolute left-0 w-full"
+                    {/* Protocol name - vertical */}
+                    <div 
+                      className="absolute left-1/2 -translate-x-1/2 bottom-8"
                       style={{
-                        height: "20px",
-                        bottom: "-20px",
-                        background: `linear-gradient(to bottom, ${colors.accent}, ${colors.leather})`,
-                        transform: "rotateX(90deg)",
-                        transformOrigin: "top center",
+                        writingMode: "vertical-rl",
+                        textOrientation: "mixed",
+                        color: colors.foil,
+                        fontFamily: "var(--font-display)",
+                        fontSize: "0.75rem",
+                        fontWeight: "600",
+                        letterSpacing: "0.1em",
+                        textShadow: `0 0 6px ${colors.foil}40`,
                       }}
-                    />
+                    >
+                      {rfc.name}
+                    </div>
+                  </div>
+                  
+                  {/* Page edges (right side) */}
+                  <div
+                    className="absolute top-1 bottom-1 overflow-hidden rounded-r-sm"
+                    style={{
+                      width: "12px",
+                      right: "-12px",
+                      background: "linear-gradient(90deg, #d4c4a8 0%, #e8dcc8 30%, #f0e6d2 70%, #e0d4bc 100%)",
+                      transform: "rotateY(90deg)",
+                      transformOrigin: "left center",
+                    }}
+                  >
+                    {[...Array(6)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute w-full"
+                        style={{
+                          height: "1px",
+                          top: `${15 + i * 13}%`,
+                          background: "rgba(139,107,84,0.15)",
+                        }}
+                      />
+                    ))}
                   </div>
                 </div>
                 
                 {/* "Coming Soon" badge */}
-                {!rfc.available && (
+                {!rfc.available && !isOpen && (
                   <div 
-                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap"
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap z-10"
                     style={{
                       fontFamily: "var(--font-mono)",
-                      fontSize: "0.5rem",
-                      letterSpacing: "0.1em",
+                      fontSize: "0.45rem",
+                      letterSpacing: "0.08em",
                       color: "#8b7355",
                       background: "#0a0a0a",
-                      padding: "2px 8px",
+                      padding: "2px 6px",
                       borderRadius: "2px",
                       border: "1px solid #1a1a1a",
                     }}
                   >
-                    COMING SOON
+                    SOON
+                  </div>
+                )}
+                
+                {/* Open book overlay - positioned absolutely on screen */}
+                {isOpen && rfc.available && (
+                  <div
+                    className="fixed inset-0 flex items-center justify-center p-4"
+                    style={{ zIndex: 200 }}
+                    onClick={(e) => {
+                      if (e.target === e.currentTarget) setOpenBook(null);
+                    }}
+                  >
+                    {/* Open book container */}
+                    <div
+                      className="relative"
+                      style={{
+                        perspective: "1500px",
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div
+                        className="flex"
+                        style={{
+                          transformStyle: "preserve-3d",
+                          transform: "rotateX(8deg)",
+                        }}
+                      >
+                        {/* Left page (angled up) */}
+                        <div
+                          className="relative overflow-hidden"
+                          style={{
+                            width: "280px",
+                            height: "360px",
+                            background: "linear-gradient(135deg, #e8dcc8 0%, #f5ebe0 50%, #e0d4bc 100%)",
+                            borderRadius: "4px 0 0 4px",
+                            boxShadow: "-8px 8px 30px rgba(0,0,0,0.4), inset 2px 0 8px rgba(139,107,84,0.1)",
+                            transform: "rotateY(25deg)",
+                            transformOrigin: "right center",
+                          }}
+                        >
+                          {/* Page aging effect */}
+                          <div 
+                            className="absolute inset-0"
+                            style={{
+                              background: "radial-gradient(ellipse at 10% 10%, rgba(139,107,84,0.15) 0%, transparent 50%)",
+                            }}
+                          />
+                          <div 
+                            className="absolute inset-0"
+                            style={{
+                              background: "radial-gradient(ellipse at 90% 90%, rgba(139,107,84,0.1) 0%, transparent 40%)",
+                            }}
+                          />
+                          
+                          {/* Binding shadow */}
+                          <div 
+                            className="absolute right-0 top-0 bottom-0 w-8"
+                            style={{
+                              background: "linear-gradient(to left, rgba(0,0,0,0.15), transparent)",
+                            }}
+                          />
+                          
+                          {/* Content */}
+                          <div className="relative p-8 h-full flex flex-col items-center justify-center text-center">
+                            {/* Decorative header */}
+                            <div 
+                              className="mb-2"
+                              style={{ 
+                                fontFamily: "var(--font-mono)", 
+                                fontSize: "0.55rem",
+                                color: "#8b6b54",
+                                letterSpacing: "0.25em",
+                              }}
+                            >
+                              REQUEST FOR COMMENTS
+                            </div>
+                            
+                            {/* RFC Number */}
+                            <div 
+                              style={{
+                                fontFamily: "var(--font-display)",
+                                fontSize: "4.5rem",
+                                fontWeight: "bold",
+                                color: "#3d2817",
+                                lineHeight: 1,
+                                textShadow: "2px 2px 0 rgba(139,107,84,0.1)",
+                              }}
+                            >
+                              {rfc.id}
+                            </div>
+                            
+                            {/* Decorative line */}
+                            <div 
+                              className="my-4"
+                              style={{
+                                width: "100px",
+                                height: "2px",
+                                background: "linear-gradient(90deg, transparent, #8b6b54, transparent)",
+                              }}
+                            />
+                            
+                            {/* Protocol name */}
+                            <div 
+                              style={{
+                                fontFamily: "var(--font-display)",
+                                fontSize: "1.5rem",
+                                fontWeight: "600",
+                                color: "#4a3525",
+                                letterSpacing: "0.1em",
+                              }}
+                            >
+                              {rfc.name}
+                            </div>
+                            
+                            {/* Year */}
+                            <div 
+                              className="mt-6"
+                              style={{
+                                fontFamily: "var(--font-mono)",
+                                fontSize: "0.7rem",
+                                color: "#8b6b54",
+                                letterSpacing: "0.15em",
+                              }}
+                            >
+                              ESTABLISHED {rfc.year}
+                            </div>
+                            
+                            {/* Decorative ornament */}
+                            <div className="mt-6 flex items-center gap-2">
+                              <div style={{ width: "20px", height: "1px", background: "#8b6b54" }} />
+                              <div style={{ 
+                                width: "8px", 
+                                height: "8px", 
+                                border: "1px solid #8b6b54",
+                                transform: "rotate(45deg)",
+                              }} />
+                              <div style={{ width: "20px", height: "1px", background: "#8b6b54" }} />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Book spine/binding center */}
+                        <div
+                          style={{
+                            width: "20px",
+                            height: "360px",
+                            background: `linear-gradient(90deg, ${colors.spine} 0%, ${colors.leather} 50%, ${colors.spine} 100%)`,
+                            boxShadow: "inset 0 0 10px rgba(0,0,0,0.5)",
+                          }}
+                        />
+                        
+                        {/* Right page (flat/angled down) */}
+                        <div
+                          className="relative overflow-hidden"
+                          style={{
+                            width: "280px",
+                            height: "360px",
+                            background: "linear-gradient(225deg, #f5ebe0 0%, #e8dcc8 50%, #ddd0b8 100%)",
+                            borderRadius: "0 4px 4px 0",
+                            boxShadow: "8px 8px 30px rgba(0,0,0,0.35), inset -2px 0 8px rgba(139,107,84,0.08)",
+                            transform: "rotateY(-15deg) rotateX(-3deg)",
+                            transformOrigin: "left center",
+                          }}
+                        >
+                          {/* Binding shadow */}
+                          <div 
+                            className="absolute left-0 top-0 bottom-0 w-6"
+                            style={{
+                              background: "linear-gradient(to right, rgba(0,0,0,0.12), transparent)",
+                            }}
+                          />
+                          
+                          {/* Content */}
+                          <div className="relative p-8 h-full flex flex-col">
+                            {/* Layer badge */}
+                            <div 
+                              className="self-end mb-4 px-3 py-1 rounded"
+                              style={{
+                                fontFamily: "var(--font-mono)",
+                                fontSize: "0.55rem",
+                                letterSpacing: "0.15em",
+                                color: "#6b5040",
+                                background: "rgba(139,107,84,0.1)",
+                                border: "1px solid rgba(139,107,84,0.2)",
+                              }}
+                            >
+                              {rfc.layer.toUpperCase()} LAYER
+                            </div>
+                            
+                            {/* Title */}
+                            <h3 
+                              style={{
+                                fontFamily: "var(--font-display)",
+                                fontSize: "1.4rem",
+                                fontWeight: "bold",
+                                color: "#2d1810",
+                                lineHeight: 1.3,
+                                marginBottom: "0.5rem",
+                              }}
+                            >
+                              {rfc.title}
+                            </h3>
+                            
+                            {/* Divider */}
+                            <div 
+                              className="my-4"
+                              style={{
+                                width: "60px",
+                                height: "1px",
+                                background: "#8b6b54",
+                              }}
+                            />
+                            
+                            {/* Description */}
+                            <p 
+                              className="flex-1"
+                              style={{
+                                fontFamily: "var(--font-body)",
+                                fontSize: "0.95rem",
+                                color: "#4a3828",
+                                lineHeight: 1.7,
+                              }}
+                            >
+                              {rfc.description}
+                            </p>
+                            
+                            {/* Footer */}
+                            <div className="mt-auto pt-4">
+                              {/* Decorative line */}
+                              <div 
+                                className="mb-4 mx-auto"
+                                style={{
+                                  width: "40px",
+                                  height: "1px",
+                                  background: "linear-gradient(90deg, transparent, #8b6b54, transparent)",
+                                }}
+                              />
+                              
+                              {/* Link to RFC page */}
+                              <a
+                                href={`/rfc/${rfc.id}`}
+                                className="
+                                  block w-full text-center py-3 rounded
+                                  transition-all duration-300
+                                  hover:scale-[1.02] hover:shadow-lg
+                                "
+                                style={{
+                                  fontFamily: "var(--font-mono)",
+                                  fontSize: "0.7rem",
+                                  letterSpacing: "0.12em",
+                                  color: "#f5e6d3",
+                                  background: `linear-gradient(135deg, ${colors.leather} 0%, ${colors.spine} 100%)`,
+                                  boxShadow: "0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
+                                  border: `1px solid ${colors.foil}60`,
+                                }}
+                              >
+                                OPEN EXHIBIT →
+                              </a>
+                            </div>
+                          </div>
+                          
+                          {/* Page curl hint */}
+                          <div 
+                            className="absolute bottom-0 right-0 w-12 h-12"
+                            style={{
+                              background: "linear-gradient(135deg, transparent 50%, rgba(139,107,84,0.08) 50%)",
+                            }}
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Close hint */}
+                      <div 
+                        className="text-center mt-6"
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: "0.6rem",
+                          color: "#8b7355",
+                          letterSpacing: "0.1em",
+                        }}
+                      >
+                        CLICK OUTSIDE TO CLOSE
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -486,20 +509,33 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
         
         {/* Wooden shelf */}
         <div 
-          className="absolute bottom-0 left-0 right-0 h-4 rounded-b"
+          className="absolute bottom-0 left-0 right-0 h-3 rounded-b"
           style={{
-            background: "linear-gradient(to bottom, #3d2817 0%, #2a1a0f 50%, #1a0f08 100%)",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,199,31,0.05)",
+            background: "linear-gradient(to bottom, #4a3020 0%, #2a1a10 50%, #1a0f08 100%)",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,200,100,0.05)",
+          }}
+        />
+        
+        {/* Shelf front edge */}
+        <div 
+          className="absolute -bottom-2 left-0 right-0 h-2"
+          style={{
+            background: "linear-gradient(to bottom, #3a2515 0%, #2a1a0f 100%)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
           }}
         />
       </div>
       
-      {/* Click outside to close */}
+      {/* Background overlay when book is open */}
       {openBook && (
         <div 
-          className="fixed inset-0 z-50" 
+          className="fixed inset-0" 
           onClick={() => setOpenBook(null)}
-          style={{ background: "rgba(0,0,0,0.3)" }}
+          style={{ 
+            background: "rgba(0,0,0,0.7)",
+            backdropFilter: "blur(4px)",
+            zIndex: 150,
+          }}
         />
       )}
     </section>
