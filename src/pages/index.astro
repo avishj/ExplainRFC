@@ -6,8 +6,8 @@ import { VaultDrawers } from "@/components/home/VaultDrawers";
 
 <Layout title="Explain RFC — The Protocol Visualization Museum">
   <main class="min-h-screen bg-obsidian">
-    <!-- Hero Section - The Casting Chamber -->
-    <FoundryHero client:load onEnterExhibit={(id) => window.location.href = `/rfc/${id}`} />
+    <!-- Hero Section -->
+    <FoundryHero client:load />
     
     <!-- Exhibits Section - The Vault -->
     <VaultDrawers client:visible onSelectRFC={(id) => window.location.href = `/rfc/${id}`} />

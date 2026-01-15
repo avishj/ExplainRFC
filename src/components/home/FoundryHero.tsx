@@ -2,20 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { gsap } from "gsap";
 
-interface FoundryHeroProps {
-  onEnterExhibit: (rfcId: number) => void;
-}
-
-export function FoundryHero({ onEnterExhibit }: FoundryHeroProps) {
+export function FoundryHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [activeProtocol, setActiveProtocol] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  
-  const protocols = [
-    { id: 793, name: "TCP", subtitle: "Transmission Control Protocol" },
-    { id: 1035, name: "DNS", subtitle: "Domain Name System" },
-    { id: 8446, name: "TLS", subtitle: "Transport Layer Security" },
-  ];
   
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -317,7 +306,7 @@ export function FoundryHero({ onEnterExhibit }: FoundryHeroProps) {
             ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
           `}
         >
-          <p className="museum-label mb-4 text-amber">Est. 1969 — Protocol Archives</p>
+          <p className="museum-label mb-4 text-amber">2026 · Learn the Internet's Foundations</p>
           
           <h1 className="font-display text-6xl md:text-8xl font-bold tracking-tight text-text-bright mb-4">
             <span className="text-glow-gold">EXPLAIN</span>
@@ -326,70 +315,27 @@ export function FoundryHero({ onEnterExhibit }: FoundryHeroProps) {
           
           <div className="incised w-48 mx-auto my-6" />
           
-          <p className="font-display text-xl md:text-2xl text-text-secondary italic">
-            A protocol visualization museum
+          <p className="font-display text-xl md:text-2xl text-text-secondary">
+            Understand IETF RFCs through interactive visualizations
           </p>
         </div>
         
-        {/* Protocol selector */}
-        <div 
+        {/* Scroll prompt */}
+        <a
+          href="#vault"
           className={`
-            flex justify-center gap-4 mb-12
+            group inline-flex flex-col items-center gap-3
             transition-all duration-1000 delay-300
             ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
           `}
         >
-          {protocols.map((protocol, i) => (
-            <button
-              key={protocol.id}
-              onClick={() => setActiveProtocol(i)}
-              className={`
-                relative px-6 py-3 font-mono text-sm tracking-wider uppercase
-                transition-all duration-300
-                ${activeProtocol === i 
-                  ? "text-gold text-glow-ember" 
-                  : "text-text-muted hover:text-text-secondary"
-                }
-              `}
-            >
-              <span className="relative z-10">{protocol.name}</span>
-              {activeProtocol === i && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber to-transparent" />
-              )}
-            </button>
-          ))}
-        </div>
-        
-        {/* Enter exhibit CTA */}
-        <button
-          onClick={() => onEnterExhibit(protocols[activeProtocol].id)}
-          className={`
-            group relative inline-flex items-center gap-4 px-10 py-5
-            metal-plate hover:glow-molten
-            transition-all duration-500
-            ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
-          `}
-          style={{ transitionDelay: "600ms" }}
-        >
-          {/* Decorative brackets */}
-          <span className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-brass opacity-50" />
-          <span className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-brass opacity-50" />
-          <span className="absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-brass opacity-50" />
-          <span className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-brass opacity-50" />
-          
-          <span className="font-display text-xl text-text-bright group-hover:text-gold transition-colors">
-            Enter the {protocols[activeProtocol].name} Exhibit
+          <span className="font-mono text-sm text-text-muted group-hover:text-gold transition-colors">
+            Explore Popular RFCs
           </span>
-          
-          <svg 
-            className="w-6 h-6 text-amber group-hover:text-gold group-hover:translate-x-1 transition-all" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </button>
+          <div className="w-8 h-12 rounded-full border-2 border-patina group-hover:border-gold transition-colors flex items-start justify-center p-2">
+            <div className="w-1.5 h-3 bg-amber rounded-full animate-bounce" />
+          </div>
+        </a>
       </div>
       
       {/* Bottom decorative line */}
