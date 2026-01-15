@@ -1,0 +1,133 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { FoundryHero } from "@/components/home/FoundryHero";
+import { VaultDrawers } from "@/components/home/VaultDrawers";
+import { RFCSearch } from "@/components/home/RFCSearch";
+---
+
+<Layout title="Explain RFC — The Protocol Visualization Museum">
+  <main class="min-h-screen bg-obsidian">
+    <!-- Hero Section -->
+    <FoundryHero client:load />
+    
+    <!-- Search Section -->
+    <section id="vault" class="pt-24 pb-8 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-8">
+          <p class="museum-label text-amber mb-3">Search the Archive</p>
+          <h2 class="font-display text-4xl md:text-5xl font-bold text-text-bright mb-4">
+            Find an <span class="text-gold">RFC</span>
+          </h2>
+          <p class="text-text-secondary max-w-xl mx-auto mb-8">
+            Search by RFC number, protocol name, or topic to find what you're looking for.
+          </p>
+        </div>
+        <RFCSearch client:visible onSelectRFC={(id) => window.location.href = `/rfc/${id}`} />
+      </div>
+    </section>
+    
+    <!-- Featured RFCs Section -->
+    <VaultDrawers client:visible onSelectRFC={(id) => window.location.href = `/rfc/${id}`} />
+    
+    <!-- About Section -->
+    <section class="py-32 px-6 relative">
+      <div class="max-w-4xl mx-auto">
+        <!-- Ornate divider -->
+        <div class="flex items-center justify-center gap-4 mb-16">
+          <div class="w-16 h-px bg-gradient-to-r from-transparent to-patina" />
+          <div class="w-3 h-3 rotate-45 border border-brass" />
+          <div class="w-32 h-px bg-patina" />
+          <div class="w-3 h-3 rotate-45 border border-brass" />
+          <div class="w-16 h-px bg-gradient-to-l from-transparent to-patina" />
+        </div>
+        
+        <div class="text-center mb-16">
+          <p class="museum-label text-amber mb-4">About the Museum</p>
+          <h2 class="font-display text-4xl md:text-5xl font-bold text-text-bright mb-8">
+            Forging <span class="text-gold">Understanding</span>
+          </h2>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-12">
+          <!-- Left column -->
+          <div class="space-y-6">
+            <p class="text-text-secondary leading-relaxed">
+              The internet runs on invisible protocols. Intricate systems of handshakes, 
+              packets, and state machines orchestrate every connection you make. These 
+              systems are beautiful, but their beauty is buried in dense specifications.
+            </p>
+            <p class="text-text-secondary leading-relaxed">
+              Each RFC in our collection has been <span class="text-brass">transformed into a living exhibit</span>. 
+              Watch packets flow, pause mid-handshake, and explore the machinery that 
+              powers the modern web.
+            </p>
+          </div>
+          
+          <!-- Right column - stats -->
+          <div class="grid grid-cols-2 gap-6">
+            <div class="metal-plate p-6 rounded-lg text-center">
+              <div class="font-display text-4xl font-bold text-gold mb-2">1</div>
+              <div class="museum-label text-text-muted">Exhibit Live</div>
+            </div>
+            <div class="metal-plate p-6 rounded-lg text-center">
+              <div class="font-display text-4xl font-bold text-amber mb-2">5+</div>
+              <div class="museum-label text-text-muted">In Progress</div>
+            </div>
+            <div class="metal-plate p-6 rounded-lg text-center">
+              <div class="font-display text-4xl font-bold text-ember mb-2">9000+</div>
+              <div class="museum-label text-text-muted">RFCs to Explore</div>
+            </div>
+            <div class="metal-plate p-6 rounded-lg text-center">
+              <div class="font-display text-4xl font-bold text-brass mb-2">∞</div>
+              <div class="museum-label text-text-muted">Curiosity</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-carbon">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded border border-brass flex items-center justify-center">
+              <span class="font-mono font-bold text-gold text-sm">RF</span>
+            </div>
+            <div>
+              <span class="font-display text-lg text-text-bright">Explain RFC</span>
+              <p class="text-xs text-text-muted">A Protocol Visualization Museum</p>
+            </div>
+          </div>
+          
+          <!-- Links -->
+          <div class="flex items-center gap-8">
+            <a href="https://github.com/avishj/ExplainRFC" class="text-text-secondary hover:text-gold transition-colors text-sm">
+              GitHub
+            </a>
+            <a href="https://www.ietf.org/standards/rfcs/" class="text-text-secondary hover:text-gold transition-colors text-sm">
+              IETF RFC Editor
+            </a>
+          </div>
+          
+          <!-- Credits -->
+          <div class="text-center md:text-right">
+            <p class="text-sm text-text-secondary">
+              Made with <span class="inline-block animate-heartbeat text-ember">&#10084;</span> by <a href="https://github.com/avishj" class="text-brass hover:text-gold transition-colors">Avish J</a>
+            </p>
+            <p class="text-xs text-text-muted mt-1">
+              Making the internet's blueprints beautiful.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </main>
+</Layout>
+
+<style>
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+</style>

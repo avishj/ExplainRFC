@@ -1,0 +1,297 @@
+@import "tailwindcss";
+
+@theme {
+  /* === The Obsidian Foundry — Color System === */
+  
+  /* Base: Pure obsidian blacks */
+  --color-obsidian: #000000;
+  --color-void: #050505;
+  --color-slate: #0a0a0a;
+  --color-stone: #111111;
+  --color-carbon: #1a1a1a;
+  
+  /* Accent: Molten amber/ochre spectrum */
+  --color-ember: #ff6b00;
+  --color-molten: #ff8c00;
+  --color-amber: #ffaa00;
+  --color-gold: #ffc71f;
+  --color-brass: #d4a44c;
+  --color-patina: #8b7355;
+  
+  /* Text hierarchy */
+  --color-text-bright: #fff8e7;
+  --color-text-primary: #e8dcc8;
+  --color-text-secondary: #a89880;
+  --color-text-muted: #5c5347;
+  
+  /* Semantic */
+  --color-heat: #ff4400;
+  --color-cool: #4a90a4;
+  
+  /* Typography */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  
+  /* Timing */
+  --ease-foundry: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-mechanical: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* === Global Reset & Base === */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-obsidian);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* === Stone Grain Texture === */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* === Selection === */
+::selection {
+  background: var(--color-amber);
+  color: var(--color-obsidian);
+}
+
+/* === Custom Scrollbar === */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-void);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-patina);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brass);
+}
+
+/* === Foundry Effects === */
+
+/* Molten glow */
+.glow-molten {
+  box-shadow: 
+    0 0 20px rgba(255, 140, 0, 0.4),
+    0 0 40px rgba(255, 107, 0, 0.2),
+    0 0 60px rgba(255, 68, 0, 0.1);
+}
+
+.glow-ember {
+  box-shadow: 
+    0 0 10px rgba(255, 107, 0, 0.5),
+    0 0 20px rgba(255, 68, 0, 0.3);
+}
+
+/* Text heat glow */
+.text-glow-gold {
+  text-shadow: 
+    0 0 10px rgba(255, 199, 31, 0.5),
+    0 0 20px rgba(255, 170, 0, 0.3),
+    0 0 40px rgba(255, 140, 0, 0.2);
+}
+
+.text-glow-ember {
+  text-shadow: 
+    0 0 20px rgba(255, 107, 0, 0.8),
+    0 0 40px rgba(255, 68, 0, 0.5);
+}
+
+/* Engraved effect */
+.engraved {
+  background: linear-gradient(135deg, var(--color-carbon) 0%, var(--color-void) 100%);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.8),
+    inset -1px -1px 2px rgba(255, 199, 31, 0.05);
+}
+
+/* Gilded surface */
+.gilded {
+  background: linear-gradient(
+    135deg,
+    var(--color-brass) 0%,
+    var(--color-gold) 25%,
+    var(--color-amber) 50%,
+    var(--color-gold) 75%,
+    var(--color-brass) 100%
+  );
+  background-size: 200% 200%;
+}
+
+/* Metal plate */
+.metal-plate {
+  background: linear-gradient(
+    180deg,
+    rgba(26, 26, 26, 1) 0%,
+    rgba(17, 17, 17, 1) 50%,
+    rgba(10, 10, 10, 1) 100%
+  );
+  border: 1px solid var(--color-carbon);
+  box-shadow:
+    0 1px 0 rgba(255, 199, 31, 0.05),
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+/* Incised line */
+.incised {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-amber) 50%,
+    transparent 100%
+  );
+  height: 1px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* === Animations === */
+
+@keyframes pour {
+  0% { 
+    clip-path: inset(0 100% 0 0);
+    filter: brightness(2);
+  }
+  100% { 
+    clip-path: inset(0 0 0 0);
+    filter: brightness(1);
+  }
+}
+
+@keyframes heat-pulse {
+  0%, 100% { 
+    filter: brightness(1);
+    text-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
+  }
+  50% { 
+    filter: brightness(1.2);
+    text-shadow: 0 0 20px rgba(255, 170, 0, 0.6);
+  }
+}
+
+@keyframes glint {
+  0% { 
+    background-position: -200% center;
+  }
+  100% { 
+    background-position: 200% center;
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(0.5deg); }
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@keyframes mechanical-settle {
+  0% { transform: translateY(-5px); opacity: 0; }
+  60% { transform: translateY(2px); }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-pour {
+  animation: pour 1.5s var(--ease-foundry) forwards;
+}
+
+.animate-heat-pulse {
+  animation: heat-pulse 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.animate-glint {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 199, 31, 0.4) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: glint 3s ease-in-out infinite;
+}
+
+.animate-settle {
+  animation: mechanical-settle 0.6s var(--ease-mechanical) forwards;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  10% { transform: scale(1.15); }
+  20% { transform: scale(1); }
+  30% { transform: scale(1.1); }
+  40% { transform: scale(1); }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+/* === Utility Classes === */
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Stamp/emboss effect for text */
+.stamped {
+  text-shadow: 
+    1px 1px 0 rgba(0, 0, 0, 0.8),
+    -0.5px -0.5px 0 rgba(255, 199, 31, 0.1);
+}
+
+/* Museum label style */
+.museum-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}

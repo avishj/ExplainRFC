@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Explain RFC
+
+> *A museum of invisible systems.*
+
+Interactive, beautifully crafted visualizations that explain how the internet works. Each RFC becomes an explorable exhibit — not just documentation, but an experience.
+
+![Explain RFC](https://img.shields.io/badge/RFC-Visualized-00f5d4?style=for-the-badge)
+
+## Features
+
+- **Interactive 3D Visualizations** — Watch protocols come alive with Three.js animations
+- **Step-by-Step Walkthroughs** — Guided narration explains each concept
+- **Instrument Panels** — Packet inspector, state machine viewer, glossary
+- **Dark/Light Mode** — Beautiful in any lighting
+- **Fully Static** — No server required, deploys anywhere
+
+## Tech Stack
+
+- [Astro](https://astro.build) — Static site generation
+- [React](https://react.dev) — Interactive islands
+- [Three.js](https://threejs.org) — 3D visualizations
+- [GSAP](https://gsap.com) — Smooth animations
+- [Tailwind CSS](https://tailwindcss.com) — Styling
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+├── components/
+│   ├── exhibit/       # Exhibit player components
+│   ├── three/         # Three.js components
+│   └── ui/            # Reusable UI components
+├── data/
+│   └── rfcs/          # RFC content and storyboards
+├── layouts/           # Page layouts
+├── lib/               # Utilities
+├── pages/             # Routes
+├── scenes/            # Three.js scene modules
+├── styles/            # Global styles
+└── types/             # TypeScript types
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Adding a New RFC
 
-## Learn More
+1. Create a new folder in `src/data/rfcs/<rfc-id>/`
+2. Add a `data.ts` file with RFC metadata and storyboard
+3. Create a scene module in `src/scenes/<rfc-id>/`
+4. Add the route in `src/pages/rfc/[id].astro`
 
-To learn more about Next.js, take a look at the following resources:
+See `src/data/rfcs/793-tcp/data.ts` for an example.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This is a fully static site. Deploy to any static hosting:
 
-## Deploy on Vercel
+```bash
+npm run build
+# Upload the `dist/` folder
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+AGPL 3.0
