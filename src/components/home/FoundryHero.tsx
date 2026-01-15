@@ -1,22 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { gsap } from "gsap";
+
+const PROTOCOL_TAGS: { name: string; rfc: number }[] = [
+  { name: "TCP", rfc: 793 },
+  { name: "IP", rfc: 791 },
+  { name: "DNS", rfc: 1035 },
+  { name: "TLS 1.3", rfc: 8446 },
+  { name: "UDP", rfc: 768 },
+  { name: "HTTP/1.1", rfc: 2616 },
+  { name: "HTTP/2", rfc: 7540 },
+  { name: "QUIC", rfc: 9000 },
+];
 
 export function FoundryHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
     
     // Scene setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
     camera.position.set(0, 0, 5);
     
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
     
@@ -178,34 +193,84 @@ export function FoundryHero() {
       scene.add(bracket2);
     });
     
-    // Floating RFC number cubes (instead of generic particles)
-    const floatingRFCs = [793, 791, 1035, 8446, 768, 2616, 7540, 9000];
-    const rfcCubes: THREE.Mesh[] = [];
+    // Floating protocol tags with text sprites
+    const tagGroups: THREE.Group[] = [];
     
-    floatingRFCs.forEach((rfcNum, i) => {
-      const cubeGeometry = new THREE.BoxGeometry(0.4, 0.25, 0.05);
-      const cubeMaterial = new THREE.MeshStandardMaterial({
-        color: 0x1a1a1a,
-        roughness: 0.5,
-        metalness: 0.8,
+    const createTextSprite = (text: string, opacity: number) => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d")!;
+      canvas.width = 256;
+      canvas.height = 64;
+      
+      ctx.fillStyle = `rgba(212, 164, 76, ${opacity})`;
+      ctx.font = "bold 28px 'JetBrains Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, 128, 32);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      
+      const spriteMaterial = new THREE.SpriteMaterial({
+        map: texture,
         transparent: true,
-        opacity: 0.3 + Math.random() * 0.2,
+        depthWrite: false,
       });
-      const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
       
-      // Position in a loose orbit
-      const angle = (i / floatingRFCs.length) * Math.PI * 2;
-      const radius = 2.5 + Math.random() * 1.5;
-      cube.position.set(
+      const sprite = new THREE.Sprite(spriteMaterial);
+      sprite.scale.set(1.2, 0.3, 1);
+      return sprite;
+    };
+    
+    PROTOCOL_TAGS.forEach((tag, i) => {
+      const group = new THREE.Group();
+      
+      // Background plate
+      const plateGeometry = new THREE.BoxGeometry(0.8, 0.3, 0.02);
+      const plateMaterial = new THREE.MeshStandardMaterial({
+        color: 0x0a0a0a,
+        roughness: 0.4,
+        metalness: 0.9,
+        transparent: true,
+        opacity: 0.6 + Math.random() * 0.2,
+      });
+      const plate = new THREE.Mesh(plateGeometry, plateMaterial);
+      group.add(plate);
+      
+      // Border frame
+      const borderGeometry = new THREE.EdgesGeometry(plateGeometry);
+      const borderMaterial = new THREE.LineBasicMaterial({
+        color: 0xd4a44c,
+        transparent: true,
+        opacity: 0.4 + Math.random() * 0.2,
+      });
+      const border = new THREE.LineSegments(borderGeometry, borderMaterial);
+      group.add(border);
+      
+      // Text sprite
+      const opacity = 0.5 + Math.random() * 0.3;
+      const textSprite = createTextSprite(tag.name, opacity);
+      textSprite.position.z = 0.02;
+      group.add(textSprite);
+      
+      // Position in orbit
+      const angle = (i / PROTOCOL_TAGS.length) * Math.PI * 2;
+      const radius = 2.2 + Math.random() * 0.8;
+      group.position.set(
         Math.cos(angle) * radius,
-        (Math.random() - 0.5) * 3,
-        Math.sin(angle) * radius - 2
+        (Math.random() - 0.5) * 2.5,
+        Math.sin(angle) * radius * 0.5 - 1.5
       );
-      cube.rotation.y = angle;
-      cube.userData = { angle, radius, speed: 0.1 + Math.random() * 0.1, yOffset: cube.position.y };
+      group.userData = { 
+        angle, 
+        radius, 
+        speed: 0.08 + Math.random() * 0.06, 
+        yOffset: group.position.y,
+        floatPhase: Math.random() * Math.PI * 2
+      };
       
-      scene.add(cube);
-      rfcCubes.push(cube);
+      scene.add(group);
+      tagGroups.push(group);
     });
     
     // Animation
@@ -249,14 +314,15 @@ export function FoundryHero() {
         mat.emissiveIntensity = 0.8 + Math.sin(elapsed * 5 + i) * 0.2;
       });
       
-      // Animate floating RFC cubes
-      rfcCubes.forEach((cube) => {
-        const { angle, radius, speed, yOffset } = cube.userData;
+      // Animate floating protocol tags
+      tagGroups.forEach((group) => {
+        const { angle, radius, speed, yOffset, floatPhase } = group.userData;
         const newAngle = angle + elapsed * speed * 0.1;
-        cube.position.x = Math.cos(newAngle) * radius;
-        cube.position.z = Math.sin(newAngle) * radius - 2;
-        cube.position.y = yOffset + Math.sin(elapsed * speed * 2) * 0.3;
-        cube.rotation.y = newAngle + Math.PI;
+        group.position.x = Math.cos(newAngle) * radius;
+        group.position.z = Math.sin(newAngle) * radius * 0.5 - 1.5;
+        group.position.y = yOffset + Math.sin(elapsed * speed * 2 + floatPhase) * 0.2;
+        // Face the camera
+        group.lookAt(camera.position);
       });
       
       // Light flickering (like fire)
@@ -268,8 +334,8 @@ export function FoundryHero() {
     
     // Handle resize
     const handleResize = () => {
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
@@ -294,38 +360,44 @@ export function FoundryHero() {
   }, []);
   
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* 3D Canvas */}
-      <canvas 
-        ref={canvasRef} 
-        className="absolute inset-0 w-full h-full"
-      />
-      
-      {/* Content overlay */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-        {/* Museum plaque - title */}
+    <section className="relative min-h-screen flex flex-col overflow-hidden">
+      {/* Top section with title */}
+      <div className="relative z-10 pt-16 md:pt-24 px-6 text-center">
         <div 
           className={`
-            metal-plate inline-block px-12 py-8 mb-8
+            metal-plate inline-block px-8 md:px-12 py-6 md:py-8
             transition-all duration-1000 ease-out
             ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
           `}
         >
           <p className="museum-label mb-4 text-amber">2026 · Learn the Internet's Foundations</p>
           
-          <h1 className="font-display text-6xl md:text-8xl font-bold tracking-tight text-text-bright mb-4">
+          <h1 className="font-display text-5xl sm:text-6xl md:text-8xl font-bold tracking-tight text-text-bright mb-4">
             <span className="text-glow-gold">EXPLAIN</span>
             <span className="block text-gold">RFC</span>
           </h1>
           
-          <div className="incised w-48 mx-auto my-6" />
+          <div className="incised w-32 md:w-48 mx-auto my-4 md:my-6" />
           
-          <p className="font-display text-xl md:text-2xl text-text-secondary">
+          <p className="font-display text-lg md:text-2xl text-text-secondary">
             Understand IETF RFCs through interactive visualizations
           </p>
         </div>
-        
-        {/* Scroll prompt */}
+      </div>
+      
+      {/* 3D Canvas - centered in remaining space */}
+      <div 
+        ref={containerRef}
+        className="relative flex-1 min-h-[400px] md:min-h-[500px]"
+      >
+        <canvas 
+          ref={canvasRef} 
+          className="absolute inset-0 w-full h-full"
+        />
+      </div>
+      
+      {/* Scroll prompt - at the bottom */}
+      <div className="relative z-10 pb-12 text-center">
         <a
           href="#vault"
           className={`
