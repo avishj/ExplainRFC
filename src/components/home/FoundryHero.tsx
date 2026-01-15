@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
-import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { gsap } from "gsap";
 
 const PROTOCOL_TAGS: { name: string; rfc: number }[] = [
