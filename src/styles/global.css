@@ -257,6 +257,30 @@ body::before {
   animation: heartbeat 1.5s ease-in-out infinite;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bookOpen {
+  0% { 
+    opacity: 0;
+    transform: scale(0.8) rotateX(20deg) translateY(40px);
+  }
+  100% { 
+    opacity: 1;
+    transform: scale(1) rotateX(0deg) translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-bookOpen {
+  animation: bookOpen 0.6s var(--ease-foundry) forwards;
+}
+
 /* === Utility Classes === */
 
 .font-display {

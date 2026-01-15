@@ -222,7 +222,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                 {/* Open book overlay - positioned absolutely on screen */}
                 {isOpen && rfc.available && (
                   <div
-                    className="fixed inset-0 flex items-center justify-center p-4"
+                    className="fixed inset-0 flex items-center justify-center p-4 animate-fadeIn"
                     style={{ zIndex: 200 }}
                     onClick={(e) => {
                       if (e.target === e.currentTarget) setOpenBook(null);
@@ -230,7 +230,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                   >
                     {/* Open book container */}
                     <div
-                      className="relative"
+                      className="relative animate-bookOpen"
                       style={{
                         perspective: "1500px",
                       }}
