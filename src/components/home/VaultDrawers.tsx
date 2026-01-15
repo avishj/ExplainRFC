@@ -138,7 +138,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                       bg-gradient-to-r from-stone to-carbon
                       border border-l-0 border-patina/30
                       shadow-[4px_4px_20px_rgba(0,0,0,0.5)]
-                      animate-settle
+                      animate-settle z-30
                     "
                     style={{
                       transformOrigin: "left center",
