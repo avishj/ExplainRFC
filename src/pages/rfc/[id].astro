@@ -1,0 +1,34 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { ExhibitPlayer } from "@/components/exhibit/ExhibitPlayer";
+import { rfcData, storyboard } from "@/data/rfcs/793-tcp/data";
+
+export function getStaticPaths() {
+  return [
+    { params: { id: "793" } },
+  ];
+}
+
+const { id } = Astro.params;
+
+// In a full implementation, this would look up the RFC by ID
+const rfc = rfcData;
+const steps = storyboard;
+
+const title = `RFC ${rfc.id}: ${rfc.shortTitle} — Explain RFC`;
+const description = rfc.description;
+---
+
+<Layout title={title} description={description}>
+  <ExhibitPlayer 
+    client:load 
+    rfc={rfc} 
+    storyboard={steps} 
+  />
+</Layout>
+
+<style>
+  :global(body) {
+    overflow: hidden;
+  }
+</style>

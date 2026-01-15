@@ -1,0 +1,206 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { Header } from "@/components/ui/Header";
+import { rfcData } from "@/data/rfcs/793-tcp/data";
+
+const featuredRFCs = [rfcData];
+---
+
+<Layout title="Explain RFC — A Museum of Invisible Systems">
+  <Header client:load />
+  
+  <main class="min-h-screen pt-16">
+    <!-- Hero Section -->
+    <section class="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+      <!-- Background grid -->
+      <div class="absolute inset-0 blueprint-grid opacity-50"></div>
+      
+      <!-- Gradient orbs -->
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan/20 rounded-full blur-[100px] animate-pulse-glow"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet/20 rounded-full blur-[100px] animate-pulse-glow" style="animation-delay: 1s;"></div>
+      
+      <!-- Content -->
+      <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+        <h1 class="font-display text-5xl md:text-7xl font-bold mb-6">
+          <span class="gradient-text">Explain RFC</span>
+        </h1>
+        
+        <p class="text-xl md:text-2xl text-text-secondary mb-4">
+          A museum of invisible systems
+        </p>
+        
+        <p class="text-lg text-text-muted max-w-2xl mx-auto mb-12">
+          Discover how the internet works through interactive, beautifully crafted visualizations. 
+          Each RFC becomes an explorable exhibit — not just documentation, but an experience.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a 
+            href="/rfc/793"
+            class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-cyan text-void font-semibold text-lg hover:bg-cyan/90 transition-all glow-cyan"
+          >
+            <span>Explore TCP Handshake</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          
+          <a 
+            href="#exhibits"
+            class="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-border text-text-primary font-medium text-lg hover:bg-white/5 transition-all"
+          >
+            View All Exhibits
+          </a>
+        </div>
+      </div>
+      
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-float">
+        <div class="w-6 h-10 rounded-full border-2 border-text-muted flex items-start justify-center p-2">
+          <div class="w-1 h-2 bg-text-muted rounded-full animate-pulse"></div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Featured Exhibits -->
+    <section id="exhibits" class="py-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="font-display text-3xl md:text-4xl font-bold mb-4">
+            Featured Exhibits
+          </h2>
+          <p class="text-text-secondary max-w-xl mx-auto">
+            Each exhibit is a carefully crafted journey through a protocol specification. 
+            Interactive, visual, and designed for understanding.
+          </p>
+        </div>
+        
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {featuredRFCs.map((rfc) => (
+            <a 
+              href={`/rfc/${rfc.id}`}
+              class="group relative glass rounded-2xl p-6 hover:border-cyan/50 transition-all duration-300"
+            >
+              <!-- Accent gradient -->
+              <div 
+                class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={`background: linear-gradient(135deg, ${rfc.accentColors[0]}10, ${rfc.accentColors[1]}10);`}
+              ></div>
+              
+              <div class="relative">
+                <!-- RFC Number badge -->
+                <div 
+                  class="inline-flex items-center justify-center w-14 h-14 rounded-xl font-mono font-bold text-lg mb-4"
+                  style={`background: linear-gradient(135deg, ${rfc.accentColors[0]}, ${rfc.accentColors[1]});`}
+                >
+                  {rfc.id}
+                </div>
+                
+                <h3 class="font-display text-xl font-semibold mb-2 text-text-primary group-hover:text-cyan transition-colors">
+                  {rfc.shortTitle}
+                </h3>
+                
+                <p class="text-sm text-text-secondary mb-4">
+                  {rfc.title}
+                </p>
+                
+                <p class="text-sm text-text-muted mb-4">
+                  {rfc.description}
+                </p>
+                
+                <div class="flex items-center gap-4 text-xs text-text-muted">
+                  <span class="flex items-center gap-1">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 6v6l4 2"/>
+                    </svg>
+                    {rfc.estimatedMinutes} min
+                  </span>
+                  <span class="px-2 py-0.5 rounded-full bg-surface text-text-secondary capitalize">
+                    {rfc.difficulty}
+                  </span>
+                </div>
+              </div>
+            </a>
+          ))}
+          
+          <!-- Coming Soon cards -->
+          <div class="glass rounded-2xl p-6 opacity-50">
+            <div class="w-14 h-14 rounded-xl bg-surface mb-4 flex items-center justify-center">
+              <span class="text-text-muted">?</span>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-2 text-text-secondary">
+              DNS
+            </h3>
+            <p class="text-sm text-text-muted">
+              Coming soon...
+            </p>
+          </div>
+          
+          <div class="glass rounded-2xl p-6 opacity-50">
+            <div class="w-14 h-14 rounded-xl bg-surface mb-4 flex items-center justify-center">
+              <span class="text-text-muted">?</span>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-2 text-text-secondary">
+              TLS 1.3
+            </h3>
+            <p class="text-sm text-text-muted">
+              Coming soon...
+            </p>
+          </div>
+          
+          <div class="glass rounded-2xl p-6 opacity-50">
+            <div class="w-14 h-14 rounded-xl bg-surface mb-4 flex items-center justify-center">
+              <span class="text-text-muted">?</span>
+            </div>
+            <h3 class="font-display text-xl font-semibold mb-2 text-text-secondary">
+              HTTP/2
+            </h3>
+            <p class="text-sm text-text-muted">
+              Coming soon...
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Stats section -->
+    <section class="py-24 px-6 border-t border-border">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="grid grid-cols-3 gap-8">
+          <div>
+            <div class="font-display text-4xl md:text-5xl font-bold gradient-text mb-2">1</div>
+            <div class="text-text-secondary">RFC Explained</div>
+          </div>
+          <div>
+            <div class="font-display text-4xl md:text-5xl font-bold gradient-text mb-2">8</div>
+            <div class="text-text-secondary">Interactive Steps</div>
+          </div>
+          <div>
+            <div class="font-display text-4xl md:text-5xl font-bold gradient-text mb-2">∞</div>
+            <div class="text-text-secondary">Curiosity Welcomed</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-8 px-6 border-t border-border">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-text-muted">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded bg-gradient-to-br from-cyan to-violet flex items-center justify-center">
+            <span class="font-mono font-bold text-void text-xs">RF</span>
+          </div>
+          <span>Explain RFC</span>
+        </div>
+        
+        <p>Making the internet's blueprints beautiful and accessible.</p>
+        
+        <div class="flex items-center gap-4">
+          <a href="https://github.com" class="hover:text-cyan transition-colors">GitHub</a>
+          <a href="https://ietf.org" class="hover:text-cyan transition-colors">IETF</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+</Layout>
