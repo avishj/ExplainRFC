@@ -221,7 +221,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                     left: `${placement.x}%`,
                     top: `${placement.y}%`,
                     zIndex: isHovered ? 100 : placement.zIndex,
-                    transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
+                    transform: `translate(-50%, -50%) rotate(${placement.rotation}deg) scale(${placement.scale})`,
                     transition: "transform 0.3s ease-out, filter 0.3s ease-out",
                     cursor: "pointer",
                   }}
@@ -233,7 +233,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                   <div
                     className="relative"
                     style={{
-                      transform: isHovered ? `scale(${placement.scale * 1.03}) translateY(-5px)` : `scale(${placement.scale})`,
+                      transform: isHovered ? `scale(1.03) translateY(-5px)` : undefined,
                       transition: "transform 0.3s ease-out",
                     }}
                   >
