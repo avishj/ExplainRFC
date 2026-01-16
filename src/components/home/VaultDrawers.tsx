@@ -56,7 +56,7 @@ const bookPlacements: BookPlacement[] = [
     scale: 0.42, 
     zIndex: 3, 
     rotation: -2,
-    spine: { x: 50, y: 72, rotation: 0, fontSize: "1.4rem", subFontSize: "0.7rem" }
+    spine: { x: 50, y: 72, rotation: 0, fontSize: "1.6rem", subFontSize: "0.8rem" }
   },
   { 
     rfcIndex: 1, 
@@ -65,7 +65,7 @@ const bookPlacements: BookPlacement[] = [
     scale: 0.40, 
     zIndex: 2, 
     rotation: 1,
-    spine: { x: 50, y: 70, rotation: 0, fontSize: "1.4rem", subFontSize: "0.7rem" }
+    spine: { x: 50, y: 70, rotation: 0, fontSize: "1.6rem", subFontSize: "0.8rem" }
   },
   { 
     rfcIndex: 2, 
@@ -74,7 +74,7 @@ const bookPlacements: BookPlacement[] = [
     scale: 0.38, 
     zIndex: 1, 
     rotation: 0,
-    spine: { x: 28, y: 55, rotation: 57, fontSize: "1.1rem", subFontSize: "0.55rem" }
+    spine: { x: 22, y: 58, rotation: 58, fontSize: "1.2rem", subFontSize: "0.6rem" }
   },
   
   // Center stack - 3 books  
@@ -85,7 +85,7 @@ const bookPlacements: BookPlacement[] = [
     scale: 0.44, 
     zIndex: 3, 
     rotation: 0,
-    spine: { x: 28, y: 58, rotation: 66, fontSize: "1.1rem", subFontSize: "0.55rem" }
+    spine: { x: 20, y: 60, rotation: 66, fontSize: "1.2rem", subFontSize: "0.6rem" }
   },
   { 
     rfcIndex: 4, 
@@ -94,7 +94,7 @@ const bookPlacements: BookPlacement[] = [
     scale: 0.40, 
     zIndex: 2, 
     rotation: 2,
-    spine: { x: 50, y: 72, rotation: 0, fontSize: "1.4rem", subFontSize: "0.7rem" }
+    spine: { x: 50, y: 72, rotation: 0, fontSize: "1.6rem", subFontSize: "0.8rem" }
   },
   { 
     rfcIndex: 5, 
@@ -103,7 +103,7 @@ const bookPlacements: BookPlacement[] = [
     scale: 0.38, 
     zIndex: 1, 
     rotation: -1,
-    spine: { x: 50, y: 70, rotation: 0, fontSize: "1.4rem", subFontSize: "0.7rem" }
+    spine: { x: 50, y: 70, rotation: 0, fontSize: "1.6rem", subFontSize: "0.8rem" }
   },
   
   // Right stack - 3 books
@@ -114,7 +114,7 @@ const bookPlacements: BookPlacement[] = [
     scale: 0.42, 
     zIndex: 3, 
     rotation: 0,
-    spine: { x: 28, y: 55, rotation: 57, fontSize: "1.1rem", subFontSize: "0.55rem" }
+    spine: { x: 22, y: 58, rotation: 58, fontSize: "1.2rem", subFontSize: "0.6rem" }
   },
   { 
     rfcIndex: 7, 
@@ -123,7 +123,7 @@ const bookPlacements: BookPlacement[] = [
     scale: 0.40, 
     zIndex: 2, 
     rotation: 2,
-    spine: { x: 28, y: 58, rotation: 66, fontSize: "1.1rem", subFontSize: "0.55rem" }
+    spine: { x: 20, y: 60, rotation: 66, fontSize: "1.2rem", subFontSize: "0.6rem" }
   },
   { 
     rfcIndex: 8, 
@@ -132,7 +132,7 @@ const bookPlacements: BookPlacement[] = [
     scale: 0.38, 
     zIndex: 1, 
     rotation: -2,
-    spine: { x: 50, y: 72, rotation: 0, fontSize: "1.4rem", subFontSize: "0.7rem" }
+    spine: { x: 50, y: 72, rotation: 0, fontSize: "1.6rem", subFontSize: "0.8rem" }
   },
 ];
 
@@ -149,7 +149,6 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
   const [hoveredBook, setHoveredBook] = useState<number | null>(null);
   
   const handleBookClick = (rfc: RFC) => {
-    if (!rfc.available) return;
     if (openBook === rfc.id) {
       handleCloseBook();
     } else {
@@ -166,7 +165,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
   };
   
   return (
-    <section id="popular-specs" className="py-24 px-6 relative overflow-hidden">
+    <section id="popular-specs" className="py-12 px-2 relative overflow-hidden">
       <div className="max-w-6xl mx-auto mb-16">
         <div className="text-center">
           <p className="museum-label text-amber mb-3">The Library</p>
@@ -180,12 +179,12 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
       </div>
       
       {/* Table Scene */}
-      <div className="max-w-5xl mx-auto relative">
+      <div className="max-w-6xl mx-auto relative">
         <div
           className="relative mx-auto"
           style={{
             width: "100%",
-            maxWidth: "1000px",
+            maxWidth: "1200px",
           }}
         >
           {/* Table image */}
@@ -225,7 +224,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                     zIndex: isHovered ? 100 : placement.zIndex,
                     transform: `translate(-50%, -50%) rotate(${placement.rotation}deg)`,
                     transition: "transform 0.3s ease-out, filter 0.3s ease-out",
-                    cursor: rfc.available ? "pointer" : "default",
+                    cursor: "pointer",
                   }}
                   onMouseEnter={() => !isOpen && !isClosing && setHoveredBook(rfc.id)}
                   onMouseLeave={() => setHoveredBook(null)}
@@ -235,9 +234,8 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                   <div
                     className="relative"
                     style={{
-                      transform: isHovered && rfc.available ? "translateY(-10px) scale(1.08)" : `scale(${placement.scale})`,
+                      transform: isHovered ? `scale(${placement.scale * 1.03}) translateY(-5px)` : `scale(${placement.scale})`,
                       transition: "transform 0.3s ease-out",
-                      filter: isHovered && rfc.available ? "brightness(1.15)" : "none",
                     }}
                   >
                     <img
@@ -246,8 +244,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                       className="w-auto h-auto max-w-none"
                       style={{
                         width: "500px",
-                        opacity: rfc.available ? 1 : 0.6,
-                        filter: rfc.available ? "none" : "saturate(0.4)",
+                        opacity: 1,
                       }}
                       draggable={false}
                     />
@@ -273,43 +270,11 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                           lineHeight: 1,
                         }}
                       >
-                        {rfc.name}
-                      </div>
-                      <div
-                        style={{
-                          fontFamily: "var(--font-mono)",
-                          fontSize: placement.spine.subFontSize,
-                          color: colors.text,
-                          textShadow: `1px 1px 2px ${colors.shadow}, 0 0 8px ${colors.shadow}`,
-                          letterSpacing: "0.12em",
-                          marginTop: "2px",
-                          opacity: 0.85,
-                          textAlign: "center",
-                        }}
-                      >
-                        RFC {rfc.id}
+                        {rfc.name} <span style={{ opacity: 0.7 }}>|</span> RFC {rfc.id}
                       </div>
                     </div>
                     
-                    {/* Coming Soon badge */}
-                    {!rfc.available && (
-                      <div
-                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 whitespace-nowrap pointer-events-none"
-                        style={{
-                          fontFamily: "var(--font-mono)",
-                          fontSize: "0.65rem",
-                          letterSpacing: "0.15em",
-                          color: "#d4a44c",
-                          background: "rgba(0,0,0,0.9)",
-                          padding: "6px 14px",
-                          borderRadius: "4px",
-                          border: "1px solid #8b7355",
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.6)",
-                        }}
-                      >
-                        COMING SOON
-                      </div>
-                    )}
+
                   </div>
                 </div>
               );
@@ -321,7 +286,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
       {/* Open book overlay */}
       {(openBook || closingBook) && (() => {
         const rfc = rfcs.find(r => r.id === (openBook || closingBook));
-        if (!rfc || !rfc.available) return null;
+        if (!rfc) return null;
         
         return (
           <>
