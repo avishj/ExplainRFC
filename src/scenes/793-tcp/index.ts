@@ -147,7 +147,7 @@ export async function init(
       }
     },
     
-    setProgress(progress: number) {
+    setProgress(_progress: number) {
       // Could be used for scrubbing the timeline
     },
     
@@ -393,7 +393,7 @@ function emitPacket(
 function highlightEntities(
   entities: Entities,
   highlights: string[],
-  color: string,
+  _color: string,
   timeline: gsap.core.Timeline
 ) {
   const allEntities = ["client", "server"];

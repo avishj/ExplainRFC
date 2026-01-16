@@ -39,7 +39,7 @@ export function CuratorDial({ activeSection, onSectionChange }: CuratorDialProps
         <div className="absolute inset-3 rounded-full border border-stone" />
         
         {/* Dial notches */}
-        {sections.map((section, i) => {
+        {sections.map((section) => {
           const isActive = section.id === activeSection;
           const angle = (section.angle * Math.PI) / 180;
           const radius = 52;

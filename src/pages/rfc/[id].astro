@@ -9,7 +9,7 @@ export function getStaticPaths() {
   ];
 }
 
-const { id } = Astro.params;
+const { id: _id } = Astro.params;
 
 // In a full implementation, this would look up the RFC by ID
 const rfc = rfcData;

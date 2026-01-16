@@ -142,7 +142,7 @@ const bookColors: Record<BookImage, { text: string; shadow: string }> = {
   "book_left1.png": { text: "#d4a44c", shadow: "rgba(0,0,0,0.9)" },
 };
 
-export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
+export function VaultDrawers({ onSelectRFC: _onSelectRFC }: VaultDrawersProps) {
   const [openBook, setOpenBook] = useState<number | null>(null);
   const [closingBook, setClosingBook] = useState<number | null>(null);
   const [hoveredBook, setHoveredBook] = useState<number | null>(null);
