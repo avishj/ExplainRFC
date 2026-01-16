@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { SceneController } from "@/types/rfc";
+import type { SceneController } from "@/types";
 
 interface SceneCanvasProps {
   rfcId: number;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import type { StoryboardStep } from "@/types/rfc";
+import type { StoryboardStep } from "@/types";
 
 interface InstrumentsPanelProps {
   step: StoryboardStep;

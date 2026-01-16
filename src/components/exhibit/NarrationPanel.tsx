@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { RFC, StoryboardStep } from "@/types/rfc";
+import type { RFC, StoryboardStep } from "@/types";
 
 interface NarrationPanelProps {
   step: StoryboardStep;

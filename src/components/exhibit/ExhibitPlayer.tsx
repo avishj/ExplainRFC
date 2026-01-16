@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import type { RFC, StoryboardStep, SceneController } from "@/types/rfc";
+import type { RFC, StoryboardStep, SceneController } from "@/types";
 import { NarrationPanel } from "./NarrationPanel";
 import { InstrumentsPanel } from "./InstrumentsPanel";
 import { SceneCanvas } from "./SceneCanvas";
-import { Header } from "@/components/ui/Header";
+import { Header } from "@/components/ui";
 
 interface ExhibitPlayerProps {
   rfc: RFC;
