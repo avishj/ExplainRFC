@@ -52,29 +52,29 @@ const bookPlacements: BookPlacement[] = [
   { 
     rfcIndex: 0, 
     image: "book_straight1.png", 
-    x: 18, y: 32, 
-    scale: 0.42, 
+    x: 25, y: 32, 
+    scale: 0.50, 
     zIndex: 3, 
     rotation: -2,
-    spine: { x: 50, y: 72, rotation: 0, fontSize: "1.6rem", subFontSize: "0.8rem" }
+    spine: { x: 50, y: 72, rotation: 0, fontSize: "2rem", subFontSize: "1rem" }
   },
   { 
     rfcIndex: 1, 
     image: "book_straight2.png", 
-    x: 16, y: 42, 
-    scale: 0.40, 
+    x: 23, y: 42, 
+    scale: 0.48, 
     zIndex: 2, 
     rotation: 1,
-    spine: { x: 50, y: 70, rotation: 0, fontSize: "1.6rem", subFontSize: "0.8rem" }
+    spine: { x: 50, y: 70, rotation: 0, fontSize: "2rem", subFontSize: "1rem" }
   },
   { 
     rfcIndex: 2, 
     image: "book_right1.png", 
-    x: 20, y: 54, 
-    scale: 0.38, 
+    x: 27, y: 54, 
+    scale: 0.46, 
     zIndex: 1, 
     rotation: 0,
-    spine: { x: 22, y: 58, rotation: 58, fontSize: "1.2rem", subFontSize: "0.6rem" }
+    spine: { x: 22, y: 58, rotation: 58, fontSize: "1.5rem", subFontSize: "0.75rem" }
   },
   
   // Center stack - 3 books  
@@ -82,57 +82,57 @@ const bookPlacements: BookPlacement[] = [
     rfcIndex: 3, 
     image: "book_right2.png", 
     x: 50, y: 28, 
-    scale: 0.44, 
+    scale: 0.52, 
     zIndex: 3, 
     rotation: 0,
-    spine: { x: 20, y: 60, rotation: 66, fontSize: "1.2rem", subFontSize: "0.6rem" }
+    spine: { x: 20, y: 60, rotation: 66, fontSize: "1.5rem", subFontSize: "0.75rem" }
   },
   { 
     rfcIndex: 4, 
     image: "book_straight1.png", 
     x: 48, y: 40, 
-    scale: 0.40, 
+    scale: 0.48, 
     zIndex: 2, 
     rotation: 2,
-    spine: { x: 50, y: 72, rotation: 0, fontSize: "1.6rem", subFontSize: "0.8rem" }
+    spine: { x: 50, y: 72, rotation: 0, fontSize: "2rem", subFontSize: "1rem" }
   },
   { 
     rfcIndex: 5, 
     image: "book_straight2.png", 
     x: 52, y: 52, 
-    scale: 0.38, 
+    scale: 0.46, 
     zIndex: 1, 
     rotation: -1,
-    spine: { x: 50, y: 70, rotation: 0, fontSize: "1.6rem", subFontSize: "0.8rem" }
+    spine: { x: 50, y: 70, rotation: 0, fontSize: "2rem", subFontSize: "1rem" }
   },
   
   // Right stack - 3 books
   { 
     rfcIndex: 6, 
     image: "book_right1.png", 
-    x: 80, y: 30, 
-    scale: 0.42, 
+    x: 73, y: 30, 
+    scale: 0.50, 
     zIndex: 3, 
     rotation: 0,
-    spine: { x: 22, y: 58, rotation: 58, fontSize: "1.2rem", subFontSize: "0.6rem" }
+    spine: { x: 22, y: 58, rotation: 58, fontSize: "1.5rem", subFontSize: "0.75rem" }
   },
   { 
     rfcIndex: 7, 
     image: "book_right2.png", 
-    x: 82, y: 42, 
-    scale: 0.40, 
+    x: 75, y: 42, 
+    scale: 0.48, 
     zIndex: 2, 
     rotation: 2,
-    spine: { x: 20, y: 60, rotation: 66, fontSize: "1.2rem", subFontSize: "0.6rem" }
+    spine: { x: 20, y: 60, rotation: 66, fontSize: "1.5rem", subFontSize: "0.75rem" }
   },
   { 
     rfcIndex: 8, 
     image: "book_straight1.png", 
-    x: 78, y: 54, 
-    scale: 0.38, 
+    x: 71, y: 54, 
+    scale: 0.46, 
     zIndex: 1, 
     rotation: -2,
-    spine: { x: 50, y: 72, rotation: 0, fontSize: "1.6rem", subFontSize: "0.8rem" }
+    spine: { x: 50, y: 72, rotation: 0, fontSize: "2rem", subFontSize: "1rem" }
   },
 ];
 
@@ -261,13 +261,14 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                     >
                       <div
                         style={{
-                          fontFamily: "var(--font-display)",
+                          fontFamily: "'Times New Roman', 'Garamond', 'Georgia', serif",
                           fontSize: placement.spine.fontSize,
-                          fontWeight: "bold",
+                          fontWeight: 900,
                           color: colors.text,
-                          textShadow: `1px 1px 3px ${colors.shadow}, 0 0 15px ${colors.shadow}`,
-                          letterSpacing: "0.08em",
+                          textShadow: `2px 2px 4px ${colors.shadow}, 0 0 20px ${colors.shadow}`,
+                          letterSpacing: "0.1em",
                           lineHeight: 1,
+                          fontVariant: "small-caps",
                         }}
                       >
                         {rfc.name} <span style={{ opacity: 0.7 }}>|</span> RFC {rfc.id}
