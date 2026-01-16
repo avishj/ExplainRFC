@@ -202,7 +202,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                     }}
                   >
                     <img
-                      src={`/${placement.image}`}
+                      src={placement.image}
                       alt={`${rfc.name} - RFC ${rfc.id}`}
                       className="w-auto h-auto max-w-none"
                       style={{
