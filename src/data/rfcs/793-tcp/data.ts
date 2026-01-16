@@ -1,4 +1,4 @@
-import type { RFC, StoryboardStep } from "@/types/rfc";
+import type { RFC, StoryboardStep } from "@/types";
 
 export const rfcData: RFC = {
   id: 793,
