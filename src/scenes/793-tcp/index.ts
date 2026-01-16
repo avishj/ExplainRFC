@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { gsap } from "gsap";
-import type { SceneController, StoryboardStep } from "@/types/rfc";
+import type { SceneController, SceneInitFn, StoryboardStep } from "@/types";
 
 interface Entities {
   client: THREE.Group;
@@ -10,10 +10,10 @@ interface Entities {
   connectionLine: THREE.Line;
 }
 
-export async function init(
+export const init: SceneInitFn = async (
   canvas: HTMLCanvasElement,
   accentColors: [string, string]
-): Promise<SceneController> {
+): Promise<SceneController> => {
   const [primaryColor, secondaryColor] = accentColors;
   
   // Scene setup
