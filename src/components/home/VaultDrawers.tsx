@@ -26,7 +26,7 @@ const rfcs: RFC[] = [
   { id: 5321, name: "SMTP", title: "Simple Mail Transfer Protocol", year: 2008, layer: "Application", description: "How email gets delivered across the internet.", available: false },
 ];
 
-type BookImage = "book_straight1.png" | "book_straight2.png" | "book_right1.png" | "book_right2.png";
+type BookImage = "book_straight1.png" | "book_straight2.png" | "book_left1.png";
 
 interface SpineConfig {
   x: number;
@@ -61,7 +61,7 @@ const bookPlacements: BookPlacement[] = [
   { 
     rfcIndex: 1, 
     image: "book_straight2.png", 
-    x: 23, y: 42, 
+    x: 26, y: 44, 
     scale: 0.48, 
     zIndex: 2, 
     rotation: 1,
