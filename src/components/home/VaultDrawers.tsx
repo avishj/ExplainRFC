@@ -69,37 +69,37 @@ const bookPlacements: BookPlacement[] = [
   },
   { 
     rfcIndex: 2, 
-    image: "book_right1.png", 
-    x: 27, y: 54, 
+    image: "book_left1.png", 
+    x: 26, y: 60, 
     scale: 0.46, 
     zIndex: 1, 
     rotation: 0,
-    spine: { x: 22, y: 58, rotation: 58, fontSize: "1.5rem", subFontSize: "0.75rem" }
+    spine: { x: 68, y: 58, rotation: -11, fontSize: "1.75rem", subFontSize: "0.75rem" }
   },
   
   // Center stack - 3 books  
   { 
     rfcIndex: 3, 
-    image: "book_right2.png", 
-    x: 50, y: 28, 
+    image: "book_left1.png", 
+    x: 49, y: 34, 
     scale: 0.52, 
     zIndex: 3, 
-    rotation: 0,
-    spine: { x: 20, y: 60, rotation: 66, fontSize: "1.5rem", subFontSize: "0.75rem" }
+    rotation: 3,
+    spine: { x: 64, y: 58, rotation: -11, fontSize: "1.75rem", subFontSize: "0.75rem" }
   },
   { 
     rfcIndex: 4, 
     image: "book_straight1.png", 
-    x: 48, y: 40, 
+    x: 51, y: 42, 
     scale: 0.48, 
     zIndex: 2, 
-    rotation: 2,
+    rotation: -2,
     spine: { x: 50, y: 72, rotation: 0, fontSize: "2rem", subFontSize: "1rem" }
   },
   { 
     rfcIndex: 5, 
     image: "book_straight2.png", 
-    x: 52, y: 52, 
+    x: 48, y: 56, 
     scale: 0.46, 
     zIndex: 1, 
     rotation: -1,
@@ -109,26 +109,26 @@ const bookPlacements: BookPlacement[] = [
   // Right stack - 3 books
   { 
     rfcIndex: 6, 
-    image: "book_right1.png", 
-    x: 73, y: 30, 
+    image: "book_straight2.png", 
+    x: 75, y: 28, 
     scale: 0.50, 
     zIndex: 3, 
-    rotation: 0,
-    spine: { x: 22, y: 58, rotation: 58, fontSize: "1.5rem", subFontSize: "0.75rem" }
+    rotation: 3,
+    spine: { x: 56, y: 69, rotation: 0, fontSize: "2rem", subFontSize: "0.75rem" }
   },
   { 
     rfcIndex: 7, 
-    image: "book_right2.png", 
-    x: 75, y: 42, 
-    scale: 0.48, 
+    image: "book_left1.png", 
+    x: 73, y: 44, 
+    scale: 0.49, 
     zIndex: 2, 
-    rotation: 2,
-    spine: { x: 20, y: 60, rotation: 66, fontSize: "1.5rem", subFontSize: "0.75rem" }
+    rotation: 4,
+    spine: { x: 65, y: 55, rotation: -11.5, fontSize: "1.5rem", subFontSize: "0.75rem" }
   },
   { 
     rfcIndex: 8, 
     image: "book_straight1.png", 
-    x: 71, y: 54, 
+    x: 74, y: 54, 
     scale: 0.46, 
     zIndex: 1, 
     rotation: -2,
@@ -139,8 +139,7 @@ const bookPlacements: BookPlacement[] = [
 const bookColors: Record<BookImage, { text: string; shadow: string }> = {
   "book_straight1.png": { text: "#d4af37", shadow: "rgba(0,0,0,0.9)" },
   "book_straight2.png": { text: "#c9a227", shadow: "rgba(0,0,0,0.9)" },
-  "book_right1.png": { text: "#d4a44c", shadow: "rgba(0,0,0,0.9)" },
-  "book_right2.png": { text: "#b8a060", shadow: "rgba(0,0,0,0.9)" },
+  "book_left1.png": { text: "#d4a44c", shadow: "rgba(0,0,0,0.9)" },
 };
 
 export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
@@ -261,14 +260,14 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                     >
                       <div
                         style={{
-                          fontFamily: "'Times New Roman', 'Garamond', 'Georgia', serif",
+                          fontFamily: "'Cinzel', 'Trajan Pro', 'Palatino Linotype', 'Book Antiqua', Palatino, serif",
                           fontSize: placement.spine.fontSize,
-                          fontWeight: 900,
+                          fontWeight: 700,
                           color: colors.text,
-                          textShadow: `2px 2px 4px ${colors.shadow}, 0 0 20px ${colors.shadow}`,
-                          letterSpacing: "0.1em",
+                          textShadow: `1px 1px 2px ${colors.shadow}, 0 0 8px rgba(0,0,0,0.6)`,
+                          letterSpacing: "0.15em",
                           lineHeight: 1,
-                          fontVariant: "small-caps",
+                          textTransform: "uppercase",
                         }}
                       >
                         {rfc.name} <span style={{ opacity: 0.7 }}>|</span> RFC {rfc.id}
