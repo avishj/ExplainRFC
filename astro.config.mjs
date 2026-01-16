@@ -9,6 +9,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://avishj.github.io',
+  base: '/ExplainRFC',
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],

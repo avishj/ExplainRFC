@@ -31,7 +31,7 @@ export function NarrationPanel({
       {/* RFC Header */}
       <div className="p-6 border-b border-carbon">
         <a 
-          href="/"
+          href="./"
           className="inline-flex items-center gap-2 text-text-muted hover:text-gold transition-colors text-sm mb-4 group"
         >
           <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

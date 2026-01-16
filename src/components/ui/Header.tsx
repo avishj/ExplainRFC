@@ -16,7 +16,7 @@ export function Header({ currentRFC }: HeaderProps) {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <a 
-            href="/" 
+            href="./" 
             className="flex items-center gap-3 text-text-primary hover:text-gold transition-colors group"
           >
             <div 
@@ -55,7 +55,7 @@ export function Header({ currentRFC }: HeaderProps) {
           {/* Actions */}
           <div className="flex items-center gap-4">
             <a
-              href="/"
+              href="./"
               className={cn(
                 "font-mono text-xs uppercase tracking-wider",
                 "text-text-muted hover:text-gold transition-colors"

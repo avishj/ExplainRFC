@@ -152,7 +152,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
         >
           {/* Table image */}
           <img 
-            src="/table.png" 
+            src="table.png" 
             alt="Antique wooden table"
             className="w-full h-auto"
             style={{ display: "block" }}
@@ -385,7 +385,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                       </p>
                       <div className="mt-auto pt-4">
                         <a
-                          href={`/rfc/${rfc.id}`}
+                          href={`rfc/${rfc.id}`}
                           className="block w-full text-center py-3 rounded transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                           style={{
                             fontFamily: "var(--font-mono)",
