@@ -267,70 +267,168 @@ body::before {
   to { opacity: 0; }
 }
 
-/* 
- * Book open animation - two stages:
- * 1. Pick up the closed book (0-50%)
- * 2. Open the book to show pages (50-100%)
- */
-@keyframes bookOpen {
+/* Book rise up from table */
+@keyframes riseUp {
   0% { 
     opacity: 0;
-    transform: translate3d(0, 150px, 0) scale3d(0.15, 0.15, 1) rotateX(-60deg);
+    transform: translate3d(0, 200px, -100px) scale(0.3);
   }
-  /* Book picked up, still closed */
-  50% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale3d(0.6, 0.08, 1) rotateX(0deg);
-  }
-  /* Book opens up */
   100% { 
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
-/* 
- * Book close animation - two stages:
- * 1. Close the book pages (0-50%)
- * 2. Put the book back down (50-100%)
- */
-@keyframes bookClose {
+/* Book lower back down to table */
+@keyframes riseDown {
   0% { 
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
   }
-  /* Book closes to thin spine */
-  50% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale3d(0.6, 0.08, 1) rotateX(0deg);
-  }
-  /* Book placed back down */
   100% { 
     opacity: 0;
-    transform: translate3d(0, 150px, 0) scale3d(0.15, 0.15, 1) rotateX(-60deg);
+    transform: translate3d(0, 200px, -100px) scale(0.3);
+  }
+}
+
+/* Front cover flips open */
+@keyframes coverOpen {
+  0% { 
+    transform: rotateY(0deg);
+  }
+  100% { 
+    transform: rotateY(-160deg);
+  }
+}
+
+/* Front cover flips closed */
+@keyframes coverClose {
+  0% { 
+    transform: rotateY(-160deg);
+  }
+  100% { 
+    transform: rotateY(0deg);
+  }
+}
+
+/* Left page fans out */
+@keyframes pageOpenLeft {
+  0% { 
+    transform: rotateY(0deg) translateX(140px);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% { 
+    transform: rotateY(20deg) translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Right page fans out */
+@keyframes pageOpenRight {
+  0% { 
+    transform: rotateY(0deg) translateX(-140px);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% { 
+    transform: rotateY(-15deg) translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Left page closes */
+@keyframes pageCloseLeft {
+  0% { 
+    transform: rotateY(20deg) translateX(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% { 
+    transform: rotateY(0deg) translateX(140px);
+    opacity: 0;
+  }
+}
+
+/* Right page closes */
+@keyframes pageCloseRight {
+  0% { 
+    transform: rotateY(-15deg) translateX(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% { 
+    transform: rotateY(0deg) translateX(-140px);
+    opacity: 0;
   }
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.4s ease-out forwards;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
 .animate-fadeOut {
-  animation: fadeOut 0.5s ease-in forwards;
+  animation: fadeOut 0.6s ease-out forwards;
 }
 
-.animate-bookOpen {
-  animation: bookOpen 0.8s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+/* Book wrapper animations */
+.book-rise-up {
+  animation: riseUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
-.animate-bookClose {
-  animation: bookClose 0.7s cubic-bezier(0.32, 0, 0.67, 0) forwards;
+.book-rise-down {
+  animation: riseDown 0.5s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  animation-delay: 0.4s;
   will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+}
+
+/* Cover animations */
+.cover-open {
+  animation: coverOpen 0.7s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  animation-delay: 0.3s;
+  will-change: transform;
+}
+
+.cover-close {
+  animation: coverClose 0.5s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  will-change: transform;
+  transform: rotateY(-160deg);
+}
+
+/* Page animations */
+.page-open-left {
+  animation: pageOpenLeft 0.6s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.page-open-right {
+  animation: pageOpenRight 0.6s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  animation-delay: 0.55s;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.page-close-left {
+  animation: pageCloseLeft 0.4s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  will-change: transform, opacity;
+  transform: rotateY(20deg) translateX(0);
+}
+
+.page-close-right {
+  animation: pageCloseRight 0.4s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  will-change: transform, opacity;
+  transform: rotateY(-15deg) translateX(0);
 }
 
 /* === Utility Classes === */

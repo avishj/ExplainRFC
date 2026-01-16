@@ -287,13 +287,14 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
       {(openBook || closingBook) && (() => {
         const rfc = rfcs.find(r => r.id === (openBook || closingBook));
         if (!rfc) return null;
+        const isClosing = !!closingBook;
         
         return (
           <>
             {/* Backdrop */}
             <div 
-              className={`fixed inset-0 ${closingBook ? 'animate-fadeOut' : 'animate-fadeIn'}`}
-              onClick={() => !closingBook && handleCloseBook()}
+              className={`fixed inset-0 ${isClosing ? 'animate-fadeOut' : 'animate-fadeIn'}`}
+              onClick={() => !isClosing && handleCloseBook()}
               style={{ 
                 background: "rgba(0,0,0,0.85)",
                 backdropFilter: "blur(8px)",
@@ -301,49 +302,80 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
               }}
             />
             
-            {/* Book content */}
+            {/* 3D Book Container */}
             <div
-              className={`fixed inset-0 flex items-center justify-center p-4 ${closingBook ? 'animate-fadeOut' : 'animate-fadeIn'}`}
+              className="fixed inset-0 flex items-center justify-center p-4"
               style={{ 
                 zIndex: 200,
-                pointerEvents: closingBook ? "none" : "auto",
+                perspective: "2000px",
+                pointerEvents: isClosing ? "none" : "auto",
               }}
               onClick={(e) => {
-                if (e.target === e.currentTarget && !closingBook) handleCloseBook();
+                if (e.target === e.currentTarget && !isClosing) handleCloseBook();
               }}
             >
+              {/* Book wrapper - handles the rise up animation */}
               <div
-                className={`relative ${closingBook ? 'animate-bookClose' : 'animate-bookOpen'}`}
-                style={{ 
-                  perspective: "1500px",
-                  transformStyle: "preserve-3d",
-                }}
+                className={isClosing ? 'book-rise-down' : 'book-rise-up'}
+                style={{ transformStyle: "preserve-3d" }}
                 onClick={(e) => e.stopPropagation()}
               >
+                {/* Book structure */}
                 <div
-                  className="flex"
+                  className="relative"
                   style={{
                     transformStyle: "preserve-3d",
-                    transform: "rotateX(5deg)",
+                    transform: "rotateX(8deg)",
                   }}
                 >
-                  {/* Left page */}
+                  {/* Back cover (red, visible when book is closed) */}
                   <div
-                    className="relative overflow-hidden"
+                    className="absolute"
+                    style={{
+                      width: "300px",
+                      height: "380px",
+                      background: "linear-gradient(135deg, #5C1616 0%, #8B2323 50%, #6a1a1a 100%)",
+                      borderRadius: "4px",
+                      boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                      transform: "translateZ(-15px)",
+                    }}
+                  />
+                  
+                  {/* Pages block (cream colored, between covers) */}
+                  <div
+                    className="absolute"
+                    style={{
+                      width: "290px",
+                      height: "370px",
+                      left: "5px",
+                      top: "5px",
+                      background: "linear-gradient(90deg, #d4c4a8 0%, #e8dcc8 10%, #f5ebe0 50%, #e8dcc8 90%, #d4c4a8 100%)",
+                      borderRadius: "2px 4px 4px 2px",
+                      transform: "translateZ(-7px)",
+                      boxShadow: "inset 0 0 10px rgba(0,0,0,0.1)",
+                    }}
+                  >
+                    {/* Page lines */}
+                    <div className="absolute right-0 top-2 bottom-2 w-1" style={{ 
+                      background: "repeating-linear-gradient(to bottom, #c9b896 0px, #c9b896 1px, transparent 1px, transparent 3px)" 
+                    }} />
+                  </div>
+                  
+                  {/* Left page (revealed when book opens) */}
+                  <div
+                    className={`absolute ${isClosing ? 'page-close-left' : 'page-open-left'}`}
                     style={{
                       width: "280px",
                       height: "360px",
-                      background: "linear-gradient(135deg, #e8dcc8 0%, #f5ebe0 50%, #e0d4bc 100%)",
-                      borderRadius: "4px 0 0 4px",
-                      boxShadow: "-8px 8px 30px rgba(0,0,0,0.4), inset 2px 0 8px rgba(139,107,84,0.1)",
-                      transform: "rotateY(20deg)",
+                      left: "10px",
+                      top: "10px",
+                      background: "linear-gradient(135deg, #f5ebe0 0%, #e8dcc8 100%)",
+                      borderRadius: "2px",
                       transformOrigin: "right center",
+                      transformStyle: "preserve-3d",
+                      backfaceVisibility: "hidden",
                     }}
                   >
-                    <div 
-                      className="absolute right-0 top-0 bottom-0 w-8"
-                      style={{ background: "linear-gradient(to left, rgba(0,0,0,0.15), transparent)" }}
-                    />
                     <div className="relative p-8 h-full flex flex-col items-center justify-center text-center">
                       <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", color: "#8b6b54", letterSpacing: "0.25em" }}>
                         REQUEST FOR COMMENTS
@@ -361,23 +393,21 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                     </div>
                   </div>
                   
-                  {/* Spine */}
-                  <div style={{ width: "20px", height: "360px", background: "linear-gradient(90deg, #5C1616 0%, #8B2323 50%, #5C1616 100%)", boxShadow: "inset 0 0 10px rgba(0,0,0,0.5)" }} />
-                  
-                  {/* Right page */}
+                  {/* Right page (revealed when book opens) */}
                   <div
-                    className="relative overflow-hidden"
+                    className={`absolute ${isClosing ? 'page-close-right' : 'page-open-right'}`}
                     style={{
                       width: "280px",
                       height: "360px",
-                      background: "linear-gradient(225deg, #f5ebe0 0%, #e8dcc8 50%, #ddd0b8 100%)",
-                      borderRadius: "0 4px 4px 0",
-                      boxShadow: "8px 8px 30px rgba(0,0,0,0.35), inset -2px 0 8px rgba(139,107,84,0.08)",
-                      transform: "rotateY(-12deg)",
+                      right: "10px",
+                      top: "10px",
+                      background: "linear-gradient(225deg, #f5ebe0 0%, #e8dcc8 100%)",
+                      borderRadius: "2px",
                       transformOrigin: "left center",
+                      transformStyle: "preserve-3d",
+                      backfaceVisibility: "hidden",
                     }}
                   >
-                    <div className="absolute left-0 top-0 bottom-0 w-6" style={{ background: "linear-gradient(to right, rgba(0,0,0,0.12), transparent)" }} />
                     <div className="relative p-8 h-full flex flex-col">
                       <div className="self-end mb-4 px-3 py-1 rounded" style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", letterSpacing: "0.15em", color: "#6b5040", background: "rgba(139,107,84,0.1)", border: "1px solid rgba(139,107,84,0.2)" }}>
                         {rfc.layer.toUpperCase()} LAYER
@@ -408,9 +438,47 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Front cover - flips open */}
+                  <div
+                    className={`absolute ${isClosing ? 'cover-close' : 'cover-open'}`}
+                    style={{
+                      width: "300px",
+                      height: "380px",
+                      background: "linear-gradient(135deg, #8B2323 0%, #a52a2a 30%, #8B2323 70%, #5C1616 100%)",
+                      borderRadius: "4px",
+                      transformOrigin: "left center",
+                      transformStyle: "preserve-3d",
+                      boxShadow: "2px 0 10px rgba(0,0,0,0.3)",
+                    }}
+                  >
+                    {/* Cover decoration */}
+                    <div className="absolute inset-4 border border-amber-600/30 rounded" />
+                    <div className="absolute inset-8 border border-amber-600/20 rounded" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.8rem", fontWeight: "700", color: "#d4af37", textShadow: "2px 2px 4px rgba(0,0,0,0.5)", letterSpacing: "0.1em" }}>
+                          RFC {rfc.id}
+                        </div>
+                        <div className="mt-2" style={{ width: "80px", height: "2px", background: "linear-gradient(90deg, transparent, #d4af37, transparent)", margin: "0 auto" }} />
+                        <div className="mt-2" style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", color: "#c9a227", letterSpacing: "0.15em" }}>
+                          {rfc.name}
+                        </div>
+                      </div>
+                    </div>
+                    {/* Cover back side (visible when flipping) */}
+                    <div 
+                      className="absolute inset-0 rounded"
+                      style={{ 
+                        background: "linear-gradient(135deg, #e8dcc8 0%, #f5ebe0 100%)",
+                        transform: "rotateY(180deg)",
+                        backfaceVisibility: "hidden",
+                      }} 
+                    />
+                  </div>
                 </div>
                 
-                <div className="text-center mt-6" style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "#8b7355", letterSpacing: "0.1em" }}>
+                <div className="text-center mt-8" style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "#8b7355", letterSpacing: "0.1em" }}>
                   CLICK OUTSIDE TO CLOSE
                 </div>
               </div>
