@@ -164,8 +164,8 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
   };
   
   return (
-    <section id="popular-specs" className="py-12 px-2 relative overflow-hidden">
-      <div className="max-w-6xl mx-auto mb-16">
+    <section id="popular-specs" className="py-8 px-2 relative overflow-hidden">
+      <div className="max-w-6xl mx-auto mb-8">
         <div className="text-center">
           <p className="museum-label text-amber mb-3">The Library</p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-text-bright mb-4">
