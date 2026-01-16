@@ -1,50 +1,14 @@
 import { useState } from "react";
+import type { CatalogRFC, BookImage, BookPlacement } from "@/types";
+import { rfcCatalog } from "@/data";
 
-interface RFC {
-  id: number;
-  name: string;
-  title: string;
-  year: number;
-  layer: string;
-  description: string;
-  available: boolean;
-}
+const featuredRFCIds = [793, 791, 1035, 8446, 7540, 9000, 768, 2616, 5321];
+const featuredRFCs: CatalogRFC[] = featuredRFCIds
+  .map(id => rfcCatalog.find(rfc => rfc.id === id))
+  .filter((rfc): rfc is CatalogRFC => rfc !== undefined);
 
 interface VaultDrawersProps {
   onSelectRFC: (rfcId: number) => void;
-}
-
-const rfcs: RFC[] = [
-  { id: 793, name: "TCP", title: "Transmission Control Protocol", year: 1981, layer: "Transport", description: "The foundation of reliable data delivery on the internet, ensuring packets arrive complete and in order.", available: true },
-  { id: 791, name: "IP", title: "Internet Protocol", year: 1981, layer: "Network", description: "The addressing system that routes packets across networks to their destination.", available: false },
-  { id: 1035, name: "DNS", title: "Domain Name System", year: 1987, layer: "Application", description: "Translates human-readable domain names into IP addresses.", available: false },
-  { id: 8446, name: "TLS 1.3", title: "Transport Layer Security", year: 2018, layer: "Security", description: "Encrypts communications to keep your data private and authenticated.", available: false },
-  { id: 7540, name: "HTTP/2", title: "Hypertext Transfer Protocol 2", year: 2015, layer: "Application", description: "Faster web loading through multiplexing and header compression.", available: false },
-  { id: 9000, name: "QUIC", title: "UDP-Based Multiplexed Transport", year: 2021, layer: "Transport", description: "Next-gen transport combining the best of TCP and UDP with built-in encryption.", available: false },
-  { id: 768, name: "UDP", title: "User Datagram Protocol", year: 1980, layer: "Transport", description: "Fast, connectionless messaging for real-time applications like gaming and video.", available: false },
-  { id: 2616, name: "HTTP/1.1", title: "Hypertext Transfer Protocol", year: 1999, layer: "Application", description: "The protocol that powers the World Wide Web.", available: false },
-  { id: 5321, name: "SMTP", title: "Simple Mail Transfer Protocol", year: 2008, layer: "Application", description: "How email gets delivered across the internet.", available: false },
-];
-
-type BookImage = "book_straight1.png" | "book_straight2.png" | "book_left1.png";
-
-interface SpineConfig {
-  x: number;
-  y: number;
-  rotation: number;
-  fontSize: string;
-  subFontSize: string;
-}
-
-interface BookPlacement {
-  rfcIndex: number;
-  image: BookImage;
-  x: number;
-  y: number;
-  scale: number;
-  zIndex: number;
-  rotation: number;
-  spine: SpineConfig;
 }
 
 const bookPlacements: BookPlacement[] = [
@@ -142,12 +106,12 @@ const bookColors: Record<BookImage, { text: string; shadow: string }> = {
   "book_left1.png": { text: "#d4a44c", shadow: "rgba(0,0,0,0.9)" },
 };
 
-export function VaultDrawers({ onSelectRFC: _onSelectRFC }: VaultDrawersProps) {
+export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
   const [openBook, setOpenBook] = useState<number | null>(null);
   const [closingBook, setClosingBook] = useState<number | null>(null);
   const [hoveredBook, setHoveredBook] = useState<number | null>(null);
   
-  const handleBookClick = (rfc: RFC) => {
+  const handleBookClick = (rfc: CatalogRFC) => {
     if (openBook === rfc.id) {
       handleCloseBook();
     } else {
@@ -205,7 +169,7 @@ export function VaultDrawers({ onSelectRFC: _onSelectRFC }: VaultDrawersProps) {
             }}
           >
             {bookPlacements.map((placement) => {
-              const rfc = rfcs[placement.rfcIndex];
+              const rfc = featuredRFCs[placement.rfcIndex];
               if (!rfc) return null;
               
               const colors = bookColors[placement.image];
@@ -285,7 +249,7 @@ export function VaultDrawers({ onSelectRFC: _onSelectRFC }: VaultDrawersProps) {
       
       {/* Open book overlay */}
       {(openBook || closingBook) && (() => {
-        const rfc = rfcs.find(r => r.id === (openBook || closingBook));
+        const rfc = featuredRFCs.find(r => r.id === (openBook || closingBook));
         if (!rfc) return null;
         const isClosing = !!closingBook;
         

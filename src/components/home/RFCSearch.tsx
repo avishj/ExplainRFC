@@ -1,33 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import Fuse from "fuse.js";
+import type { CatalogRFC } from "@/types";
+import { rfcCatalog } from "@/data";
 
-interface RFC {
-  id: number;
-  name: string;
-  title: string;
-  layer: string;
-  available: boolean;
-}
-
-const allRFCs: RFC[] = [
-  { id: 793, name: "TCP", title: "Transmission Control Protocol", layer: "Transport", available: true },
-  { id: 791, name: "IP", title: "Internet Protocol", layer: "Network", available: false },
-  { id: 1035, name: "DNS", title: "Domain Name System", layer: "Application", available: false },
-  { id: 8446, name: "TLS 1.3", title: "Transport Layer Security", layer: "Security", available: false },
-  { id: 7540, name: "HTTP/2", title: "Hypertext Transfer Protocol 2", layer: "Application", available: false },
-  { id: 9000, name: "QUIC", title: "UDP-Based Multiplexed Transport", layer: "Transport", available: false },
-  { id: 768, name: "UDP", title: "User Datagram Protocol", layer: "Transport", available: false },
-  { id: 2616, name: "HTTP/1.1", title: "Hypertext Transfer Protocol", layer: "Application", available: false },
-  { id: 5321, name: "SMTP", title: "Simple Mail Transfer Protocol", layer: "Application", available: false },
-  { id: 4271, name: "BGP", title: "Border Gateway Protocol", layer: "Routing", available: false },
-  { id: 2818, name: "HTTPS", title: "HTTP Over TLS", layer: "Security", available: false },
-  { id: 6749, name: "OAuth 2.0", title: "Authorization Framework", layer: "Security", available: false },
-  { id: 7519, name: "JWT", title: "JSON Web Token", layer: "Security", available: false },
-  { id: 3986, name: "URI", title: "Uniform Resource Identifier", layer: "Application", available: false },
-  { id: 8259, name: "JSON", title: "JavaScript Object Notation", layer: "Application", available: false },
-];
-
-const fuse = new Fuse(allRFCs, {
+const fuse = new Fuse(rfcCatalog, {
   keys: ["id", "name", "title", "layer"],
   threshold: 0.3,
   includeScore: true,
@@ -39,7 +15,7 @@ interface RFCSearchProps {
 
 export function RFCSearch({ onSelectRFC }: RFCSearchProps) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<RFC[]>([]);
+  const [results, setResults] = useState<CatalogRFC[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
