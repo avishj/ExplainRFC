@@ -267,64 +267,70 @@ body::before {
   to { opacity: 0; }
 }
 
-/* Realistic book pick-up and open animation */
+/* 
+ * Book open animation - two stages:
+ * 1. Pick up the closed book (0-50%)
+ * 2. Open the book to show pages (50-100%)
+ */
 @keyframes bookOpen {
   0% { 
     opacity: 0;
-    transform: scale(0.2) rotateX(80deg) rotateZ(-15deg) translateY(200px);
+    transform: translate3d(0, 150px, 0) scale3d(0.15, 0.15, 1) rotateX(-60deg);
   }
-  30% {
+  /* Book picked up, still closed */
+  50% {
     opacity: 1;
-    transform: scale(0.5) rotateX(50deg) rotateZ(-8deg) translateY(100px);
+    transform: translate3d(0, 0, 0) scale3d(0.6, 0.08, 1) rotateX(0deg);
   }
-  60% {
-    transform: scale(0.85) rotateX(20deg) rotateZ(-2deg) translateY(30px);
-  }
-  80% {
-    transform: scale(1.02) rotateX(5deg) rotateZ(0deg) translateY(-5px);
-  }
+  /* Book opens up */
   100% { 
     opacity: 1;
-    transform: scale(1) rotateX(0deg) rotateZ(0deg) translateY(0);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0deg);
   }
 }
 
-/* Book closing - reverse pick up, set back down */
+/* 
+ * Book close animation - two stages:
+ * 1. Close the book pages (0-50%)
+ * 2. Put the book back down (50-100%)
+ */
 @keyframes bookClose {
   0% { 
     opacity: 1;
-    transform: scale(1) rotateX(0deg) translateY(0);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0deg);
   }
-  25% {
-    transform: scale(1.02) rotateX(8deg) translateY(-10px);
-  }
+  /* Book closes to thin spine */
   50% {
-    transform: scale(0.7) rotateX(40deg) rotateZ(5deg) translateY(60px);
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(0.6, 0.08, 1) rotateX(0deg);
   }
-  75% {
-    opacity: 0.7;
-    transform: scale(0.4) rotateX(70deg) rotateZ(10deg) translateY(150px);
-  }
+  /* Book placed back down */
   100% { 
     opacity: 0;
-    transform: scale(0.2) rotateX(85deg) rotateZ(15deg) translateY(200px);
+    transform: translate3d(0, 150px, 0) scale3d(0.15, 0.15, 1) rotateX(-60deg);
   }
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.35s ease-out forwards;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 .animate-fadeOut {
-  animation: fadeOut 0.5s ease-out forwards;
+  animation: fadeOut 0.5s ease-in forwards;
 }
 
 .animate-bookOpen {
-  animation: bookOpen 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: bookOpen 0.8s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .animate-bookClose {
-  animation: bookClose 0.55s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+  animation: bookClose 0.7s cubic-bezier(0.32, 0, 0.67, 0) forwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* === Utility Classes === */

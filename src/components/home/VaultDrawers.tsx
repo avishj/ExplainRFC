@@ -314,7 +314,10 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
             >
               <div
                 className={`relative ${closingBook ? 'animate-bookClose' : 'animate-bookOpen'}`}
-                style={{ perspective: "2000px" }}
+                style={{ 
+                  perspective: "1500px",
+                  transformStyle: "preserve-3d",
+                }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div
