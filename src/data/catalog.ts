@@ -31,11 +31,11 @@ export const rfcCatalog: CatalogRFC[] = [
 
   // Application Layer - Web
   { id: 9110, name: "HTTP", title: "HTTP Semantics", year: 2022, layer: "Application", description: "The core semantics of HTTP applicable to all versions.", available: false },
-  { id: 9112, name: "HTTP/1.1", title: "HTTP/1.1", year: 2022, layer: "Application", description: "The HTTP/1.1 message syntax and connection management.", available: false },
-  { id: 9113, name: "HTTP/2", title: "HTTP/2", year: 2022, layer: "Application", description: "Binary framing, multiplexing, and header compression for faster web.", available: false },
+  { id: 9112, name: "HTTP/1.1 v2", title: "HTTP/1.1", year: 2022, layer: "Application", description: "The HTTP/1.1 message syntax and connection management.", available: false },
+  { id: 9113, name: "HTTP/2 v2", title: "HTTP/2", year: 2022, layer: "Application", description: "Binary framing, multiplexing, and header compression for faster web.", available: false },
   { id: 9114, name: "HTTP/3", title: "HTTP/3", year: 2022, layer: "Application", description: "HTTP over QUIC for reduced latency and improved reliability.", available: false },
-  { id: 2616, name: "HTTP/1.1 (Original)", title: "Hypertext Transfer Protocol -- HTTP/1.1", year: 1999, layer: "Application", description: "The original HTTP/1.1 specification that powered the early web.", available: false },
-  { id: 7540, name: "HTTP/2 (Original)", title: "Hypertext Transfer Protocol Version 2", year: 2015, layer: "Application", description: "Faster web loading through multiplexing and header compression.", available: false },
+  { id: 2616, name: "HTTP/1.1 v2", title: "Hypertext Transfer Protocol -- HTTP/1.1", year: 1999, layer: "Application", description: "The original HTTP/1.1 specification that powered the early web.", available: false },
+  { id: 7540, name: "HTTP/2 v1", title: "Hypertext Transfer Protocol Version 2", year: 2015, layer: "Application", description: "Faster web loading through multiplexing and header compression.", available: false },
   { id: 6455, name: "WebSocket", title: "The WebSocket Protocol", year: 2011, layer: "Application", description: "Full-duplex communication over a single TCP connection.", available: false },
   { id: 3986, name: "URI", title: "Uniform Resource Identifier", year: 2005, layer: "Application", description: "Syntax for identifying resources on the web.", available: false },
   { id: 6570, name: "URI Template", title: "URI Template", year: 2012, layer: "Application", description: "Syntax for URI templates with variable expansion.", available: false },
