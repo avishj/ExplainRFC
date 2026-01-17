@@ -52,8 +52,8 @@ const MoltenShader = {
   uniforms: {
     uTime: { value: 0 },
     uIntensity: { value: 1.0 },
-    uBaseColor: { value: new THREE.Color(0xff4500) },
-    uHighColor: { value: new THREE.Color(0xff8c00) },
+    uBaseColor: { value: new THREE.Color(0xaa3300) },
+    uHighColor: { value: new THREE.Color(0xff6600) },
   },
   vertexShader: `
     varying vec2 vUv;
@@ -141,31 +141,33 @@ const MoltenShader = {
     }
     
     void main() {
+      // Distance from center for radial effects
+      float dist = length(vUv - 0.5) * 2.0;
+      
       // Multi-layered noise for turbulent molten effect
-      float noise1 = snoise(vec3(vPosition.xy * 2.0, uTime * 0.3)) * 0.5 + 0.5;
-      float noise2 = snoise(vec3(vPosition.xy * 4.0, uTime * 0.5 + 100.0)) * 0.5 + 0.5;
-      float noise3 = snoise(vec3(vPosition.xy * 8.0, uTime * 0.8 + 200.0)) * 0.5 + 0.5;
+      float noise1 = snoise(vec3(vPosition.xy * 4.0, uTime * 0.2)) * 0.5 + 0.5;
+      float noise2 = snoise(vec3(vPosition.xy * 8.0, uTime * 0.35 + 100.0)) * 0.5 + 0.5;
+      float noise3 = snoise(vec3(vPosition.xy * 16.0, uTime * 0.5 + 200.0)) * 0.5 + 0.5;
       
       float combined = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
       
-      // Hot spots that move and pulse
-      float hotSpot = pow(combined, 2.0) * uIntensity;
+      // Hot spots - creates variation
+      float hotSpot = pow(combined, 2.0) * 0.8;
       
-      // Color gradient from deep orange to bright gold
+      // Color gradient - warm orange base to brighter orange
       vec3 color = mix(uBaseColor, uHighColor, hotSpot);
       
-      // Add bright orange-hot core areas - smaller and more molten orange
-      float hotCore = smoothstep(0.95, 1.0, combined * uIntensity);
-      color = mix(color, vec3(1.0, 0.5, 0.1), hotCore * 0.25);
-      
-      // Rim darkening for depth
-      float rim = 1.0 - pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.5);
-      color *= mix(0.3, 1.0, rim);
+      // Slight darkening at edges - but keep it molten looking
+      float edgeDark = smoothstep(0.6, 1.0, dist);
+      color *= 1.0 - edgeDark * 0.3;
       
       // Pulsing glow
-      float pulse = sin(uTime * 2.0) * 0.1 + 0.9;
+      float pulse = sin(uTime * 1.5) * 0.05 + 0.9;
       
-      gl_FragColor = vec4(color * pulse, 1.0);
+      // Clamp to prevent bloom blowout but keep it vibrant
+      color = min(color * pulse, vec3(0.85, 0.5, 0.2));
+      
+      gl_FragColor = vec4(color, 1.0);
     }
   `,
 };
@@ -250,8 +252,8 @@ export function FoundryHero() {
       0.1,
       100
     );
-    camera.position.set(0, 3, 8);
-    camera.lookAt(0, 0, 0);
+    camera.position.set(0, 2.2, 6);
+    camera.lookAt(0, -0.3, 0);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -272,9 +274,9 @@ export function FoundryHero() {
 
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(container.clientWidth, container.clientHeight),
-      0.5, // strength - much more subtle
-      0.3, // radius
-      0.92 // threshold - only brightest elements bloom
+      0.35, // strength - reduced to prevent blowout
+      0.25, // radius
+      0.95 // threshold - higher to only catch the brightest spots
     );
     composer.addPass(bloomPass);
 
@@ -342,43 +344,54 @@ export function FoundryHero() {
     const crucibleGroup = new THREE.Group();
     scene.add(crucibleGroup);
 
-    // Crucible bowl - proper 3D bowl shape using LatheGeometry
-    const bowlPoints: THREE.Vector2[] = [];
-    const bowlSegments = 20;
-    for (let i = 0; i <= bowlSegments; i++) {
-      const t = i / bowlSegments;
-      const y = t * 0.5 - 0.25;
-      const x = 0.3 + 0.5 * Math.pow(t, 0.6);
-      bowlPoints.push(new THREE.Vector2(x, y));
-    }
-    bowlPoints.push(new THREE.Vector2(0.85, 0.25));
+    // Crucible parameters - sized to fit inside orrery rings
+    const outerRadius = 0.95;
+    const innerRadius = 0.8;
+    const wallHeight = 0.5;
+    const baseThickness = 0.15;
     
-    const crucibleOuterGeo = new THREE.LatheGeometry(bowlPoints, 48);
+    // Outer wall - cylinder with slight taper
+    const outerWallGeo = new THREE.CylinderGeometry(outerRadius, outerRadius * 0.9, wallHeight, 48);
     const crucibleMat = new THREE.MeshStandardMaterial({
-      color: 0x4a4a4a,
-      roughness: 0.4,
-      metalness: 0.8,
-      side: THREE.DoubleSide,
+      color: 0x9a9a9a,
+      roughness: 0.5,
+      metalness: 0.65,
     });
-    const crucibleOuter = new THREE.Mesh(crucibleOuterGeo, crucibleMat);
-    crucibleGroup.add(crucibleOuter);
+    const outerWall = new THREE.Mesh(outerWallGeo, crucibleMat);
+    outerWall.position.y = -wallHeight * 0.3;
+    crucibleGroup.add(outerWall);
+    
+    // Inner cavity - carved out space for molten metal
+    const innerCavityGeo = new THREE.CylinderGeometry(innerRadius, innerRadius * 0.85, wallHeight * 0.8, 48);
+    const innerCavityMat = new THREE.MeshStandardMaterial({
+      color: 0x2a2a2a,
+      roughness: 0.8,
+      metalness: 0.3,
+      emissive: 0x661100,
+      emissiveIntensity: 0.3,
+      side: THREE.BackSide,
+    });
+    const innerCavity = new THREE.Mesh(innerCavityGeo, innerCavityMat);
+    innerCavity.position.y = -wallHeight * 0.25;
+    crucibleGroup.add(innerCavity);
 
-    // Crucible rim - thicker lip at the top
-    const rimGeo = new THREE.TorusGeometry(0.85, 0.08, 16, 48);
+    // Crucible rim - visible lip at top
+    const rimGeo = new THREE.TorusGeometry(outerRadius, 0.08, 12, 48);
     const rimMat = new THREE.MeshStandardMaterial({
-      color: 0x5a5046,
+      color: 0xb0a090,
       roughness: 0.45,
-      metalness: 0.75,
-      emissive: 0xff6b00,
-      emissiveIntensity: 0.08,
+      metalness: 0.6,
+      emissive: 0x442200,
+      emissiveIntensity: 0.2,
     });
     const crucibleRim = new THREE.Mesh(rimGeo, rimMat);
     crucibleRim.rotation.x = Math.PI / 2;
-    crucibleRim.position.y = 0.25;
+    crucibleRim.position.y = -wallHeight * 0.05;
     crucibleGroup.add(crucibleRim);
 
-    // Molten metal surface (custom shader)
-    const moltenGeo = new THREE.CircleGeometry(0.75, 64);
+    // Molten metal surface - MUST be smaller than inner cavity
+    const moltenRadius = innerRadius * 0.75;
+    const moltenGeo = new THREE.CircleGeometry(moltenRadius, 64);
     const moltenMat = new THREE.ShaderMaterial({
       uniforms: MoltenShader.uniforms,
       vertexShader: MoltenShader.vertexShader,
@@ -387,12 +400,12 @@ export function FoundryHero() {
     });
     const moltenSurface = new THREE.Mesh(moltenGeo, moltenMat);
     moltenSurface.rotation.x = -Math.PI / 2;
-    moltenSurface.position.y = 0.1;
+    moltenSurface.position.y = -wallHeight * 0.35;
     crucibleGroup.add(moltenSurface);
 
-    // Orrery rings (the rotating mechanism)
+    // Orrery rings (the rotating mechanism) - positioned above crucible
     const orreryGroup = new THREE.Group();
-    orreryGroup.position.y = 0.8;
+    orreryGroup.position.y = 0.6;
     scene.add(orreryGroup);
 
     // Inner ring
@@ -634,9 +647,9 @@ export function FoundryHero() {
 
       // Camera parallax
       if (!prefersReducedMotion) {
-        camera.position.x = mouseRef.current.x * 1.5;
-        camera.position.y = 3 + mouseRef.current.y * 0.8;
-        camera.lookAt(0, 0, 0);
+        camera.position.x = mouseRef.current.x * 1.0;
+        camera.position.y = 2.2 + mouseRef.current.y * 0.5;
+        camera.lookAt(0, -0.3, 0);
       }
 
       // Update molten shader
