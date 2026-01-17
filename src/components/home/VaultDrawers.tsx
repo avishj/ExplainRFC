@@ -137,7 +137,7 @@ export function VaultDrawers({ onSelectRFC, baseUrl = '' }: VaultDrawersProps) {
             Popular <span className="text-gold">Specifications</span>
           </h2>
           <p className="text-text-secondary max-w-2xl mx-auto">
-            Ancient tomes of protocol wisdom. Click a book to reveal its secrets.
+            Curated protocol references, ready for study. Select a volume to open the exhibit.
           </p>
         </div>
       </div>

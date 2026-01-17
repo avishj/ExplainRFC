@@ -41,6 +41,31 @@ export function RFCSearch({ onSelectRFC }: RFCSearchProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   
+  useEffect(() => {
+    const onGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "/") return;
+      if (e.defaultPrevented) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const isTypingContext =
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        !!target?.isContentEditable;
+
+      if (isTypingContext) return;
+
+      e.preventDefault();
+      setIsOpen(true);
+      requestAnimationFrame(() => inputRef.current?.focus());
+    };
+
+    document.addEventListener("keydown", onGlobalKeyDown);
+    return () => document.removeEventListener("keydown", onGlobalKeyDown);
+  }, []);
+  
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
