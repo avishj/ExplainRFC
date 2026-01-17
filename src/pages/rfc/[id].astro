@@ -17,13 +17,15 @@ const steps = storyboard;
 
 const title = `RFC ${rfc.id}: ${rfc.shortTitle} — Explain RFC`;
 const description = rfc.description;
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title={title} description={description}>
   <ExhibitPlayer 
     client:load 
     rfc={rfc} 
-    storyboard={steps} 
+    storyboard={steps}
+    baseUrl={base}
   />
 </Layout>
 

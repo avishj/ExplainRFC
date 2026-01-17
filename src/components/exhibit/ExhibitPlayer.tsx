@@ -9,9 +9,10 @@ import { Header } from "@/components/ui";
 interface ExhibitPlayerProps {
   rfc: RFC;
   storyboard: StoryboardStep[];
+  baseUrl?: string;
 }
 
-export function ExhibitPlayer({ rfc, storyboard }: ExhibitPlayerProps) {
+export function ExhibitPlayer({ rfc, storyboard, baseUrl = '' }: ExhibitPlayerProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showInstruments, setShowInstruments] = useState(true);
@@ -81,7 +82,7 @@ export function ExhibitPlayer({ rfc, storyboard }: ExhibitPlayerProps) {
   
   return (
     <div className="min-h-screen flex flex-col">
-      <Header currentRFC={`RFC ${rfc.id} — ${rfc.shortTitle}`} />
+      <Header currentRFC={`RFC ${rfc.id} — ${rfc.shortTitle}`} baseUrl={baseUrl} />
       
       {/* Main content */}
       <main className="flex-1 pt-16 flex">
@@ -97,6 +98,7 @@ export function ExhibitPlayer({ rfc, storyboard }: ExhibitPlayerProps) {
           onSeek={goToStep}
           progress={progress}
           rfc={rfc}
+          baseUrl={baseUrl}
         />
         
         {/* Scene Canvas - Center */}

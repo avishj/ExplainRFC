@@ -2,9 +2,10 @@ import { cn } from "@/lib/utils";
 
 interface HeaderProps {
   currentRFC?: string;
+  baseUrl?: string;
 }
 
-export function Header({ currentRFC }: HeaderProps) {
+export function Header({ currentRFC, baseUrl = '' }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <div 
@@ -16,7 +17,7 @@ export function Header({ currentRFC }: HeaderProps) {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <a 
-            href="./" 
+            href={baseUrl || './'} 
             className="flex items-center gap-3 text-text-primary hover:text-gold transition-colors group"
           >
             <div 
@@ -55,7 +56,7 @@ export function Header({ currentRFC }: HeaderProps) {
           {/* Actions */}
           <div className="flex items-center gap-4">
             <a
-              href="./"
+              href={baseUrl || './'}
               className={cn(
                 "font-mono text-xs uppercase tracking-wider",
                 "text-text-muted hover:text-gold transition-colors"

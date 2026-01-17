@@ -7,10 +7,12 @@ import path from 'path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const isProd = process.env.NODE_ENV === 'production';
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://avishj.github.io',
-  base: '/ExplainRFC',
+  base: isProd ? '/ExplainRFC/' : '/',
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],

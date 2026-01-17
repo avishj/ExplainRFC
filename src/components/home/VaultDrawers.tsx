@@ -9,6 +9,7 @@ const featuredRFCs: CatalogRFC[] = featuredRFCIds
 
 interface VaultDrawersProps {
   onSelectRFC: (rfcId: number) => void;
+  baseUrl?: string;
 }
 
 const bookPlacements: BookPlacement[] = [
@@ -106,7 +107,7 @@ const bookColors: Record<BookImage, { text: string; shadow: string }> = {
   "book_left1.png": { text: "#d4a44c", shadow: "rgba(0,0,0,0.9)" },
 };
 
-export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
+export function VaultDrawers({ onSelectRFC, baseUrl = '' }: VaultDrawersProps) {
   const [openBook, setOpenBook] = useState<number | null>(null);
   const [closingBook, setClosingBook] = useState<number | null>(null);
   const [hoveredBook, setHoveredBook] = useState<number | null>(null);
@@ -152,7 +153,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
         >
           {/* Table image */}
           <img 
-            src="table.png" 
+            src={`${baseUrl}table.png`} 
             alt="Antique wooden table"
             className="w-full h-auto"
             style={{ display: "block" }}
@@ -202,7 +203,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                     }}
                   >
                     <img
-                      src={placement.image}
+                      src={`${baseUrl}${placement.image}`}
                       alt={`${rfc.name} - RFC ${rfc.id}`}
                       className="w-auto h-auto max-w-none"
                       style={{
@@ -385,7 +386,7 @@ export function VaultDrawers({ onSelectRFC }: VaultDrawersProps) {
                       </p>
                       <div className="mt-auto pt-4">
                         <a
-                          href={`rfc/${rfc.id}`}
+                          href={`${baseUrl}rfc/${rfc.id}`}
                           className="block w-full text-center py-3 rounded transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                           style={{
                             fontFamily: "var(--font-mono)",

@@ -1,6 +1,8 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { FoundryHero, VaultDrawers, RFCSearch } from "@/components/home";
+
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title="Explain RFC — The Protocol Visualization Museum">
@@ -20,12 +22,12 @@ import { FoundryHero, VaultDrawers, RFCSearch } from "@/components/home";
             Search by RFC number, protocol name, or topic to find what you're looking for.
           </p>
         </div>
-        <RFCSearch client:visible onSelectRFC={(id) => window.location.href = `/rfc/${id}`} />
+        <RFCSearch client:visible onSelectRFC={(id) => window.location.href = `${base}rfc/${id}`} />
       </div>
     </section>
     
     <!-- Featured RFCs Section -->
-    <VaultDrawers client:visible onSelectRFC={(id) => window.location.href = `/rfc/${id}`} />
+    <VaultDrawers client:visible baseUrl={base} onSelectRFC={(id) => window.location.href = `${base}rfc/${id}`} />
     
     <!-- About Section -->
     <section class="py-16 px-6 relative">
