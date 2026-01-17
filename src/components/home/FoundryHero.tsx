@@ -6,18 +6,6 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { gsap } from "gsap";
 
-// Protocol artifacts that orbit the orrery
-const PROTOCOLS = [
-  { name: "TCP", rfc: 793, symbol: "◈" },
-  { name: "IP", rfc: 791, symbol: "◇" },
-  { name: "DNS", rfc: 1035, symbol: "◎" },
-  { name: "TLS", rfc: 8446, symbol: "◆" },
-  { name: "UDP", rfc: 768, symbol: "○" },
-  { name: "HTTP", rfc: 2616, symbol: "◐" },
-  { name: "QUIC", rfc: 9000, symbol: "◉" },
-  { name: "BGP", rfc: 4271, symbol: "◌" },
-];
-
 // Vignette shader for cinematic edges
 const VignetteShader = {
   uniforms: {
@@ -47,131 +35,6 @@ const VignetteShader = {
   `,
 };
 
-// Custom molten metal shader
-const MoltenShader = {
-  uniforms: {
-    uTime: { value: 0 },
-    uIntensity: { value: 1.0 },
-    uBaseColor: { value: new THREE.Color(0xaa3300) },
-    uHighColor: { value: new THREE.Color(0xff6600) },
-  },
-  vertexShader: `
-    varying vec2 vUv;
-    varying vec3 vNormal;
-    varying vec3 vPosition;
-    
-    void main() {
-      vUv = uv;
-      vNormal = normalize(normalMatrix * normal);
-      vPosition = position;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-  fragmentShader: `
-    uniform float uTime;
-    uniform float uIntensity;
-    uniform vec3 uBaseColor;
-    uniform vec3 uHighColor;
-    
-    varying vec2 vUv;
-    varying vec3 vNormal;
-    varying vec3 vPosition;
-    
-    // Simplex noise functions
-    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-    vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-    vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
-    vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-    
-    float snoise(vec3 v) {
-      const vec2 C = vec2(1.0/6.0, 1.0/3.0);
-      const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
-      
-      vec3 i = floor(v + dot(v, C.yyy));
-      vec3 x0 = v - i + dot(i, C.xxx);
-      
-      vec3 g = step(x0.yzx, x0.xyz);
-      vec3 l = 1.0 - g;
-      vec3 i1 = min(g.xyz, l.zxy);
-      vec3 i2 = max(g.xyz, l.zxy);
-      
-      vec3 x1 = x0 - i1 + C.xxx;
-      vec3 x2 = x0 - i2 + C.yyy;
-      vec3 x3 = x0 - D.yyy;
-      
-      i = mod289(i);
-      vec4 p = permute(permute(permute(
-        i.z + vec4(0.0, i1.z, i2.z, 1.0))
-        + i.y + vec4(0.0, i1.y, i2.y, 1.0))
-        + i.x + vec4(0.0, i1.x, i2.x, 1.0));
-      
-      float n_ = 0.142857142857;
-      vec3 ns = n_ * D.wyz - D.xzx;
-      
-      vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-      
-      vec4 x_ = floor(j * ns.z);
-      vec4 y_ = floor(j - 7.0 * x_);
-      
-      vec4 x = x_ * ns.x + ns.yyyy;
-      vec4 y = y_ * ns.x + ns.yyyy;
-      vec4 h = 1.0 - abs(x) - abs(y);
-      
-      vec4 b0 = vec4(x.xy, y.xy);
-      vec4 b1 = vec4(x.zw, y.zw);
-      
-      vec4 s0 = floor(b0) * 2.0 + 1.0;
-      vec4 s1 = floor(b1) * 2.0 + 1.0;
-      vec4 sh = -step(h, vec4(0.0));
-      
-      vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
-      vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-      
-      vec3 p0 = vec3(a0.xy, h.x);
-      vec3 p1 = vec3(a0.zw, h.y);
-      vec3 p2 = vec3(a1.xy, h.z);
-      vec3 p3 = vec3(a1.zw, h.w);
-      
-      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
-      p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
-      
-      vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-      m = m * m;
-      return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
-    }
-    
-    void main() {
-      // Distance from center for radial effects
-      float dist = length(vUv - 0.5) * 2.0;
-      
-      // Multi-layered noise for turbulent molten effect
-      float noise1 = snoise(vec3(vPosition.xy * 4.0, uTime * 0.2)) * 0.5 + 0.5;
-      float noise2 = snoise(vec3(vPosition.xy * 8.0, uTime * 0.35 + 100.0)) * 0.5 + 0.5;
-      float noise3 = snoise(vec3(vPosition.xy * 16.0, uTime * 0.5 + 200.0)) * 0.5 + 0.5;
-      
-      float combined = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
-      
-      // Hot spots - creates variation
-      float hotSpot = pow(combined, 2.0) * 0.8;
-      
-      // Color gradient - warm orange base to brighter orange
-      vec3 color = mix(uBaseColor, uHighColor, hotSpot);
-      
-      // Slight darkening at edges - but keep it molten looking
-      float edgeDark = smoothstep(0.6, 1.0, dist);
-      color *= 1.0 - edgeDark * 0.3;
-      
-      // Pulsing glow
-      float pulse = sin(uTime * 1.5) * 0.05 + 0.9;
-      
-      // Clamp to prevent bloom blowout but keep it vibrant
-      color = min(color * pulse, vec3(0.85, 0.5, 0.2));
-      
-      gl_FragColor = vec4(color, 1.0);
-    }
-  `,
-};
-
 // Data stream particle shader
 const ParticleShader = {
   vertexShader: `
@@ -192,10 +55,13 @@ const ParticleShader = {
       // Calculate particle position along path
       float t = mod((uTime * aSpeed * 0.1) + aPhase, 1.0);
       
-      // Spiral path converging to center
-      float angle = t * 6.28318 * 3.0 + aPhase * 6.28318;
-      float radius = (1.0 - t) * 1.25 + 0.15;
-      float height = (1.0 - t) * 1.0 - 0.5;
+      // Spiral path converging into the cauldron
+      // Start wide at top, spiral down into cauldron opening (radius ~1.2 at rim)
+      float angle = t * 6.28318 * 4.0 + aPhase * 6.28318;
+      // Radius: start at 2.0, narrow to 0.8 (inside cauldron walls)
+      float radius = mix(2.0, 0.6, t * t);
+      // Height: start at 1.5 (above cauldron), descend to -1.7 (at molten surface)
+      float height = mix(1.5, -1.7, t);
       
       vec3 pos = vec3(
         cos(angle) * radius,
@@ -203,11 +69,11 @@ const ParticleShader = {
         sin(angle) * radius
       );
       
-      // Fade in/out
-      vAlpha = smoothstep(0.0, 0.1, t) * smoothstep(1.0, 0.7, t) * uProgress;
+      // Fade in at start, fade out as particles approach the molten surface
+      vAlpha = smoothstep(0.0, 0.1, t) * smoothstep(1.0, 0.85, t) * uProgress;
       
       vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-      gl_PointSize = aSize * (300.0 / -mvPosition.z) * (0.5 + t * 0.5);
+      gl_PointSize = aSize * (300.0 / -mvPosition.z) * (0.3 + t * 0.7);
       gl_Position = projectionMatrix * mvPosition;
     }
   `,
@@ -349,13 +215,13 @@ export function FoundryHero() {
 
     // Central cauldron - dark bowl that the spiral flows into
     const cauldronGroup = new THREE.Group();
-    cauldronGroup.position.y = -2.5; // Position so rim is near y=-0.5 where particles converge (depth is 2.0)
+    cauldronGroup.position.y = -2.5; // Position so rim is near y=-0.5 where particles converge
     scene.add(cauldronGroup);
 
     // Cauldron bowl - using LatheGeometry for proper tall cauldron shape
     const cauldronProfile: THREE.Vector2[] = [];
-    const cauldronRadius = 1.2; // Opening radius
-    const cauldronDepth = 2.0; // MUCH TALLER - proper cauldron proportions
+    const cauldronRadius = 1.4; // Opening radius - slightly larger
+    const cauldronDepth = 2.0; // Tall cauldron proportions
     const wallThickness = 0.15;
     
     // Outer profile (bottom to top) - classic cauldron shape: narrower bottom, wider top
@@ -363,7 +229,7 @@ export function FoundryHero() {
       const t = i / 24;
       const y = t * cauldronDepth;
       // Cauldron curve - starts narrow at bottom, flares out toward top
-      const r = 0.4 + (cauldronRadius - 0.4) * Math.pow(t, 0.5);
+      const r = 0.45 + (cauldronRadius - 0.45) * Math.pow(t, 0.5);
       cauldronProfile.push(new THREE.Vector2(r, y));
     }
     // Add rim - slight lip at top
@@ -374,23 +240,25 @@ export function FoundryHero() {
     for (let i = 24; i >= 0; i--) {
       const t = i / 24;
       const y = t * (cauldronDepth - 0.15) + 0.1;
-      const r = Math.max(0.25, (0.4 + (cauldronRadius - 0.4) * Math.pow(t, 0.5)) - wallThickness);
+      const r = Math.max(0.3, (0.45 + (cauldronRadius - 0.45) * Math.pow(t, 0.5)) - wallThickness);
       cauldronProfile.push(new THREE.Vector2(r, y));
     }
     // Close bottom
-    cauldronProfile.push(new THREE.Vector2(0.25, 0.1));
-    cauldronProfile.push(new THREE.Vector2(0.4, 0));
+    cauldronProfile.push(new THREE.Vector2(0.3, 0.1));
+    cauldronProfile.push(new THREE.Vector2(0.45, 0));
     
     const cauldronGeo = new THREE.LatheGeometry(cauldronProfile, 64);
     const cauldronMat = new THREE.MeshStandardMaterial({
-      color: 0xff0000, // BRIGHT RED FOR DEBUGGING
-      roughness: 0.5,
-      metalness: 0.3,
-      emissive: 0xff0000,
-      emissiveIntensity: 1.0,
+      color: 0x1a1008,
+      roughness: 0.4,
+      metalness: 0.8,
+      emissive: 0x110800,
+      emissiveIntensity: 0.15,
       side: THREE.DoubleSide,
+      depthWrite: true,
     });
     const cauldronMesh = new THREE.Mesh(cauldronGeo, cauldronMat);
+    cauldronMesh.renderOrder = 0; // Render cauldron first to establish depth
     cauldronGroup.add(cauldronMesh);
 
     // Cauldron rim highlight
@@ -406,126 +274,6 @@ export function FoundryHero() {
     cauldronRim.rotation.x = Math.PI / 2;
     cauldronRim.position.y = cauldronDepth;
     cauldronGroup.add(cauldronRim);
-
-    // Molten glow at bottom of cauldron - DISABLED FOR DEBUGGING
-    const moltenGeo = new THREE.CircleGeometry(0.5, 64);
-    const moltenMat = new THREE.ShaderMaterial({
-      uniforms: MoltenShader.uniforms,
-      vertexShader: MoltenShader.vertexShader,
-      fragmentShader: MoltenShader.fragmentShader,
-      transparent: false,
-    });
-    const moltenSurface = new THREE.Mesh(moltenGeo, moltenMat);
-    moltenSurface.rotation.x = -Math.PI / 2;
-    moltenSurface.position.y = 0.1;
-    moltenSurface.visible = false; // DISABLED FOR DEBUGGING
-    cauldronGroup.add(moltenSurface);
-
-    // Orrery rings (the rotating mechanism) - positioned above crucible
-    const orreryGroup = new THREE.Group();
-    orreryGroup.position.y = 0.6;
-    orreryGroup.visible = false; // DISABLED FOR DEBUGGING
-    scene.add(orreryGroup);
-
-    // Inner ring
-    const innerOrreryGeo = new THREE.TorusGeometry(1.2, 0.02, 8, 64);
-    const orreryMat = new THREE.MeshStandardMaterial({
-      color: 0xd4a44c,
-      roughness: 0.25,
-      metalness: 0.9,
-      emissive: 0xffaa00,
-      emissiveIntensity: 0.08,
-    });
-    const innerOrrery = new THREE.Mesh(innerOrreryGeo, orreryMat);
-    innerOrrery.rotation.x = Math.PI / 2;
-    orreryGroup.add(innerOrrery);
-
-    // Middle ring
-    const middleOrreryGeo = new THREE.TorusGeometry(1.8, 0.025, 8, 64);
-    const middleOrrery = new THREE.Mesh(middleOrreryGeo, orreryMat.clone());
-    middleOrrery.rotation.x = Math.PI / 2;
-    middleOrrery.rotation.z = Math.PI / 6;
-    orreryGroup.add(middleOrrery);
-
-    // Protocol artifacts orbiting the orrery
-    const artifactGroup = new THREE.Group();
-    orreryGroup.add(artifactGroup);
-
-    interface Artifact {
-      mesh: THREE.Mesh;
-      label: THREE.Sprite;
-      orbit: number;
-      angle: number;
-      speed: number;
-      yOffset: number;
-    }
-    const artifacts: Artifact[] = [];
-
-    const createTextTexture = (text: string, color: string) => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d")!;
-      canvas.width = 256;
-      canvas.height = 64;
-
-      ctx.fillStyle = color;
-      ctx.font = "bold 32px 'IBM Plex Mono', monospace";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(text, 128, 32);
-
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.needsUpdate = true;
-      return texture;
-    };
-
-    PROTOCOLS.forEach((protocol, i) => {
-      // Artifact body (faceted gem-like)
-      const artifactGeo = new THREE.OctahedronGeometry(0.12, 0);
-      const artifactMat = new THREE.MeshStandardMaterial({
-        color: 0xffc71f,
-        roughness: 0.2,
-        metalness: 0.9,
-        emissive: 0xff8c00,
-        emissiveIntensity: 0.2,
-      });
-      const artifact = new THREE.Mesh(artifactGeo, artifactMat);
-
-      // Position in different orbit rings (only inner and middle now)
-      const orbitIndex = i % 2;
-      const orbitRadius = [1.2, 1.8][orbitIndex];
-      const baseAngle = (i / PROTOCOLS.length) * Math.PI * 2 + orbitIndex * 0.3;
-
-      artifact.position.set(
-        Math.cos(baseAngle) * orbitRadius,
-        0,
-        Math.sin(baseAngle) * orbitRadius
-      );
-
-      artifactGroup.add(artifact);
-
-      // Protocol label
-      const labelTexture = createTextTexture(protocol.name, "#ffc71f");
-      const labelMat = new THREE.SpriteMaterial({
-        map: labelTexture,
-        transparent: true,
-        opacity: 0.9,
-        depthWrite: false,
-      });
-      const label = new THREE.Sprite(labelMat);
-      label.scale.set(0.6, 0.15, 1);
-      label.position.copy(artifact.position);
-      label.position.y += 0.25;
-      artifactGroup.add(label);
-
-      artifacts.push({
-        mesh: artifact,
-        label,
-        orbit: orbitRadius,
-        angle: baseAngle,
-        speed: 0.15 + Math.random() * 0.1,
-        yOffset: (Math.random() - 0.5) * 0.2,
-      });
-    });
 
     // Data stream particles (converging to crucible)
     const particleCount = 2000;
@@ -573,7 +321,7 @@ export function FoundryHero() {
     });
 
     const particles = new THREE.Points(particleGeo, particleMat);
-    particles.visible = false; // DISABLED FOR DEBUGGING
+    particles.renderOrder = 2; // Render after cauldron for proper occlusion
     scene.add(particles);
 
     // Sparks system (emitting from crucible)
@@ -652,38 +400,8 @@ export function FoundryHero() {
         camera.lookAt(0, -0.3, 0);
       }
 
-      // Update molten shader
-      (moltenMat.uniforms.uTime as THREE.IUniform<number>).value = elapsed;
-      (moltenMat.uniforms.uIntensity as THREE.IUniform<number>).value = 
-        0.8 + Math.sin(elapsed * 1.5) * 0.2;
-
       // Update particles
       (particleMat.uniforms.uTime as THREE.IUniform<number>).value = elapsed;
-
-      // Rotate orrery rings at different speeds
-      if (!prefersReducedMotion) {
-        innerOrrery.rotation.z = elapsed * 0.3;
-        middleOrrery.rotation.z = -elapsed * 0.2;
-      }
-
-      // Animate artifacts in orbit
-      artifacts.forEach((artifact) => {
-        if (!prefersReducedMotion) {
-          artifact.angle += artifact.speed * delta;
-        }
-        const x = Math.cos(artifact.angle) * artifact.orbit;
-        const z = Math.sin(artifact.angle) * artifact.orbit;
-        const y = artifact.yOffset + Math.sin(elapsed * 2 + artifact.angle) * 0.05;
-
-        artifact.mesh.position.set(x, y, z);
-        artifact.mesh.rotation.y = elapsed * 2;
-        artifact.mesh.rotation.x = elapsed * 1.5;
-        artifact.label.position.set(x, y + 0.25, z);
-
-        // Pulsing emissive
-        const mat = artifact.mesh.material as THREE.MeshStandardMaterial;
-        mat.emissiveIntensity = 0.3 + Math.sin(elapsed * 3 + artifact.angle) * 0.15;
-      });
 
       // Crucible light flicker - subtle breathing
       crucibleLight.intensity = 1.2 + Math.sin(elapsed * 2) * 0.15 + Math.sin(elapsed * 5) * 0.05;
@@ -765,16 +483,6 @@ export function FoundryHero() {
       duration: 4,
       delay: 1.5,
       ease: "power2.out",
-    });
-
-    // Stagger orrery entrance - slower, more graceful
-    gsap.from(orreryGroup.scale, {
-      x: 0,
-      y: 0,
-      z: 0,
-      duration: 3,
-      delay: 2,
-      ease: "power3.out",
     });
 
     gsap.from(cauldronGroup.position, {
