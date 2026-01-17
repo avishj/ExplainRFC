@@ -194,8 +194,8 @@ const ParticleShader = {
       
       // Spiral path converging to center
       float angle = t * 6.28318 * 3.0 + aPhase * 6.28318;
-      float radius = (1.0 - t) * 3.0 + 0.3;
-      float height = (1.0 - t) * 2.0 - 1.0;
+      float radius = (1.0 - t) * 1.25 + 0.15;
+      float height = (1.0 - t) * 1.0 - 0.5;
       
       vec3 pos = vec3(
         cos(angle) * radius,
@@ -311,33 +311,30 @@ export function FoundryHero() {
     scene.add(plinthGroup);
 
     // Main plinth body
-    const plinthGeo = new THREE.CylinderGeometry(2.5, 3, 0.4, 64, 1);
+    const plinthGeo = new THREE.CylinderGeometry(1.25, 1.5, 0.2, 64, 1);
     const plinthMat = new THREE.MeshStandardMaterial({
       color: 0x050505,
-      roughness: 0.15,
-      metalness: 0.9,
-      envMapIntensity: 0.3,
+      roughness: 0.3,
+      metalness: 0.7,
     });
     const plinth = new THREE.Mesh(plinthGeo, plinthMat);
-    plinth.position.y = -1.5;
+    plinth.position.y = -0.75;
     plinthGroup.add(plinth);
 
-    // Decorative rings on plinth
-    const ringGeo = new THREE.TorusGeometry(2.7, 0.03, 8, 64);
+    // Decorative rings on plinth - no emissive to prevent bloom
+    const ringGeo = new THREE.TorusGeometry(1.35, 0.015, 8, 64);
     const brassRingMat = new THREE.MeshStandardMaterial({
-      color: 0xd4a44c,
-      roughness: 0.3,
-      metalness: 0.95,
-      emissive: 0xff8c00,
-      emissiveIntensity: 0.05,
+      color: 0x8a7040,
+      roughness: 0.4,
+      metalness: 0.8,
     });
     const plinthRing1 = new THREE.Mesh(ringGeo, brassRingMat);
     plinthRing1.rotation.x = Math.PI / 2;
-    plinthRing1.position.y = -1.3;
+    plinthRing1.position.y = -0.65;
     plinthGroup.add(plinthRing1);
 
     const plinthRing2 = plinthRing1.clone();
-    plinthRing2.position.y = -1.7;
+    plinthRing2.position.y = -0.85;
     plinthGroup.add(plinthRing2);
 
     // Central crucible (the heart of the forge)
