@@ -6,6 +6,20 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { gsap } from "gsap";
 
+// RFCs for output bricks (what gets forged)
+const RFC_OUTPUTS = [
+  { rfc: 793, title: "TCP" },
+  { rfc: 791, title: "IP" },
+  { rfc: 1035, title: "DNS" },
+  { rfc: 8446, title: "TLS 1.3" },
+  { rfc: 768, title: "UDP" },
+  { rfc: 2616, title: "HTTP/1.1" },
+  { rfc: 9000, title: "QUIC" },
+  { rfc: 4271, title: "BGP" },
+  { rfc: 7540, title: "HTTP/2" },
+  { rfc: 6749, title: "OAuth 2.0" },
+];
+
 // Protocol artifacts that orbit the orrery
 const PROTOCOLS = [
   { name: "TCP", rfc: 793, symbol: "◈" },
@@ -226,6 +240,113 @@ const ParticleShader = {
   `,
 };
 
+// RFC Sheet shader - document that burns as it approaches crucible
+const SheetShader = {
+  uniforms: {
+    uTime: { value: 0 },
+    uBurnProgress: { value: 0 },
+    uOpacity: { value: 1.0 },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    uniform float uBurnProgress;
+    uniform float uTime;
+    
+    void main() {
+      vUv = uv;
+      
+      // Curl effect as sheet burns
+      vec3 pos = position;
+      float curl = uBurnProgress * sin(uv.x * 3.14159 + uTime * 2.0) * 0.1;
+      pos.z += curl;
+      pos.y += uBurnProgress * sin(uv.y * 6.28) * 0.05;
+      
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform float uBurnProgress;
+    uniform float uOpacity;
+    uniform float uTime;
+    varying vec2 vUv;
+    
+    void main() {
+      // Base sheet color - very dark charcoal
+      vec3 sheetColor = vec3(0.06, 0.05, 0.04);
+      
+      // Faint text lines
+      float lines = step(0.8, sin(vUv.y * 40.0));
+      sheetColor += vec3(0.03) * lines * (1.0 - uBurnProgress);
+      
+      // Burn edge effect
+      float burnEdge = smoothstep(1.0 - uBurnProgress * 1.2, 1.0 - uBurnProgress * 1.2 + 0.15, vUv.x + vUv.y * 0.3);
+      
+      // Ember glow at burn edge
+      vec3 emberColor = mix(vec3(1.0, 0.3, 0.0), vec3(1.0, 0.6, 0.1), sin(uTime * 10.0 + vUv.y * 20.0) * 0.5 + 0.5);
+      float emberGlow = smoothstep(0.0, 0.1, burnEdge) * smoothstep(0.3, 0.1, burnEdge);
+      
+      vec3 finalColor = mix(sheetColor, emberColor, emberGlow * 2.0);
+      
+      // Fade to transparent as it burns away
+      float alpha = (1.0 - burnEdge) * uOpacity;
+      
+      gl_FragColor = vec4(finalColor, alpha);
+    }
+  `,
+};
+
+// RFC Brick shader - cooling molten metal with stamped text
+const BrickShader = {
+  uniforms: {
+    uTime: { value: 0 },
+    uHeat: { value: 1.0 },
+    uOpacity: { value: 1.0 },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    varying vec3 vNormal;
+    
+    void main() {
+      vUv = uv;
+      vNormal = normalize(normalMatrix * normal);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform float uTime;
+    uniform float uHeat;
+    uniform float uOpacity;
+    varying vec2 vUv;
+    varying vec3 vNormal;
+    
+    void main() {
+      // Cool brass color
+      vec3 brassColor = vec3(0.83, 0.64, 0.3);
+      // Hot molten color
+      vec3 hotColor = vec3(1.0, 0.5, 0.1);
+      // White hot
+      vec3 whiteHot = vec3(1.0, 0.9, 0.7);
+      
+      // Mix based on heat level
+      vec3 color = mix(brassColor, hotColor, uHeat);
+      color = mix(color, whiteHot, uHeat * uHeat * 0.3);
+      
+      // Add some surface variation
+      float noise = sin(vUv.x * 50.0 + uTime) * sin(vUv.y * 50.0) * 0.02;
+      color += noise * uHeat;
+      
+      // Rim lighting
+      float rim = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);
+      color += vec3(1.0, 0.7, 0.3) * rim * 0.2 * (1.0 - uHeat * 0.5);
+      
+      // Emissive glow when hot
+      color += hotColor * uHeat * 0.5;
+      
+      gl_FragColor = vec4(color, uOpacity);
+    }
+  `,
+};
+
 export function FoundryHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -237,7 +358,6 @@ export function FoundryHero() {
     const container = containerRef.current;
     if (!canvas || !container) return;
 
-    // Check for reduced motion preference
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // Scene setup
@@ -304,11 +424,10 @@ export function FoundryHero() {
     fillLight.position.set(0, 5, 5);
     scene.add(fillLight);
 
-    // Create the obsidian plinth with engraved channels
+    // Create the obsidian plinth
     const plinthGroup = new THREE.Group();
     scene.add(plinthGroup);
 
-    // Main plinth body
     const plinthGeo = new THREE.CylinderGeometry(2.5, 3, 0.4, 64, 1);
     const plinthMat = new THREE.MeshStandardMaterial({
       color: 0x050505,
@@ -338,11 +457,10 @@ export function FoundryHero() {
     plinthRing2.position.y = -1.7;
     plinthGroup.add(plinthRing2);
 
-    // Central crucible (the heart of the forge)
+    // Central crucible
     const crucibleGroup = new THREE.Group();
     scene.add(crucibleGroup);
 
-    // Crucible bowl (outer)
     const crucibleOuterGeo = new THREE.CylinderGeometry(0.8, 0.6, 0.5, 32, 1, true);
     const crucibleMat = new THREE.MeshStandardMaterial({
       color: 0x1a1a1a,
@@ -353,7 +471,6 @@ export function FoundryHero() {
     const crucibleOuter = new THREE.Mesh(crucibleOuterGeo, crucibleMat);
     crucibleGroup.add(crucibleOuter);
 
-    // Crucible rim
     const rimGeo = new THREE.TorusGeometry(0.8, 0.06, 16, 32);
     const rimMat = new THREE.MeshStandardMaterial({
       color: 0x8b7355,
@@ -370,7 +487,7 @@ export function FoundryHero() {
     // Molten metal surface (custom shader)
     const moltenGeo = new THREE.CircleGeometry(0.75, 64);
     const moltenMat = new THREE.ShaderMaterial({
-      uniforms: MoltenShader.uniforms,
+      uniforms: { ...MoltenShader.uniforms },
       vertexShader: MoltenShader.vertexShader,
       fragmentShader: MoltenShader.fragmentShader,
       transparent: false,
@@ -380,12 +497,11 @@ export function FoundryHero() {
     moltenSurface.position.y = 0.1;
     crucibleGroup.add(moltenSurface);
 
-    // Orrery rings (the rotating mechanism)
+    // Orrery rings
     const orreryGroup = new THREE.Group();
     orreryGroup.position.y = 0.8;
     scene.add(orreryGroup);
 
-    // Inner ring
     const innerOrreryGeo = new THREE.TorusGeometry(1.2, 0.02, 8, 64);
     const orreryMat = new THREE.MeshStandardMaterial({
       color: 0xd4a44c,
@@ -398,14 +514,12 @@ export function FoundryHero() {
     innerOrrery.rotation.x = Math.PI / 2;
     orreryGroup.add(innerOrrery);
 
-    // Middle ring
     const middleOrreryGeo = new THREE.TorusGeometry(1.8, 0.025, 8, 64);
     const middleOrrery = new THREE.Mesh(middleOrreryGeo, orreryMat.clone());
     middleOrrery.rotation.x = Math.PI / 2;
     middleOrrery.rotation.z = Math.PI / 6;
     orreryGroup.add(middleOrrery);
 
-    // Outer ring with tick marks
     const outerOrreryGeo = new THREE.TorusGeometry(2.4, 0.03, 8, 64);
     const outerOrrery = new THREE.Mesh(outerOrreryGeo, orreryMat.clone());
     outerOrrery.rotation.x = Math.PI / 2;
@@ -427,7 +541,7 @@ export function FoundryHero() {
       orreryGroup.add(tick);
     }
 
-    // Protocol artifacts orbiting the orrery
+    // Protocol artifacts
     const artifactGroup = new THREE.Group();
     orreryGroup.add(artifactGroup);
 
@@ -459,7 +573,6 @@ export function FoundryHero() {
     };
 
     PROTOCOLS.forEach((protocol, i) => {
-      // Artifact body (faceted gem-like)
       const artifactGeo = new THREE.OctahedronGeometry(0.12, 0);
       const artifactMat = new THREE.MeshStandardMaterial({
         color: 0xffc71f,
@@ -470,7 +583,6 @@ export function FoundryHero() {
       });
       const artifact = new THREE.Mesh(artifactGeo, artifactMat);
 
-      // Position in different orbit rings
       const orbitIndex = i % 3;
       const orbitRadius = [1.2, 1.8, 2.4][orbitIndex];
       const baseAngle = (i / PROTOCOLS.length) * Math.PI * 2 + orbitIndex * 0.3;
@@ -483,7 +595,6 @@ export function FoundryHero() {
 
       artifactGroup.add(artifact);
 
-      // Protocol label
       const labelTexture = createTextTexture(protocol.name, "#ffc71f");
       const labelMat = new THREE.SpriteMaterial({
         map: labelTexture,
@@ -506,6 +617,140 @@ export function FoundryHero() {
         yOffset: (Math.random() - 0.5) * 0.2,
       });
     });
+
+    // ========== RFC SHEET INPUTS (from upper-left) ==========
+    interface RFCSheet {
+      mesh: THREE.Mesh;
+      material: THREE.ShaderMaterial;
+      startTime: number;
+      duration: number;
+      startPos: THREE.Vector3;
+      active: boolean;
+    }
+    const sheets: RFCSheet[] = [];
+    let nextSheetTime = 3; // Start after intro animation
+    const sheetInterval = 4; // Seconds between sheets
+
+    const createSheet = (elapsed: number) => {
+      const sheetGeo = new THREE.PlaneGeometry(0.5, 0.35, 8, 8);
+      const sheetMat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: elapsed },
+          uBurnProgress: { value: 0 },
+          uOpacity: { value: 0 },
+        },
+        vertexShader: SheetShader.vertexShader,
+        fragmentShader: SheetShader.fragmentShader,
+        transparent: true,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      });
+
+      const sheet = new THREE.Mesh(sheetGeo, sheetMat);
+      const startPos = new THREE.Vector3(-4.5, 3.5, -1);
+      sheet.position.copy(startPos);
+      sheet.rotation.x = -0.3;
+      sheet.rotation.z = 0.15;
+      scene.add(sheet);
+
+      sheets.push({
+        mesh: sheet,
+        material: sheetMat,
+        startTime: elapsed,
+        duration: 5,
+        startPos: startPos.clone(),
+        active: true,
+      });
+    };
+
+    // ========== RFC BRICK OUTPUTS (to the right) ==========
+    interface RFCBrick {
+      group: THREE.Group;
+      material: THREE.ShaderMaterial;
+      labelSprite: THREE.Sprite;
+      startTime: number;
+      duration: number;
+      rfcData: { rfc: number; title: string };
+      active: boolean;
+      phase: "emerge" | "cool" | "drift" | "fade";
+    }
+    const bricks: RFCBrick[] = [];
+    let nextBrickTime = 5;
+    const brickInterval = 5;
+    let brickIndex = 0;
+
+    const createBrickLabelTexture = (rfc: number, title: string) => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d")!;
+      canvas.width = 512;
+      canvas.height = 128;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Text styling
+      ctx.fillStyle = "#1a1510";
+      ctx.font = "bold 48px 'IBM Plex Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(`RFC ${rfc} | ${title}`, 256, 64);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      return texture;
+    };
+
+    const createBrick = (elapsed: number) => {
+      const rfcData = RFC_OUTPUTS[brickIndex % RFC_OUTPUTS.length];
+      brickIndex++;
+
+      const group = new THREE.Group();
+
+      // Brick geometry
+      const brickGeo = new THREE.BoxGeometry(0.8, 0.25, 0.4);
+      const brickMat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: elapsed },
+          uHeat: { value: 1.0 },
+          uOpacity: { value: 0 },
+        },
+        vertexShader: BrickShader.vertexShader,
+        fragmentShader: BrickShader.fragmentShader,
+        transparent: true,
+      });
+
+      const brickMesh = new THREE.Mesh(brickGeo, brickMat);
+      group.add(brickMesh);
+
+      // Label on the brick
+      const labelTexture = createBrickLabelTexture(rfcData.rfc, rfcData.title);
+      const labelMat = new THREE.SpriteMaterial({
+        map: labelTexture,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+      });
+      const labelSprite = new THREE.Sprite(labelMat);
+      labelSprite.scale.set(1.2, 0.3, 1);
+      labelSprite.position.y = 0.02;
+      labelSprite.position.z = 0.21;
+      group.add(labelSprite);
+
+      // Start position - emerging from crucible
+      group.position.set(0.3, 0.3, 0);
+      group.rotation.y = -0.3;
+      scene.add(group);
+
+      bricks.push({
+        group,
+        material: brickMat,
+        labelSprite,
+        startTime: elapsed,
+        duration: 8,
+        rfcData,
+        active: true,
+        phase: "emerge",
+      });
+    };
 
     // Data stream particles (converging to crucible)
     const particleCount = 2000;
@@ -616,7 +861,7 @@ export function FoundryHero() {
     const animate = () => {
       animationId = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
-      const delta = clock.getDelta();
+      const delta = Math.min(clock.getDelta(), 0.1);
 
       // Smooth mouse following
       mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05;
@@ -631,7 +876,7 @@ export function FoundryHero() {
 
       // Update molten shader
       (moltenMat.uniforms.uTime as THREE.IUniform<number>).value = elapsed;
-      (moltenMat.uniforms.uIntensity as THREE.IUniform<number>).value = 
+      (moltenMat.uniforms.uIntensity as THREE.IUniform<number>).value =
         0.8 + Math.sin(elapsed * 1.5) * 0.2;
 
       // Update particles
@@ -665,6 +910,103 @@ export function FoundryHero() {
 
       // Crucible light flicker - subtle breathing
       crucibleLight.intensity = 1.2 + Math.sin(elapsed * 2) * 0.15 + Math.sin(elapsed * 5) * 0.05;
+
+      // ========== ANIMATE RFC SHEETS ==========
+      if (elapsed > nextSheetTime && !prefersReducedMotion) {
+        createSheet(elapsed);
+        nextSheetTime = elapsed + sheetInterval + Math.random() * 2;
+      }
+
+      sheets.forEach((sheet, idx) => {
+        if (!sheet.active) return;
+
+        const progress = (elapsed - sheet.startTime) / sheet.duration;
+
+        if (progress > 1) {
+          scene.remove(sheet.mesh);
+          sheet.mesh.geometry.dispose();
+          sheet.material.dispose();
+          sheet.active = false;
+          return;
+        }
+
+        // Move toward crucible
+        const targetPos = new THREE.Vector3(0, 0.5, 0);
+        sheet.mesh.position.lerpVectors(sheet.startPos, targetPos, Math.pow(progress, 0.7));
+
+        // Fade in at start
+        const fadeIn = Math.min(progress * 5, 1);
+        // Burn progress increases as it gets closer
+        const burnProgress = Math.max(0, (progress - 0.4) / 0.6);
+
+        sheet.material.uniforms.uTime.value = elapsed;
+        sheet.material.uniforms.uOpacity.value = fadeIn * (1 - Math.pow(progress, 3));
+        sheet.material.uniforms.uBurnProgress.value = burnProgress;
+
+        // Wobble and rotate as it falls
+        sheet.mesh.rotation.x = -0.3 + Math.sin(elapsed * 2 + idx) * 0.1;
+        sheet.mesh.rotation.z = 0.15 + Math.sin(elapsed * 1.5 + idx) * 0.1;
+        sheet.mesh.rotation.y = progress * 0.5;
+      });
+
+      // ========== ANIMATE RFC BRICKS ==========
+      if (elapsed > nextBrickTime && !prefersReducedMotion) {
+        createBrick(elapsed);
+        nextBrickTime = elapsed + brickInterval + Math.random() * 2;
+      }
+
+      bricks.forEach((brick) => {
+        if (!brick.active) return;
+
+        const age = elapsed - brick.startTime;
+
+        if (age > brick.duration) {
+          scene.remove(brick.group);
+          brick.material.dispose();
+          brick.active = false;
+          return;
+        }
+
+        // Phase timings
+        const emergeEnd = 1.2;
+        const coolEnd = 3.0;
+        const driftEnd = 7.0;
+
+        if (age < emergeEnd) {
+          // Emerge from crucible
+          brick.phase = "emerge";
+          const t = age / emergeEnd;
+          brick.group.position.y = 0.3 + t * 0.5;
+          brick.group.position.x = 0.3 + t * 0.3;
+          brick.material.uniforms.uOpacity.value = Math.min(t * 2, 1);
+          brick.material.uniforms.uHeat.value = 1.0;
+          brick.labelSprite.material.opacity = 0;
+        } else if (age < coolEnd) {
+          // Cooling phase
+          brick.phase = "cool";
+          const t = (age - emergeEnd) / (coolEnd - emergeEnd);
+          brick.material.uniforms.uHeat.value = 1.0 - t * 0.9;
+          brick.labelSprite.material.opacity = t * 0.8;
+          brick.group.position.x = 0.6 + t * 0.5;
+          brick.group.position.y = 0.8 + t * 0.2;
+        } else if (age < driftEnd) {
+          // Drifting right
+          brick.phase = "drift";
+          const t = (age - coolEnd) / (driftEnd - coolEnd);
+          brick.group.position.x = 1.1 + t * 4;
+          brick.group.position.y = 1.0 - t * 0.3;
+          brick.group.rotation.y = -0.3 + t * 0.2;
+          brick.material.uniforms.uHeat.value = 0.1 - t * 0.1;
+        } else {
+          // Fading out
+          brick.phase = "fade";
+          const t = (age - driftEnd) / (brick.duration - driftEnd);
+          brick.material.uniforms.uOpacity.value = 1 - t;
+          brick.labelSprite.material.opacity = 0.8 * (1 - t);
+        }
+
+        brick.material.uniforms.uTime.value = elapsed;
+      });
 
       // Spark emission
       sparkTimer += delta;
@@ -730,18 +1072,18 @@ export function FoundryHero() {
     };
     container.addEventListener("mousemove", handleMouseMove);
 
-    // Intro animation - slow and cinematic
+    // ========== SLOW CINEMATIC INTRO ==========
     gsap.from(camera.position, {
       z: 18,
       y: 8,
-      duration: 5,
+      duration: 6,
       ease: "power2.out",
     });
 
     gsap.to(particleMat.uniforms.uProgress, {
       value: 1,
-      duration: 4,
-      delay: 1.5,
+      duration: 5,
+      delay: 2,
       ease: "power2.out",
     });
 
@@ -750,15 +1092,15 @@ export function FoundryHero() {
       x: 0,
       y: 0,
       z: 0,
-      duration: 3,
-      delay: 2,
+      duration: 4,
+      delay: 2.5,
       ease: "power3.out",
     });
 
     gsap.from(crucibleGroup.position, {
       y: -2,
-      duration: 2.5,
-      delay: 0.8,
+      duration: 3,
+      delay: 1,
       ease: "power2.out",
     });
 
@@ -766,14 +1108,14 @@ export function FoundryHero() {
     crucibleLight.intensity = 0;
     gsap.to(crucibleLight, {
       intensity: 1.2,
-      duration: 3,
-      delay: 1,
+      duration: 4,
+      delay: 1.5,
       ease: "power2.out",
     });
 
     animate();
 
-    setTimeout(() => setIsLoaded(true), 1500);
+    setTimeout(() => setIsLoaded(true), 2000);
 
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -804,7 +1146,7 @@ export function FoundryHero() {
         <div className="flex-1 flex items-center justify-center px-6 pt-16 md:pt-24">
           <div
             className={`
-              text-center transition-all duration-1000 ease-out
+              text-center transition-all duration-[2000ms] ease-out
               ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}
             `}
           >
@@ -823,8 +1165,8 @@ export function FoundryHero() {
 
                 <h1 className="font-display text-5xl sm:text-7xl md:text-9xl font-bold tracking-tight mb-4 md:mb-6">
                   <span className="block text-text-bright text-glow-gold">EXPLAIN</span>
-                  <span className="block text-gold" style={{ 
-                    textShadow: "0 0 40px rgba(255,199,31,0.5), 0 0 80px rgba(255,140,0,0.3)" 
+                  <span className="block text-gold" style={{
+                    textShadow: "0 0 30px rgba(255,199,31,0.4), 0 0 60px rgba(255,140,0,0.2)"
                   }}>
                     RFC
                   </span>
@@ -844,7 +1186,7 @@ export function FoundryHero() {
         {/* Scroll prompt */}
         <div
           className={`
-            pb-12 text-center transition-all duration-1000 delay-500
+            pb-12 text-center transition-all duration-[2000ms] delay-1000
             ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
           `}
         >
