@@ -808,25 +808,14 @@ export function FoundryHero() {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col overflow-hidden">
-      {/* 3D Canvas - Full bleed background */}
-      <div
-        ref={containerRef}
-        className="absolute inset-0"
-      >
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full"
-        />
-      </div>
-
-      {/* Content overlay */}
-      <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Top section with title */}
-        <div className="flex-1 flex items-center justify-center px-6 pt-16 md:pt-24">
+    <section className="relative min-h-screen flex overflow-hidden bg-obsidian">
+      {/* Main layout: Left text | Right cauldron */}
+      <div className="relative z-10 flex flex-col lg:flex-row w-full min-h-screen">
+        {/* Left side - Text content */}
+        <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0">
           <div
             className={`
-              text-center transition-all duration-1000 ease-out
+              transition-all duration-1000 ease-out
               ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}
             `}
           >
@@ -838,12 +827,12 @@ export function FoundryHero() {
               <div className="absolute -bottom-4 -left-4 w-8 h-8 border-b-2 border-l-2 border-brass opacity-60" />
               <div className="absolute -bottom-4 -right-4 w-8 h-8 border-b-2 border-r-2 border-brass opacity-60" />
 
-              <div className="px-8 md:px-16 py-8 md:py-12">
-                <p className="museum-label mb-4 md:mb-6 text-amber tracking-[0.25em]">
+              <div className="px-8 md:px-12 py-8 md:py-10">
+                <p className="museum-label mb-4 text-amber tracking-[0.25em]">
                   THE PROTOCOL VISUALIZATION MUSEUM
                 </p>
 
-                <h1 className="font-display text-5xl sm:text-7xl md:text-9xl font-bold tracking-tight mb-4 md:mb-6">
+                <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-4">
                   <span className="block text-text-bright text-glow-gold">EXPLAIN</span>
                   <span className="block text-gold" style={{ 
                     textShadow: "0 0 40px rgba(255,199,31,0.5), 0 0 80px rgba(255,140,0,0.3)" 
@@ -852,40 +841,64 @@ export function FoundryHero() {
                   </span>
                 </h1>
 
-                <div className="incised w-32 md:w-64 mx-auto my-6 md:my-8" />
+                <div className="incised w-32 md:w-48 my-6" />
 
-                <p className="font-display text-lg md:text-2xl text-text-secondary max-w-xl mx-auto leading-relaxed">
+                <p className="font-display text-lg md:text-xl text-text-secondary max-w-md leading-relaxed">
                   Where dense specifications become
                   <span className="text-brass font-semibold"> living exhibits</span>
                 </p>
               </div>
             </div>
+
+            {/* Scroll prompt - below text on left side */}
+            <div
+              className={`
+                mt-12 transition-all duration-1000 delay-500
+                ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
+              `}
+            >
+              <a
+                href="#vault"
+                className="group inline-flex items-center gap-4"
+              >
+                <div className="w-8 h-12 rounded-full border border-patina group-hover:border-gold transition-colors flex items-start justify-center p-2">
+                  <div className="w-1 h-2.5 bg-amber rounded-full animate-bounce" />
+                </div>
+                <span className="font-mono text-xs tracking-wider text-text-muted group-hover:text-gold transition-colors">
+                  ENTER THE VAULT
+                </span>
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Scroll prompt */}
-        <div
-          className={`
-            pb-12 text-center transition-all duration-1000 delay-500
-            ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
-          `}
-        >
-          <a
-            href="#vault"
-            className="group inline-flex flex-col items-center gap-3"
+        {/* Right side - Cauldron area with input/output spaces */}
+        <div className="flex-1 flex items-center justify-center relative">
+          {/* Left input space (placeholder) */}
+          <div className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-24 z-20">
+            {/* Future: Input elements will go here */}
+          </div>
+
+          {/* 3D Canvas - Cauldron */}
+          <div
+            ref={containerRef}
+            className="w-full h-[50vh] lg:h-full lg:absolute lg:inset-0"
           >
-            <span className="font-mono text-xs tracking-wider text-text-muted group-hover:text-gold transition-colors">
-              ENTER THE VAULT
-            </span>
-            <div className="w-8 h-12 rounded-full border border-patina group-hover:border-gold transition-colors flex items-start justify-center p-2">
-              <div className="w-1 h-2.5 bg-amber rounded-full animate-bounce" />
-            </div>
-          </a>
+            <canvas
+              ref={canvasRef}
+              className="w-full h-full"
+            />
+          </div>
+
+          {/* Right output space (placeholder) */}
+          <div className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-24 z-20">
+            {/* Future: Output elements will go here */}
+          </div>
         </div>
       </div>
 
       {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-obsidian to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-obsidian to-transparent pointer-events-none z-20" />
     </section>
   );
 }
