@@ -52,8 +52,8 @@ const MoltenShader = {
   uniforms: {
     uTime: { value: 0 },
     uIntensity: { value: 1.0 },
-    uBaseColor: { value: new THREE.Color(0xff6b00) },
-    uHighColor: { value: new THREE.Color(0xffc71f) },
+    uBaseColor: { value: new THREE.Color(0xff4500) },
+    uHighColor: { value: new THREE.Color(0xff8c00) },
   },
   vertexShader: `
     varying vec2 vUv;
@@ -154,9 +154,9 @@ const MoltenShader = {
       // Color gradient from deep orange to bright gold
       vec3 color = mix(uBaseColor, uHighColor, hotSpot);
       
-      // Add bright white-hot core areas - reduced intensity
-      float whiteHot = smoothstep(0.9, 1.0, combined * uIntensity);
-      color = mix(color, vec3(1.0, 0.95, 0.8), whiteHot * 0.3);
+      // Add bright orange-hot core areas - smaller and more molten orange
+      float hotCore = smoothstep(0.95, 1.0, combined * uIntensity);
+      color = mix(color, vec3(1.0, 0.5, 0.1), hotCore * 0.25);
       
       // Rim darkening for depth
       float rim = 1.0 - pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.5);
@@ -342,25 +342,35 @@ export function FoundryHero() {
     const crucibleGroup = new THREE.Group();
     scene.add(crucibleGroup);
 
-    // Crucible bowl (outer)
-    const crucibleOuterGeo = new THREE.CylinderGeometry(0.8, 0.6, 0.5, 32, 1, true);
+    // Crucible bowl - proper 3D bowl shape using LatheGeometry
+    const bowlPoints: THREE.Vector2[] = [];
+    const bowlSegments = 20;
+    for (let i = 0; i <= bowlSegments; i++) {
+      const t = i / bowlSegments;
+      const y = t * 0.5 - 0.25;
+      const x = 0.3 + 0.5 * Math.pow(t, 0.6);
+      bowlPoints.push(new THREE.Vector2(x, y));
+    }
+    bowlPoints.push(new THREE.Vector2(0.85, 0.25));
+    
+    const crucibleOuterGeo = new THREE.LatheGeometry(bowlPoints, 48);
     const crucibleMat = new THREE.MeshStandardMaterial({
-      color: 0x1a1a1a,
-      roughness: 0.2,
-      metalness: 0.95,
+      color: 0x4a4a4a,
+      roughness: 0.4,
+      metalness: 0.8,
       side: THREE.DoubleSide,
     });
     const crucibleOuter = new THREE.Mesh(crucibleOuterGeo, crucibleMat);
     crucibleGroup.add(crucibleOuter);
 
-    // Crucible rim
-    const rimGeo = new THREE.TorusGeometry(0.8, 0.06, 16, 32);
+    // Crucible rim - thicker lip at the top
+    const rimGeo = new THREE.TorusGeometry(0.85, 0.08, 16, 48);
     const rimMat = new THREE.MeshStandardMaterial({
-      color: 0x8b7355,
-      roughness: 0.4,
-      metalness: 0.85,
+      color: 0x5a5046,
+      roughness: 0.45,
+      metalness: 0.75,
       emissive: 0xff6b00,
-      emissiveIntensity: 0.1,
+      emissiveIntensity: 0.08,
     });
     const crucibleRim = new THREE.Mesh(rimGeo, rimMat);
     crucibleRim.rotation.x = Math.PI / 2;
