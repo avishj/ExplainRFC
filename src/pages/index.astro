@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { FoundryHero, VaultDrawers, RFCSearch } from "@/components/home";
+import { OrnateDivider } from "@/components/ui";
 
 const base = import.meta.env.BASE_URL;
 ---
@@ -10,8 +11,11 @@ const base = import.meta.env.BASE_URL;
     <!-- Hero Section -->
     <FoundryHero client:load />
     
+    <!-- Divider after hero -->
+    <OrnateDivider className="pt-12" />
+    
     <!-- Search Section -->
-    <section id="vault" class="pt-12 pb-6 px-6">
+    <section id="vault" class="pt-8 pb-6 px-6">
       <div class="max-w-6xl mx-auto">
         <div class="text-center mb-8">
           <p class="museum-label text-amber mb-3">Search the Archive</p>
@@ -26,21 +30,18 @@ const base = import.meta.env.BASE_URL;
       </div>
     </section>
     
+    <!-- Divider before library -->
+    <OrnateDivider className="py-8" />
+    
     <!-- Featured RFCs Section -->
     <VaultDrawers client:visible baseUrl={base} onSelectRFC={(id) => window.location.href = `${base}rfc/${id}`} />
     
+    <!-- Divider before about -->
+    <OrnateDivider className="pt-12 pb-8" />
+    
     <!-- About Section -->
-    <section class="py-16 px-6 relative">
+    <section class="pb-16 px-6 relative">
       <div class="max-w-4xl mx-auto">
-        <!-- Ornate divider -->
-        <div class="flex items-center justify-center gap-4 mb-16">
-          <div class="w-16 h-px bg-gradient-to-r from-transparent to-patina" />
-          <div class="w-3 h-3 rotate-45 border border-brass" />
-          <div class="w-32 h-px bg-patina" />
-          <div class="w-3 h-3 rotate-45 border border-brass" />
-          <div class="w-16 h-px bg-gradient-to-l from-transparent to-patina" />
-        </div>
-        
         <div class="text-center mb-16">
           <p class="museum-label text-amber mb-4">About the Museum</p>
           <h2 class="font-display text-4xl md:text-5xl font-bold text-text-bright mb-8">
