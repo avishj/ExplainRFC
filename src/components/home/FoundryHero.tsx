@@ -58,8 +58,8 @@ const ParticleShader = {
       // Spiral path converging into the cauldron
       // Start wide at top, spiral down into cauldron opening (radius ~1.2 at rim)
       float angle = t * 6.28318 * 4.0 + aPhase * 6.28318;
-      // Radius: start at 2.0, narrow to 0.8 (inside cauldron walls)
-      float radius = mix(2.0, 0.6, t * t);
+      // Radius: start at 1.2 (inside cauldron rim ~1.4), narrow to 0.4 (inside cauldron walls)
+      float radius = mix(1.2, 0.4, t * t);
       // Height: start at 1.5 (above cauldron), descend to -1.7 (at molten surface)
       float height = mix(1.5, -1.7, t);
       
@@ -175,11 +175,16 @@ export function FoundryHero() {
     scene.add(fillLight);
 
     // Spotlight pointing DOWN at the cauldron to illuminate it properly
-    const cauldronSpotlight = new THREE.SpotLight(0xff6600, 3, 10, Math.PI / 4, 0.3, 1);
-    cauldronSpotlight.position.set(0, 3, 2);
-    cauldronSpotlight.target.position.set(0, -1, 0);
+    const cauldronSpotlight = new THREE.SpotLight(0xff6600, 5, 15, Math.PI / 3, 0.2, 0.5);
+    cauldronSpotlight.position.set(0, 4, 4);
+    cauldronSpotlight.target.position.set(0, -2, 0);
     scene.add(cauldronSpotlight);
     scene.add(cauldronSpotlight.target);
+    
+    // Additional front light to make cauldron visible
+    const frontLight = new THREE.PointLight(0xffaa66, 2, 12);
+    frontLight.position.set(0, 0, 5);
+    scene.add(frontLight);
 
     // Create the obsidian plinth with engraved channels
     const plinthGroup = new THREE.Group();
@@ -215,7 +220,7 @@ export function FoundryHero() {
 
     // Central cauldron - dark bowl that the spiral flows into
     const cauldronGroup = new THREE.Group();
-    cauldronGroup.position.y = -2.5; // Position so rim is near y=-0.5 where particles converge
+    cauldronGroup.position.y = -2.0; // Position so rim is near y=0 where particles converge
     scene.add(cauldronGroup);
 
     // Cauldron bowl - using LatheGeometry for proper tall cauldron shape
@@ -249,11 +254,11 @@ export function FoundryHero() {
     
     const cauldronGeo = new THREE.LatheGeometry(cauldronProfile, 64);
     const cauldronMat = new THREE.MeshStandardMaterial({
-      color: 0x1a1008,
+      color: 0x2a2018,
       roughness: 0.4,
       metalness: 0.8,
-      emissive: 0x110800,
-      emissiveIntensity: 0.15,
+      emissive: 0x331800,
+      emissiveIntensity: 0.4,
       side: THREE.DoubleSide,
       depthWrite: true,
     });
@@ -316,8 +321,9 @@ export function FoundryHero() {
       vertexShader: ParticleShader.vertexShader,
       fragmentShader: ParticleShader.fragmentShader,
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
       depthWrite: false,
+      depthTest: true,
     });
 
     const particles = new THREE.Points(particleGeo, particleMat);
