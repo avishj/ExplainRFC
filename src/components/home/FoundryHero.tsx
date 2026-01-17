@@ -284,7 +284,7 @@ export function FoundryHero() {
     composer.addPass(vignettePass);
 
     // Lighting - forge atmosphere
-    const ambientLight = new THREE.AmbientLight(0x1a0a00, 0.3);
+    const ambientLight = new THREE.AmbientLight(0x1a0a00, 0.6); // Increased for visibility
     scene.add(ambientLight);
 
     // Main crucible light (warm amber) - toned down
@@ -305,6 +305,13 @@ export function FoundryHero() {
     const fillLight = new THREE.PointLight(0x4a90a4, 0.15, 20);
     fillLight.position.set(0, 5, 5);
     scene.add(fillLight);
+
+    // Spotlight pointing DOWN at the cauldron to illuminate it properly
+    const cauldronSpotlight = new THREE.SpotLight(0xff6600, 3, 10, Math.PI / 4, 0.3, 1);
+    cauldronSpotlight.position.set(0, 3, 2);
+    cauldronSpotlight.target.position.set(0, -1, 0);
+    scene.add(cauldronSpotlight);
+    scene.add(cauldronSpotlight.target);
 
     // Create the obsidian plinth with engraved channels
     const plinthGroup = new THREE.Group();
@@ -337,58 +344,67 @@ export function FoundryHero() {
     plinthRing2.position.y = -0.85;
     plinthGroup.add(plinthRing2);
 
-    // Central crucible (the heart of the forge)
-    const crucibleGroup = new THREE.Group();
-    scene.add(crucibleGroup);
+    // Central cauldron - dark bowl that the spiral flows into
+    const cauldronGroup = new THREE.Group();
+    cauldronGroup.position.y = -1.3; // Position so rim is at y=-0.5 where particles converge
+    scene.add(cauldronGroup);
 
-    // Crucible parameters - sized to fit inside orrery rings
-    const outerRadius = 0.95;
-    const innerRadius = 0.8;
-    const wallHeight = 0.5;
-    const baseThickness = 0.15;
+    // Cauldron bowl - using LatheGeometry for proper bowl shape
+    const cauldronProfile: THREE.Vector2[] = [];
+    const cauldronRadius = 1.4; // Wide enough to capture spiral (spiral starts at 1.25)
+    const cauldronDepth = 0.8;
+    const wallThickness = 0.12;
     
-    // Outer wall - cylinder with slight taper
-    const outerWallGeo = new THREE.CylinderGeometry(outerRadius, outerRadius * 0.9, wallHeight, 48);
-    const crucibleMat = new THREE.MeshStandardMaterial({
-      color: 0x9a9a9a,
+    // Outer profile (bottom to top)
+    for (let i = 0; i <= 20; i++) {
+      const t = i / 20;
+      const y = t * cauldronDepth;
+      // Bowl curve - wider at top, narrower at bottom
+      const r = 0.3 + (cauldronRadius - 0.3) * Math.pow(t, 0.6);
+      cauldronProfile.push(new THREE.Vector2(r, y));
+    }
+    // Add rim thickness
+    cauldronProfile.push(new THREE.Vector2(cauldronRadius + wallThickness, cauldronDepth));
+    cauldronProfile.push(new THREE.Vector2(cauldronRadius + wallThickness, cauldronDepth - 0.05));
+    // Inner profile (top to bottom)
+    for (let i = 20; i >= 0; i--) {
+      const t = i / 20;
+      const y = t * (cauldronDepth - 0.1) + 0.05;
+      const r = Math.max(0.2, (0.3 + (cauldronRadius - 0.3) * Math.pow(t, 0.6)) - wallThickness);
+      cauldronProfile.push(new THREE.Vector2(r, y));
+    }
+    // Close bottom
+    cauldronProfile.push(new THREE.Vector2(0.2, 0.05));
+    cauldronProfile.push(new THREE.Vector2(0.3, 0));
+    
+    const cauldronGeo = new THREE.LatheGeometry(cauldronProfile, 64);
+    const cauldronMat = new THREE.MeshStandardMaterial({
+      color: 0x3a3a3a, // Lighter so it catches light
       roughness: 0.5,
-      metalness: 0.65,
+      metalness: 0.7,
+      emissive: 0x441100,
+      emissiveIntensity: 0.4,
+      side: THREE.DoubleSide,
     });
-    const outerWall = new THREE.Mesh(outerWallGeo, crucibleMat);
-    outerWall.position.y = -wallHeight * 0.3;
-    crucibleGroup.add(outerWall);
-    
-    // Inner cavity - carved out space for molten metal
-    const innerCavityGeo = new THREE.CylinderGeometry(innerRadius, innerRadius * 0.85, wallHeight * 0.8, 48);
-    const innerCavityMat = new THREE.MeshStandardMaterial({
-      color: 0x2a2a2a,
-      roughness: 0.8,
-      metalness: 0.3,
-      emissive: 0x661100,
-      emissiveIntensity: 0.3,
-      side: THREE.BackSide,
-    });
-    const innerCavity = new THREE.Mesh(innerCavityGeo, innerCavityMat);
-    innerCavity.position.y = -wallHeight * 0.25;
-    crucibleGroup.add(innerCavity);
+    const cauldronMesh = new THREE.Mesh(cauldronGeo, cauldronMat);
+    cauldronGroup.add(cauldronMesh);
 
-    // Crucible rim - visible lip at top
-    const rimGeo = new THREE.TorusGeometry(outerRadius, 0.08, 12, 48);
+    // Cauldron rim highlight
+    const rimGeo = new THREE.TorusGeometry(cauldronRadius + wallThickness * 0.5, 0.06, 12, 64);
     const rimMat = new THREE.MeshStandardMaterial({
-      color: 0xb0a090,
-      roughness: 0.45,
-      metalness: 0.6,
-      emissive: 0x442200,
+      color: 0x1a1a1a,
+      roughness: 0.3,
+      metalness: 0.9,
+      emissive: 0x221100,
       emissiveIntensity: 0.2,
     });
-    const crucibleRim = new THREE.Mesh(rimGeo, rimMat);
-    crucibleRim.rotation.x = Math.PI / 2;
-    crucibleRim.position.y = -wallHeight * 0.05;
-    crucibleGroup.add(crucibleRim);
+    const cauldronRim = new THREE.Mesh(rimGeo, rimMat);
+    cauldronRim.rotation.x = Math.PI / 2;
+    cauldronRim.position.y = cauldronDepth;
+    cauldronGroup.add(cauldronRim);
 
-    // Molten metal surface - MUST be smaller than inner cavity
-    const moltenRadius = innerRadius * 0.75;
-    const moltenGeo = new THREE.CircleGeometry(moltenRadius, 64);
+    // Molten glow at bottom of cauldron
+    const moltenGeo = new THREE.CircleGeometry(0.5, 64);
     const moltenMat = new THREE.ShaderMaterial({
       uniforms: MoltenShader.uniforms,
       vertexShader: MoltenShader.vertexShader,
@@ -397,8 +413,8 @@ export function FoundryHero() {
     });
     const moltenSurface = new THREE.Mesh(moltenGeo, moltenMat);
     moltenSurface.rotation.x = -Math.PI / 2;
-    moltenSurface.position.y = -wallHeight * 0.35;
-    crucibleGroup.add(moltenSurface);
+    moltenSurface.position.y = 0.1;
+    cauldronGroup.add(moltenSurface);
 
     // Orrery rings (the rotating mechanism) - positioned above crucible
     const orreryGroup = new THREE.Group();
@@ -424,28 +440,6 @@ export function FoundryHero() {
     middleOrrery.rotation.x = Math.PI / 2;
     middleOrrery.rotation.z = Math.PI / 6;
     orreryGroup.add(middleOrrery);
-
-    // Outer ring with tick marks
-    const outerOrreryGeo = new THREE.TorusGeometry(2.4, 0.03, 8, 64);
-    const outerOrrery = new THREE.Mesh(outerOrreryGeo, orreryMat.clone());
-    outerOrrery.rotation.x = Math.PI / 2;
-    outerOrrery.rotation.z = -Math.PI / 8;
-    orreryGroup.add(outerOrrery);
-
-    // Tick marks on outer ring
-    const tickGeo = new THREE.BoxGeometry(0.02, 0.15, 0.02);
-    const tickMat = new THREE.MeshStandardMaterial({
-      color: 0xffc71f,
-      emissive: 0xff8c00,
-      emissiveIntensity: 0.2,
-    });
-    for (let i = 0; i < 24; i++) {
-      const tick = new THREE.Mesh(tickGeo, tickMat);
-      const angle = (i / 24) * Math.PI * 2;
-      tick.position.set(Math.cos(angle) * 2.4, 0, Math.sin(angle) * 2.4);
-      tick.lookAt(0, 0, 0);
-      orreryGroup.add(tick);
-    }
 
     // Protocol artifacts orbiting the orrery
     const artifactGroup = new THREE.Group();
@@ -490,9 +484,9 @@ export function FoundryHero() {
       });
       const artifact = new THREE.Mesh(artifactGeo, artifactMat);
 
-      // Position in different orbit rings
-      const orbitIndex = i % 3;
-      const orbitRadius = [1.2, 1.8, 2.4][orbitIndex];
+      // Position in different orbit rings (only inner and middle now)
+      const orbitIndex = i % 2;
+      const orbitRadius = [1.2, 1.8][orbitIndex];
       const baseAngle = (i / PROTOCOLS.length) * Math.PI * 2 + orbitIndex * 0.3;
 
       artifact.position.set(
@@ -661,7 +655,6 @@ export function FoundryHero() {
       if (!prefersReducedMotion) {
         innerOrrery.rotation.z = elapsed * 0.3;
         middleOrrery.rotation.z = -elapsed * 0.2;
-        outerOrrery.rotation.z = elapsed * 0.1;
       }
 
       // Animate artifacts in orbit
@@ -775,7 +768,7 @@ export function FoundryHero() {
       ease: "power3.out",
     });
 
-    gsap.from(crucibleGroup.position, {
+    gsap.from(cauldronGroup.position, {
       y: -2,
       duration: 2.5,
       delay: 0.8,
