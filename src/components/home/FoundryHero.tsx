@@ -252,8 +252,10 @@ export function FoundryHero() {
       0.1,
       100
     );
-    camera.position.set(0, 2.2, 6);
-    camera.lookAt(0, -0.3, 0);
+    // Camera at ~30 degrees down from horizontal (eye level looking slightly down)
+    // At distance 8, height 1.5 gives roughly 30 degree angle: atan(1.5/8) ≈ 10.6°, plus lookAt target
+    camera.position.set(0, 1.0, 8);
+    camera.lookAt(0, -1.0, 0);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -315,6 +317,7 @@ export function FoundryHero() {
 
     // Create the obsidian plinth with engraved channels
     const plinthGroup = new THREE.Group();
+    plinthGroup.visible = false; // DISABLED FOR DEBUGGING
     scene.add(plinthGroup);
 
     // Main plinth body
@@ -346,44 +349,45 @@ export function FoundryHero() {
 
     // Central cauldron - dark bowl that the spiral flows into
     const cauldronGroup = new THREE.Group();
-    cauldronGroup.position.y = -1.3; // Position so rim is at y=-0.5 where particles converge
+    cauldronGroup.position.y = -2.5; // Position so rim is near y=-0.5 where particles converge (depth is 2.0)
     scene.add(cauldronGroup);
 
-    // Cauldron bowl - using LatheGeometry for proper bowl shape
+    // Cauldron bowl - using LatheGeometry for proper tall cauldron shape
     const cauldronProfile: THREE.Vector2[] = [];
-    const cauldronRadius = 1.4; // Wide enough to capture spiral (spiral starts at 1.25)
-    const cauldronDepth = 0.8;
-    const wallThickness = 0.12;
+    const cauldronRadius = 1.2; // Opening radius
+    const cauldronDepth = 2.0; // MUCH TALLER - proper cauldron proportions
+    const wallThickness = 0.15;
     
-    // Outer profile (bottom to top)
-    for (let i = 0; i <= 20; i++) {
-      const t = i / 20;
+    // Outer profile (bottom to top) - classic cauldron shape: narrower bottom, wider top
+    for (let i = 0; i <= 24; i++) {
+      const t = i / 24;
       const y = t * cauldronDepth;
-      // Bowl curve - wider at top, narrower at bottom
-      const r = 0.3 + (cauldronRadius - 0.3) * Math.pow(t, 0.6);
+      // Cauldron curve - starts narrow at bottom, flares out toward top
+      const r = 0.4 + (cauldronRadius - 0.4) * Math.pow(t, 0.5);
       cauldronProfile.push(new THREE.Vector2(r, y));
     }
-    // Add rim thickness
-    cauldronProfile.push(new THREE.Vector2(cauldronRadius + wallThickness, cauldronDepth));
-    cauldronProfile.push(new THREE.Vector2(cauldronRadius + wallThickness, cauldronDepth - 0.05));
+    // Add rim - slight lip at top
+    cauldronProfile.push(new THREE.Vector2(cauldronRadius + 0.08, cauldronDepth));
+    cauldronProfile.push(new THREE.Vector2(cauldronRadius + wallThickness, cauldronDepth + 0.05));
+    cauldronProfile.push(new THREE.Vector2(cauldronRadius + wallThickness, cauldronDepth - 0.08));
     // Inner profile (top to bottom)
-    for (let i = 20; i >= 0; i--) {
-      const t = i / 20;
-      const y = t * (cauldronDepth - 0.1) + 0.05;
-      const r = Math.max(0.2, (0.3 + (cauldronRadius - 0.3) * Math.pow(t, 0.6)) - wallThickness);
+    for (let i = 24; i >= 0; i--) {
+      const t = i / 24;
+      const y = t * (cauldronDepth - 0.15) + 0.1;
+      const r = Math.max(0.25, (0.4 + (cauldronRadius - 0.4) * Math.pow(t, 0.5)) - wallThickness);
       cauldronProfile.push(new THREE.Vector2(r, y));
     }
     // Close bottom
-    cauldronProfile.push(new THREE.Vector2(0.2, 0.05));
-    cauldronProfile.push(new THREE.Vector2(0.3, 0));
+    cauldronProfile.push(new THREE.Vector2(0.25, 0.1));
+    cauldronProfile.push(new THREE.Vector2(0.4, 0));
     
     const cauldronGeo = new THREE.LatheGeometry(cauldronProfile, 64);
     const cauldronMat = new THREE.MeshStandardMaterial({
-      color: 0x3a3a3a, // Lighter so it catches light
+      color: 0xff0000, // BRIGHT RED FOR DEBUGGING
       roughness: 0.5,
-      metalness: 0.7,
-      emissive: 0x441100,
-      emissiveIntensity: 0.4,
+      metalness: 0.3,
+      emissive: 0xff0000,
+      emissiveIntensity: 1.0,
       side: THREE.DoubleSide,
     });
     const cauldronMesh = new THREE.Mesh(cauldronGeo, cauldronMat);
@@ -403,7 +407,7 @@ export function FoundryHero() {
     cauldronRim.position.y = cauldronDepth;
     cauldronGroup.add(cauldronRim);
 
-    // Molten glow at bottom of cauldron
+    // Molten glow at bottom of cauldron - DISABLED FOR DEBUGGING
     const moltenGeo = new THREE.CircleGeometry(0.5, 64);
     const moltenMat = new THREE.ShaderMaterial({
       uniforms: MoltenShader.uniforms,
@@ -414,11 +418,13 @@ export function FoundryHero() {
     const moltenSurface = new THREE.Mesh(moltenGeo, moltenMat);
     moltenSurface.rotation.x = -Math.PI / 2;
     moltenSurface.position.y = 0.1;
+    moltenSurface.visible = false; // DISABLED FOR DEBUGGING
     cauldronGroup.add(moltenSurface);
 
     // Orrery rings (the rotating mechanism) - positioned above crucible
     const orreryGroup = new THREE.Group();
     orreryGroup.position.y = 0.6;
+    orreryGroup.visible = false; // DISABLED FOR DEBUGGING
     scene.add(orreryGroup);
 
     // Inner ring
@@ -567,6 +573,7 @@ export function FoundryHero() {
     });
 
     const particles = new THREE.Points(particleGeo, particleMat);
+    particles.visible = false; // DISABLED FOR DEBUGGING
     scene.add(particles);
 
     // Sparks system (emitting from crucible)
@@ -596,6 +603,7 @@ export function FoundryHero() {
     });
 
     const sparks = new THREE.Points(sparkGeo, sparkMat);
+    sparks.visible = false; // DISABLED FOR DEBUGGING
     scene.add(sparks);
 
     // Ambient dust particles
@@ -620,6 +628,7 @@ export function FoundryHero() {
     });
 
     const dust = new THREE.Points(dustGeo, dustMat);
+    dust.visible = false; // DISABLED FOR DEBUGGING
     scene.add(dust);
 
     // Animation
