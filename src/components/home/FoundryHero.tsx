@@ -763,14 +763,11 @@ export function FoundryHero() {
       }
 
       await new Promise(r => setTimeout(r, 400));
-      setShowBootOverlay(false);
       setBootComplete(true);
     };
 
     runBootSequence();
 
-    setTimeout(() => setIsLoaded(true), 6500);
-    setTimeout(() => setTitleVisible(true), 6900);
     animationId = requestAnimationFrame(draw);
 
     return () => {
@@ -789,41 +786,63 @@ export function FoundryHero() {
   }, [createParticle, prefersReducedMotion]);
 
   useEffect(() => {
-    if (!titleVisible) return;
+    if (!bootComplete) return;
 
     const tl = gsap.timeline();
     
+    tl.to(".boot-terminal-content", {
+      opacity: 0,
+      y: -30,
+      scale: 0.98,
+      duration: 0.6,
+      ease: "power2.in",
+    });
+
+    tl.to(".boot-overlay", {
+      opacity: 0,
+      duration: 0.5,
+      ease: "power2.inOut",
+      onComplete: () => {
+        setShowBootOverlay(false);
+        setIsLoaded(true);
+      }
+    }, "-=0.3");
+
+    tl.call(() => setTitleVisible(true), [], "-=0.2");
+
     tl.fromTo(
       ".hero-title-line",
-      { opacity: 0, y: 40, rotateX: -15 },
+      { opacity: 0, y: 50, rotateX: -20, scale: 0.95 },
       { 
         opacity: 1, 
         y: 0, 
         rotateX: 0,
-        duration: 1.2, 
-        stagger: 0.15,
+        scale: 1,
+        duration: 1.0, 
+        stagger: 0.12,
         ease: "power3.out"
-      }
+      },
+      "-=0.3"
     );
 
     tl.fromTo(
       ".hero-subtitle",
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" },
-      "-=0.5"
+      { opacity: 0, y: 25 },
+      { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" },
+      "-=0.6"
     );
 
     tl.fromTo(
       ".hero-cta",
       { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-      "-=0.3"
+      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+      "-=0.4"
     );
 
     return () => {
       tl.kill();
     };
-  }, [titleVisible]);
+  }, [bootComplete]);
 
   return (
     <section className="relative min-h-screen flex overflow-hidden bg-obsidian">
@@ -841,12 +860,11 @@ export function FoundryHero() {
 
       <div
         className={`
-          absolute inset-0 z-30 bg-obsidian flex items-center justify-center
-          transition-opacity duration-700
-          ${showBootOverlay ? "opacity-100" : "opacity-0 pointer-events-none"}
+          boot-overlay absolute inset-0 z-30 bg-obsidian flex items-center justify-center
+          ${!showBootOverlay ? "pointer-events-none" : ""}
         `}
       >
-        <div className="max-w-2xl w-full px-8">
+        <div className="boot-terminal-content max-w-2xl w-full px-8">
           <div className="font-mono text-sm text-amber space-y-1">
             {showInitialCursor && (
               <div style={{ textShadow: "0 0 10px rgba(255, 170, 0, 0.5)" }}>
