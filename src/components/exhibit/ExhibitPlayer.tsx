@@ -41,8 +41,11 @@ export function ExhibitPlayer({ rfc, storyboard, baseUrl = '' }: ExhibitPlayerPr
   }, [currentStep, goToStep]);
   
   const togglePlay = useCallback(() => {
+    if (!isPlaying) {
+      nextStep();
+    }
     setIsPlaying(prev => !prev);
-  }, []);
+  }, [isPlaying, nextStep]);
   
   // Auto-advance when playing
   useEffect(() => {

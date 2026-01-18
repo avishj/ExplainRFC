@@ -183,8 +183,9 @@ export function NarrationPanel({
         </div>
         
         <p className="text-center text-xs text-text-muted mt-4">
-          <kbd className="px-1.5 py-0.5 rounded bg-carbon font-mono text-patina">→</kbd> or 
-          <kbd className="px-1.5 py-0.5 rounded bg-carbon font-mono text-patina ml-1">Space</kbd> to advance
+          <kbd className="px-1.5 py-0.5 rounded bg-carbon font-mono text-patina">←</kbd> back · 
+          <kbd className="px-1.5 py-0.5 rounded bg-carbon font-mono text-patina ml-1">→</kbd> or 
+          <kbd className="px-1.5 py-0.5 rounded bg-carbon font-mono text-patina ml-1">Space</kbd> advance
         </p>
       </div>
     </aside>
