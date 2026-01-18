@@ -21,21 +21,10 @@ const BOOT_SEQUENCE: BootLine[] = [
 ];
 
 const RFC_FRAGMENTS = [
-  "SYN", "ACK", "FIN", "RST", "PSH", "URG",
-  "RFC793", "RFC2616", "RFC7231", "RFC8446",
-  "TCP", "UDP", "HTTP", "TLS", "DNS", "QUIC",
-  "0x00", "0xFF", "0x1A", "0xBE", "0xEF",
-  "SEQ", "WIN", "LEN", "TTL", "MSS",
-  "GET", "POST", "HEAD", "PUT", "DELETE",
-  "200", "404", "500", "301", "418",
-  "HELO", "EHLO", "MAIL", "RCPT", "DATA",
-  "::1", "0.0.0.0", "127.0.0.1",
-  "port:80", "port:443", "port:22",
-  "▓▓▓", "░░░", "███", "▒▒▒",
-  ">>>", "<<<", "===", "---", "+++",
-  "CONNECT", "CLOSE", "LISTEN", "ESTABLISHED",
-  "src→dst", "req→res", "syn→ack",
-  "[OK]", "[ERR]", "[???]", "[...]",
+  "SYN", "ACK", "FIN", "TCP", "UDP", "HTTP",
+  "RFC793", "RFC2616", "SEQ", "TTL",
+  "GET", "POST", "200", "404",
+  "port:443", "CONNECT", "LISTEN",
 ];
 
 interface Particle {
@@ -124,6 +113,8 @@ export function FoundryHero() {
   const [showBootOverlay, setShowBootOverlay] = useState(true);
   const [showInitialCursor, setShowInitialCursor] = useState(true);
   const [progressPercent, setProgressPercent] = useState(0);
+  const [showDocumentAssembly, setShowDocumentAssembly] = useState(false);
+  const [hideCanvas, setHideCanvas] = useState(false);
   const bootStartedRef = useRef(false);
 
   const prefersReducedMotion =
@@ -785,122 +776,169 @@ export function FoundryHero() {
     };
   }, [createParticle, prefersReducedMotion]);
 
+  // Effect 1: When boot completes, fade out boot overlay and show document assembly
   useEffect(() => {
     if (!bootComplete) return;
 
     const tl = gsap.timeline();
     
-    // Phase 1: Terminal content "processes" - subtle pulse glow
+    tl.call(() => setHideCanvas(true), []);
+    
     tl.to(".boot-terminal-content", {
-      textShadow: "0 0 30px rgba(255, 170, 0, 0.8), 0 0 60px rgba(255, 140, 0, 0.4)",
-      duration: 0.4,
+      opacity: 0,
+      duration: 0.5,
       ease: "power2.in",
     });
 
-    // Phase 2: Terminal lines dissolve upward like data being transmitted
-    tl.to(".boot-line", {
-      opacity: 0,
-      y: -20,
-      filter: "blur(4px)",
-      duration: 0.6,
-      stagger: {
-        each: 0.05,
-        from: "start",
-      },
-      ease: "power2.in",
-    }, "-=0.1");
-
-    // Phase 3: Gentle scanline sweep as data "transfers"
-    tl.to(".boot-scanline", {
-      scaleY: 1,
-      duration: 0.5,
-      ease: "power1.inOut",
-    }, "-=0.4");
-
-    tl.to(".boot-scanline", {
-      y: "-100%",
-      duration: 0.8,
-      ease: "power1.inOut",
-    }, "-=0.2");
-
-    // Phase 4: Overlay fades as fragments converge to center
-    tl.to(".boot-terminal-content", {
-      opacity: 0,
-      scale: 1.05,
-      duration: 0.5,
-      ease: "power2.out",
-    }, "-=0.6");
-
     tl.to(".boot-overlay", {
       opacity: 0,
-      duration: 0.6,
+      duration: 0.4,
       ease: "power2.out",
       onComplete: () => {
         setShowBootOverlay(false);
-        setIsLoaded(true);
-      }
-    }, "-=0.4");
+        setShowDocumentAssembly(true);
+      },
+    }, "-=0.2");
 
-    // Phase 5: Hero content assembles from convergence point
-    tl.call(() => setTitleVisible(true), [], "-=0.5");
+    return () => { tl.kill(); };
+  }, [bootComplete]);
 
-    // Glow expands from center like data materializing
+  // Effect 2: When document assembly layer mounts, run the fragment animation
+  useEffect(() => {
+    if (!showDocumentAssembly) return;
+
+    // Small delay to ensure DOM is rendered
+    const timeout = setTimeout(() => {
+      const fragments = document.querySelectorAll(".rfc-fragment");
+      if (fragments.length === 0) return;
+
+      // Set initial positions from data attributes
+      fragments.forEach((el) => {
+        const x = parseFloat(el.getAttribute("data-x") || "0");
+        const y = parseFloat(el.getAttribute("data-y") || "0");
+        gsap.set(el, { x, y, opacity: 0, scale: 0.5 });
+      });
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setShowDocumentAssembly(false);
+          setIsLoaded(true);
+          setTitleVisible(true);
+        }
+      });
+
+      // Fragments fade in at their starting positions
+      tl.to(".rfc-fragment", {
+        opacity: 1,
+        scale: 1,
+        duration: 1.0,
+        stagger: {
+          each: 0.08,
+          from: "random",
+        },
+        ease: "power2.out",
+      });
+
+      // Fragments converge toward their final positions within the document
+      fragments.forEach((el, i) => {
+        const finalX = parseFloat(el.getAttribute("data-final-x") || "0");
+        const finalY = parseFloat(el.getAttribute("data-final-y") || "0");
+        tl.to(el, {
+          x: finalX,
+          y: finalY,
+          duration: 1.8,
+          ease: "power3.inOut",
+        }, i === 0 ? "-=0.3" : "<0.05");
+      });
+
+      // Document page fades in as fragments arrive
+      tl.to(".document-page", {
+        opacity: 1,
+        scale: 1,
+        duration: 0.7,
+        ease: "power2.out",
+      }, "-=1.2");
+
+      // Document glows intensely
+      tl.to(".document-page", {
+        boxShadow: "0 0 80px rgba(255, 170, 0, 0.8), 0 0 150px rgba(255, 140, 0, 0.5)",
+        duration: 0.5,
+        ease: "power2.in",
+      });
+
+      // Small pause
+      tl.to({}, { duration: 0.3 });
+
+      // Everything dissolves
+      tl.to(".rfc-fragment", {
+        opacity: 0,
+        scale: 0.3,
+        duration: 0.5,
+        stagger: 0.02,
+        ease: "power2.in",
+      });
+
+      tl.to(".document-page", {
+        opacity: 0,
+        scale: 1.2,
+        filter: "blur(15px)",
+        duration: 0.5,
+        ease: "power2.in",
+      }, "-=0.4");
+    }, 50);
+
+    return () => clearTimeout(timeout);
+  }, [showDocumentAssembly]);
+
+  // Effect 3: When hero is loaded, animate in the content
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const tl = gsap.timeline();
+
     tl.fromTo(
       ".hero-glow",
-      { opacity: 0, scale: 0.3 },
-      { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" },
-      "-=0.4"
+      { opacity: 0, scale: 0.2 },
+      { opacity: 1, scale: 1, duration: 1.0, ease: "power2.out" },
     );
 
-    // Title lines materialize with "document assembly" feel
-    // Each line assembles from scattered fragments to solid text
     tl.fromTo(
       ".hero-title-line",
-      { 
-        opacity: 0, 
-        y: 40,
-        scale: 0.95,
-        filter: "blur(8px)",
-        letterSpacing: "0.5em",
-      },
+      { opacity: 0, y: 30, filter: "blur(6px)" },
       { 
         opacity: 1, 
         y: 0, 
-        scale: 1,
         filter: "blur(0px)",
-        letterSpacing: "normal",
-        duration: 1.2,
-        stagger: 0.15,
-        ease: "power3.out"
+        duration: 1.0,
+        stagger: 0.12,
+        ease: "power2.out"
       },
-      "-=0.9"
+      "-=0.7"
     );
 
     tl.fromTo(
       ".hero-subtitle",
-      { opacity: 0, y: 20, filter: "blur(4px)" },
-      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power2.out" },
-      "-=0.6"
-    );
-
-    tl.fromTo(
-      ".hero-cta",
-      { opacity: 0, y: 20, scale: 0.98 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power2.out" },
+      { opacity: 0, y: 15 },
+      { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" },
       "-=0.5"
     );
 
     tl.fromTo(
-      ".hero-status",
-      { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+      ".hero-cta",
+      { opacity: 0, y: 15 },
+      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
       "-=0.4"
     );
 
-    return () => {
-      tl.kill();
-    };
-  }, [bootComplete]);
+    tl.fromTo(
+      ".hero-status",
+      { opacity: 0 },
+      { opacity: 1, duration: 0.5, ease: "power2.out" },
+      "-=0.3"
+    );
+
+    return () => { tl.kill(); };
+  }, [isLoaded]);
 
   return (
     <section className="relative min-h-screen flex overflow-hidden bg-obsidian">
@@ -910,7 +948,7 @@ export function FoundryHero() {
       >
         <canvas
           ref={canvasRef}
-          className="w-full h-full"
+          className={`w-full h-full transition-opacity duration-500 ${hideCanvas ? "opacity-0" : "opacity-100"}`}
         />
       </div>
 
@@ -959,6 +997,72 @@ export function FoundryHero() {
         </div>
       </div>
 
+      {/* Document Assembly Layer - RFC fragments converging into a document */}
+      {showDocumentAssembly && (
+        <div className="document-assembly-layer absolute inset-0 z-25 flex items-center justify-center pointer-events-none bg-[#0a0a0a]">
+          {/* The document page that fragments converge into */}
+          <div 
+            className="document-page absolute w-72 h-96 border-2 rounded"
+            style={{
+              opacity: 0,
+              transform: "scale(0.8)",
+              borderColor: "rgba(255, 170, 0, 0.4)",
+              backgroundColor: "#0a0a0a",
+              boxShadow: "0 0 30px rgba(255, 170, 0, 0.3)",
+            }}
+          >
+            {/* Document header */}
+            <div className="p-3" style={{ borderBottom: "1px solid rgba(255, 170, 0, 0.2)" }}>
+              <div className="h-2 w-20 rounded-full" style={{ backgroundColor: "rgba(255, 170, 0, 0.3)" }} />
+              <div className="h-1.5 w-32 rounded-full mt-2" style={{ backgroundColor: "rgba(255, 170, 0, 0.15)" }} />
+            </div>
+            {/* Document lines */}
+            <div className="p-4 space-y-3">
+              {[85, 70, 90, 60, 80, 75, 65, 85].map((width, i) => (
+                <div
+                  key={i}
+                  className="h-1.5 rounded-full"
+                  style={{ width: `${width}%`, backgroundColor: "rgba(255, 170, 0, 0.2)" }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Floating RFC fragments - GSAP will set x/y from data attributes */}
+          {/* Each fragment has start position (x,y) and final position (finalX, finalY) within the document */}
+          {[
+            { text: "MUST", x: -280, y: -180, finalX: -60, finalY: -140 },
+            { text: "SHALL", x: 260, y: -150, finalX: 40, finalY: -100 },
+            { text: "sequence number", x: -220, y: 120, finalX: -30, finalY: 60 },
+            { text: "RFC 793", x: 200, y: 180, finalX: 0, finalY: -160 },
+            { text: "header", x: -300, y: 30, finalX: -50, finalY: -20 },
+            { text: "protocol", x: 280, y: -60, finalX: 30, finalY: 20 },
+            { text: "§3.1", x: -120, y: -220, finalX: 60, finalY: -60 },
+            { text: "ACK", x: 160, y: 140, finalX: -40, finalY: 100 },
+            { text: "SYN", x: -180, y: -80, finalX: 50, finalY: 140 },
+            { text: "FIN", x: 220, y: 60, finalX: -20, finalY: -80 },
+            { text: "TTL", x: -250, y: 180, finalX: 20, finalY: 40 },
+            { text: "port:443", x: 140, y: -200, finalX: -10, finalY: 80 },
+          ].map((frag, i) => (
+            <span
+              key={i}
+              className="rfc-fragment absolute font-mono text-sm font-semibold"
+              data-x={frag.x}
+              data-y={frag.y}
+              data-final-x={frag.finalX}
+              data-final-y={frag.finalY}
+              style={{
+                opacity: 0,
+                color: "#ffaa00",
+                textShadow: "0 0 12px rgba(255, 170, 0, 0.7), 0 0 24px rgba(255, 140, 0, 0.4)",
+              }}
+            >
+              {frag.text}
+            </span>
+          ))}
+        </div>
+      )}
+
       <div className="relative z-20 flex flex-col items-center justify-center w-full min-h-screen px-6 py-12">
         <div
           className={`
@@ -970,8 +1074,8 @@ export function FoundryHero() {
           <div className="relative inline-block mb-8">
             <div className="hero-glow absolute -inset-8 bg-gradient-radial from-amber/5 via-transparent to-transparent blur-xl opacity-0" />
             
-            <p className="hero-title-line museum-label text-amber tracking-[0.3em] mb-6 opacity-0">
-              THE PROTOCOL VISUALIZATION MUSEUM
+            <p className="hero-title-line text-amber tracking-[0.25em] text-xs sm:text-sm mb-6 opacity-0 font-mono">
+              FROM TEXT TO VISUALIZATION
             </p>
 
             <h1 className="font-display tracking-tight mb-2">
@@ -1004,8 +1108,8 @@ export function FoundryHero() {
             <div className="hero-subtitle opacity-0 mt-8 space-y-4">
               <div className="incised w-48 mx-auto" />
               <p className="font-display text-xl md:text-2xl text-text-secondary max-w-lg mx-auto">
-                Where dense specifications become
-                <span className="text-brass font-semibold"> living exhibits</span>
+                Dense protocols transformed into
+                <span className="text-brass font-semibold"> interactive visualizations</span>
               </p>
             </div>
           </div>
@@ -1016,7 +1120,7 @@ export function FoundryHero() {
               className="group inline-flex items-center gap-4 px-8 py-4 border border-patina/50 rounded-full hover:border-gold/80 hover:bg-gold/5 transition-all duration-300"
             >
               <span className="font-mono text-sm tracking-wider text-text-secondary group-hover:text-gold transition-colors">
-                EXPLORE THE ARCHIVE
+                START EXPLORING
               </span>
               <svg 
                 className="w-5 h-5 text-amber group-hover:text-gold group-hover:translate-y-1 transition-all duration-300"
