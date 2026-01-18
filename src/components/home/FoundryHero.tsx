@@ -790,115 +790,111 @@ export function FoundryHero() {
 
     const tl = gsap.timeline();
     
+    // Phase 1: Terminal content "processes" - subtle pulse glow
     tl.to(".boot-terminal-content", {
-      opacity: 0.7,
-      scale: 1.02,
-      duration: 0.15,
+      textShadow: "0 0 30px rgba(255, 170, 0, 0.8), 0 0 60px rgba(255, 140, 0, 0.4)",
+      duration: 0.4,
       ease: "power2.in",
     });
 
-    tl.to(".boot-terminal-content", {
-      x: -3,
-      duration: 0.05,
-      ease: "none",
-    });
-    tl.to(".boot-terminal-content", {
-      x: 5,
-      duration: 0.05,
-      ease: "none",
-    });
-    tl.to(".boot-terminal-content", {
-      x: -2,
-      duration: 0.05,
-      ease: "none",
-    });
-    tl.to(".boot-terminal-content", {
-      x: 0,
-      duration: 0.05,
-      ease: "none",
-    });
-
-    tl.to(".boot-scanline", {
-      scaleY: 1,
-      duration: 0.4,
-      ease: "power2.inOut",
+    // Phase 2: Terminal lines dissolve upward like data being transmitted
+    tl.to(".boot-line", {
+      opacity: 0,
+      y: -20,
+      filter: "blur(4px)",
+      duration: 0.6,
+      stagger: {
+        each: 0.05,
+        from: "start",
+      },
+      ease: "power2.in",
     }, "-=0.1");
 
-    tl.to(".boot-terminal-content", {
-      opacity: 0,
-      y: -60,
-      scale: 0.9,
-      filter: "blur(8px)",
+    // Phase 3: Gentle scanline sweep as data "transfers"
+    tl.to(".boot-scanline", {
+      scaleY: 1,
       duration: 0.5,
-      ease: "power3.in",
-    }, "-=0.2");
+      ease: "power1.inOut",
+    }, "-=0.4");
 
     tl.to(".boot-scanline", {
       y: "-100%",
-      duration: 0.6,
-      ease: "power2.inOut",
-    }, "-=0.4");
+      duration: 0.8,
+      ease: "power1.inOut",
+    }, "-=0.2");
+
+    // Phase 4: Overlay fades as fragments converge to center
+    tl.to(".boot-terminal-content", {
+      opacity: 0,
+      scale: 1.05,
+      duration: 0.5,
+      ease: "power2.out",
+    }, "-=0.6");
 
     tl.to(".boot-overlay", {
       opacity: 0,
-      duration: 0.4,
+      duration: 0.6,
       ease: "power2.out",
       onComplete: () => {
         setShowBootOverlay(false);
         setIsLoaded(true);
       }
-    }, "-=0.3");
+    }, "-=0.4");
 
-    tl.call(() => setTitleVisible(true), [], "-=0.35");
+    // Phase 5: Hero content assembles from convergence point
+    tl.call(() => setTitleVisible(true), [], "-=0.5");
 
+    // Glow expands from center like data materializing
     tl.fromTo(
       ".hero-glow",
-      { opacity: 0, scale: 0.8 },
-      { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" },
-      "-=0.3"
+      { opacity: 0, scale: 0.3 },
+      { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" },
+      "-=0.4"
     );
 
+    // Title lines materialize with "document assembly" feel
+    // Each line assembles from scattered fragments to solid text
     tl.fromTo(
       ".hero-title-line",
       { 
         opacity: 0, 
-        y: 80, 
-        rotateX: -30,
-        scale: 0.85,
-        filter: "blur(10px)"
+        y: 40,
+        scale: 0.95,
+        filter: "blur(8px)",
+        letterSpacing: "0.5em",
       },
       { 
         opacity: 1, 
         y: 0, 
-        rotateX: 0,
         scale: 1,
         filter: "blur(0px)",
-        duration: 0.9, 
-        stagger: 0.1,
-        ease: "power4.out"
+        letterSpacing: "normal",
+        duration: 1.2,
+        stagger: 0.15,
+        ease: "power3.out"
       },
-      "-=0.5"
+      "-=0.9"
     );
 
     tl.fromTo(
       ".hero-subtitle",
-      { opacity: 0, y: 30, filter: "blur(4px)" },
-      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power2.out" },
-      "-=0.5"
+      { opacity: 0, y: 20, filter: "blur(4px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power2.out" },
+      "-=0.6"
     );
 
     tl.fromTo(
       ".hero-cta",
-      { opacity: 0, y: 25, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" },
-      "-=0.3"
+      { opacity: 0, y: 20, scale: 0.98 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power2.out" },
+      "-=0.5"
     );
 
     tl.fromTo(
       ".hero-status",
       { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
-      "-=0.2"
+      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+      "-=0.4"
     );
 
     return () => {
