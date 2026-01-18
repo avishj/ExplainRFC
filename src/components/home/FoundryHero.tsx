@@ -91,6 +91,12 @@ interface GlyphTrail {
   alpha: number;
 }
 
+interface ElectricArc {
+  points: { x: number; y: number }[];
+  alpha: number;
+  life: number;
+}
+
 export function FoundryHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -101,6 +107,7 @@ export function FoundryHero() {
   const dataStreamsRef = useRef<DataStream[]>([]);
   const orbitRingsRef = useRef<OrbitRing[]>([]);
   const glyphTrailsRef = useRef<GlyphTrail[]>([]);
+  const electricArcsRef = useRef<ElectricArc[]>([]);
   const timeRef = useRef(0);
   const bootPhaseRef = useRef(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -207,6 +214,29 @@ export function FoundryHero() {
     }
 
     const glyphTrails = glyphTrailsRef.current;
+    const electricArcs = electricArcsRef.current;
+
+    const createArc = (x1: number, y1: number, x2: number, y2: number): ElectricArc => {
+      const points: { x: number; y: number }[] = [];
+      const segments = 8 + Math.floor(Math.random() * 6);
+      
+      for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        const baseX = x1 + (x2 - x1) * t;
+        const baseY = y1 + (y2 - y1) * t;
+        const perpX = -(y2 - y1);
+        const perpY = x2 - x1;
+        const len = Math.hypot(perpX, perpY);
+        const offset = (Math.random() - 0.5) * 30 * Math.sin(t * Math.PI);
+        
+        points.push({
+          x: baseX + (perpX / len) * offset,
+          y: baseY + (perpY / len) * offset,
+        });
+      }
+      
+      return { points, alpha: 1, life: 300 + Math.random() * 200 };
+    };
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
@@ -543,6 +573,49 @@ export function FoundryHero() {
         ctx.shadowBlur = 0;
       }
 
+      if (Math.random() < 0.008 * bootProgress && electricArcs.length < 5 && particles.length >= 2) {
+        const i1 = Math.floor(Math.random() * particles.length);
+        let i2 = Math.floor(Math.random() * particles.length);
+        while (i2 === i1) i2 = Math.floor(Math.random() * particles.length);
+        
+        const p1 = particles[i1];
+        const p2 = particles[i2];
+        const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        
+        if (dist < 250 && dist > 50) {
+          electricArcs.push(createArc(p1.x, p1.y, p2.x, p2.y));
+        }
+      }
+
+      for (let i = electricArcs.length - 1; i >= 0; i--) {
+        const arc = electricArcs[i];
+        arc.life -= dt;
+        arc.alpha = arc.life / 300;
+        
+        if (arc.life <= 0) {
+          electricArcs.splice(i, 1);
+          continue;
+        }
+        
+        ctx.beginPath();
+        ctx.moveTo(arc.points[0].x, arc.points[0].y);
+        for (let j = 1; j < arc.points.length; j++) {
+          ctx.lineTo(arc.points[j].x, arc.points[j].y);
+        }
+        
+        ctx.strokeStyle = `rgba(255, 220, 100, ${arc.alpha * 0.9})`;
+        ctx.lineWidth = 2;
+        ctx.shadowColor = `rgba(255, 200, 50, ${arc.alpha})`;
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+        
+        ctx.strokeStyle = `rgba(255, 255, 200, ${arc.alpha * 0.6})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        
+        ctx.shadowBlur = 0;
+      }
+
       const coreGlow = ctx.createRadialGradient(
         centerX, centerY, 0,
         centerX, centerY, 80
@@ -646,6 +719,7 @@ export function FoundryHero() {
       dataStreams.length = 0;
       orbitRings.length = 0;
       glyphTrails.length = 0;
+      electricArcs.length = 0;
     };
   }, [createParticle, prefersReducedMotion]);
 
