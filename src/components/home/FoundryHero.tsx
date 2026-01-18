@@ -10,14 +10,14 @@ interface BootLine {
 
 const BOOT_SEQUENCE: BootLine[] = [
   { text: "> INITIALIZING PROTOCOL MUSEUM v2.0", typingSpeed: 35, postDelay: 300 },
-  { text: "> LOADING RFC ARCHIVE...", typingSpeed: 40, postDelay: 100 },
-  { text: "  [                    ] 0%", typingSpeed: 0, postDelay: 0, isProgressBar: true },
   { text: "> ESTABLISHING SECURE CHANNEL", typingSpeed: 30, postDelay: 200 },
   { text: "  SYN ────────────────────────►", typingSpeed: 15, postDelay: 350 },
   { text: "  ◄──────────────────── SYN-ACK", typingSpeed: 15, postDelay: 350 },
   { text: "  ACK ────────────────────────►", typingSpeed: 15, postDelay: 250 },
-  { text: "> CONNECTION ESTABLISHED", typingSpeed: 25, postDelay: 400 },
-  { text: "> WELCOME TO THE ARCHIVE", typingSpeed: 45, postDelay: 600 },
+  { text: "> CONNECTION ESTABLISHED", typingSpeed: 25, postDelay: 300 },
+  { text: "> LOADING RFC ARCHIVE...", typingSpeed: 40, postDelay: 100 },
+  { text: "  [                    ] 0%", typingSpeed: 0, postDelay: 0, isProgressBar: true },
+  { text: "> WELCOME TO THE ARCHIVE", typingSpeed: 45, postDelay: 500 },
 ];
 
 const RFC_FRAGMENTS = [
@@ -791,52 +791,114 @@ export function FoundryHero() {
     const tl = gsap.timeline();
     
     tl.to(".boot-terminal-content", {
-      opacity: 0,
-      y: -30,
-      scale: 0.98,
-      duration: 0.6,
+      opacity: 0.7,
+      scale: 1.02,
+      duration: 0.15,
       ease: "power2.in",
     });
 
+    tl.to(".boot-terminal-content", {
+      x: -3,
+      duration: 0.05,
+      ease: "none",
+    });
+    tl.to(".boot-terminal-content", {
+      x: 5,
+      duration: 0.05,
+      ease: "none",
+    });
+    tl.to(".boot-terminal-content", {
+      x: -2,
+      duration: 0.05,
+      ease: "none",
+    });
+    tl.to(".boot-terminal-content", {
+      x: 0,
+      duration: 0.05,
+      ease: "none",
+    });
+
+    tl.to(".boot-scanline", {
+      scaleY: 1,
+      duration: 0.4,
+      ease: "power2.inOut",
+    }, "-=0.1");
+
+    tl.to(".boot-terminal-content", {
+      opacity: 0,
+      y: -60,
+      scale: 0.9,
+      filter: "blur(8px)",
+      duration: 0.5,
+      ease: "power3.in",
+    }, "-=0.2");
+
+    tl.to(".boot-scanline", {
+      y: "-100%",
+      duration: 0.6,
+      ease: "power2.inOut",
+    }, "-=0.4");
+
     tl.to(".boot-overlay", {
       opacity: 0,
-      duration: 0.5,
-      ease: "power2.inOut",
+      duration: 0.4,
+      ease: "power2.out",
       onComplete: () => {
         setShowBootOverlay(false);
         setIsLoaded(true);
       }
     }, "-=0.3");
 
-    tl.call(() => setTitleVisible(true), [], "-=0.2");
+    tl.call(() => setTitleVisible(true), [], "-=0.35");
+
+    tl.fromTo(
+      ".hero-glow",
+      { opacity: 0, scale: 0.8 },
+      { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" },
+      "-=0.3"
+    );
 
     tl.fromTo(
       ".hero-title-line",
-      { opacity: 0, y: 50, rotateX: -20, scale: 0.95 },
+      { 
+        opacity: 0, 
+        y: 80, 
+        rotateX: -30,
+        scale: 0.85,
+        filter: "blur(10px)"
+      },
       { 
         opacity: 1, 
         y: 0, 
         rotateX: 0,
         scale: 1,
-        duration: 1.0, 
-        stagger: 0.12,
-        ease: "power3.out"
+        filter: "blur(0px)",
+        duration: 0.9, 
+        stagger: 0.1,
+        ease: "power4.out"
       },
-      "-=0.3"
+      "-=0.5"
     );
 
     tl.fromTo(
       ".hero-subtitle",
-      { opacity: 0, y: 25 },
-      { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" },
-      "-=0.6"
+      { opacity: 0, y: 30, filter: "blur(4px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power2.out" },
+      "-=0.5"
     );
 
     tl.fromTo(
       ".hero-cta",
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
-      "-=0.4"
+      { opacity: 0, y: 25, scale: 0.95 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" },
+      "-=0.3"
+    );
+
+    tl.fromTo(
+      ".hero-status",
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+      "-=0.2"
     );
 
     return () => {
@@ -864,7 +926,15 @@ export function FoundryHero() {
           ${!showBootOverlay ? "pointer-events-none" : ""}
         `}
       >
-        <div className="boot-terminal-content max-w-2xl w-full px-8">
+        <div 
+          className="boot-scanline absolute inset-x-0 top-0 h-full pointer-events-none origin-top"
+          style={{
+            background: "linear-gradient(to bottom, transparent 0%, rgba(255, 170, 0, 0.03) 45%, rgba(255, 170, 0, 0.08) 50%, rgba(255, 170, 0, 0.03) 55%, transparent 100%)",
+            transform: "scaleY(0)",
+          }}
+        />
+        
+        <div className="boot-terminal-content max-w-2xl w-full px-8 relative">
           <div className="font-mono text-sm text-amber space-y-1">
             {showInitialCursor && (
               <div style={{ textShadow: "0 0 10px rgba(255, 170, 0, 0.5)" }}>
@@ -877,6 +947,7 @@ export function FoundryHero() {
               return (
                 <div
                   key={i}
+                  className="boot-line"
                   style={{
                     textShadow: "0 0 10px rgba(255, 170, 0, 0.5)",
                   }}
@@ -901,7 +972,7 @@ export function FoundryHero() {
           `}
         >
           <div className="relative inline-block mb-8">
-            <div className="absolute -inset-8 bg-gradient-radial from-amber/5 via-transparent to-transparent blur-xl" />
+            <div className="hero-glow absolute -inset-8 bg-gradient-radial from-amber/5 via-transparent to-transparent blur-xl opacity-0" />
             
             <p className="hero-title-line museum-label text-amber tracking-[0.3em] mb-6 opacity-0">
               THE PROTOCOL VISUALIZATION MUSEUM
@@ -968,7 +1039,7 @@ export function FoundryHero() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
+      <div className="hero-status absolute bottom-8 left-1/2 -translate-x-1/2 z-20 opacity-0">
         <div className="flex items-center gap-2 text-text-muted font-mono text-xs">
           <span className="inline-block w-2 h-2 bg-green-500/60 rounded-full animate-pulse" />
           <span>TRANSMISSION ACTIVE</span>
