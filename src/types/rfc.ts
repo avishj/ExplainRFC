@@ -49,6 +49,8 @@ export interface SceneState {
   action?: string;
   from?: string;
   to?: string;
+  at?: string;
+  prefix?: string;
   packet?: PacketData;
 }
 

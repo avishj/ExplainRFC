@@ -1,19 +1,25 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { ExhibitPlayer } from "@/components/exhibit";
-import { rfcData, storyboard } from "@/data/rfcs/793-tcp/data";
+import { rfcData as tcpData, storyboard as tcpStoryboard } from "@/data/rfcs/793-tcp/data";
+import { rfcData as bgpData, storyboard as bgpStoryboard } from "@/data/rfcs/4271-bgp/data";
+
+const rfcRegistry = {
+  "793": { rfc: tcpData, storyboard: tcpStoryboard },
+  "4271": { rfc: bgpData, storyboard: bgpStoryboard },
+};
 
 export function getStaticPaths() {
   return [
     { params: { id: "793" } },
+    { params: { id: "4271" } },
   ];
 }
 
-const { id: _id } = Astro.params;
-
-// In a full implementation, this would look up the RFC by ID
-const rfc = rfcData;
-const steps = storyboard;
+const { id } = Astro.params;
+const rfcEntry = rfcRegistry[id as keyof typeof rfcRegistry] || rfcRegistry["793"];
+const rfc = rfcEntry.rfc;
+const steps = rfcEntry.storyboard;
 
 const title = `RFC ${rfc.id}: ${rfc.shortTitle} — Explain RFC`;
 const description = rfc.description;

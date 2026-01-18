@@ -24,11 +24,15 @@ export function SceneCanvas({ rfcId, accentColors, onControllerReady }: SceneCan
         setError(null);
         
         // Dynamically import the scene module based on RFC ID
-        const sceneModule = await import(`@scenes/${rfcId}-tcp/index.ts`).catch(() => {
-          // Fallback to default scene if specific one doesn't exist
-          return import("@scenes/793-tcp/index.ts");
-        });
+        const scenePaths: Record<number, () => Promise<{ init: typeof import("@scenes/793-tcp/index.ts").init }>> = {
+          793: () => import("@scenes/793-tcp/index.ts"),
+          4271: () => import("@scenes/4271-bgp/index.ts"),
+        };
         
+        const loadScene = scenePaths[rfcId] || scenePaths[793];
+        const sceneModule = await loadScene();
+        
+        if (!canvas) return;
         controller = await sceneModule.init(canvas, accentColors);
         if (controller) {
           onControllerReady(controller);

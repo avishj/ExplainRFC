@@ -69,7 +69,7 @@ export const rfcCatalog: CatalogRFC[] = [
   { id: 2045, name: "MIME", title: "MIME Part One: Format of Internet Message Bodies", year: 1996, layer: "Mail", description: "Extends email to support attachments and non-ASCII text.", available: false },
 
   // Routing
-  { id: 4271, name: "BGP", title: "A Border Gateway Protocol 4", year: 2006, layer: "Routing", description: "The protocol that makes internet routing decisions between autonomous systems.", available: false },
+  { id: 4271, name: "BGP", title: "A Border Gateway Protocol 4", year: 2006, layer: "Routing", description: "The protocol that makes internet routing decisions between autonomous systems.", available: true },
   { id: 2328, name: "OSPF", title: "OSPF Version 2", year: 1998, layer: "Routing", description: "Link-state routing protocol for IP networks.", available: false },
   { id: 5340, name: "OSPFv3", title: "OSPF for IPv6", year: 2008, layer: "Routing", description: "OSPF adapted for IPv6 networks.", available: false },
   { id: 2453, name: "RIP", title: "RIP Version 2", year: 1998, layer: "Routing", description: "Simple distance-vector routing protocol.", available: false },

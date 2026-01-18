@@ -60,6 +60,9 @@ export function InstrumentsPanel({ step }: InstrumentsPanelProps) {
 }
 
 function StateMachineView({ currentState }: { currentState?: string }) {
+  const bgpStates = ["IDLE", "CONNECT", "ACTIVE", "OPEN_SENT", "OPEN_CONFIRM", "ESTABLISHED"];
+  const isBGPState = bgpStates.includes(currentState || "");
+  
   const tcpStates = [
     { id: "CLOSED", x: 50, y: 10 },
     { id: "LISTEN", x: 80, y: 25 },
@@ -72,13 +75,24 @@ function StateMachineView({ currentState }: { currentState?: string }) {
     { id: "LAST-ACK", x: 80, y: 85 },
     { id: "TIME-WAIT", x: 50, y: 92 },
   ];
+
+  const bgpStateLayout = [
+    { id: "IDLE", x: 50, y: 10 },
+    { id: "CONNECT", x: 25, y: 30 },
+    { id: "ACTIVE", x: 75, y: 30 },
+    { id: "OPEN_SENT", x: 25, y: 55 },
+    { id: "OPEN_CONFIRM", x: 75, y: 55 },
+    { id: "ESTABLISHED", x: 50, y: 82 },
+  ];
+
+  const states = isBGPState ? bgpStateLayout : tcpStates;
+  const title = isBGPState ? "BGP FSM" : "TCP State Machine";
   
   return (
     <div className="space-y-4">
-      <h3 className="museum-label text-brass">TCP State Machine</h3>
+      <h3 className="museum-label text-brass">{title}</h3>
       
       <div className="relative aspect-[4/5] engraved rounded-lg p-4">
-        {/* Connection lines (simplified) */}
         <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
           <defs>
             <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -86,27 +100,47 @@ function StateMachineView({ currentState }: { currentState?: string }) {
               <stop offset="50%" stopColor="#d4a44c" stopOpacity="0.5" />
               <stop offset="100%" stopColor="#8b7355" stopOpacity="0.3" />
             </linearGradient>
+            <linearGradient id="bgpGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#00d4aa" stopOpacity="0.3" />
+              <stop offset="50%" stopColor="#7c3aed" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#00d4aa" stopOpacity="0.3" />
+            </linearGradient>
           </defs>
-          {/* Vertical spine */}
-          <line x1="50%" y1="15%" x2="50%" y2="90%" stroke="url(#lineGradient)" strokeWidth="1" />
-          {/* Horizontal branches */}
-          <line x1="20%" y1="25%" x2="80%" y2="25%" stroke="url(#lineGradient)" strokeWidth="1" />
-          <line x1="20%" y1="72%" x2="80%" y2="72%" stroke="url(#lineGradient)" strokeWidth="1" />
+          {isBGPState ? (
+            <>
+              <line x1="50%" y1="15%" x2="25%" y2="30%" stroke="url(#bgpGradient)" strokeWidth="1" />
+              <line x1="50%" y1="15%" x2="75%" y2="30%" stroke="url(#bgpGradient)" strokeWidth="1" />
+              <line x1="25%" y1="30%" x2="75%" y2="30%" stroke="url(#bgpGradient)" strokeWidth="1" />
+              <line x1="25%" y1="30%" x2="25%" y2="55%" stroke="url(#bgpGradient)" strokeWidth="1" />
+              <line x1="75%" y1="30%" x2="75%" y2="55%" stroke="url(#bgpGradient)" strokeWidth="1" />
+              <line x1="25%" y1="55%" x2="75%" y2="55%" stroke="url(#bgpGradient)" strokeWidth="1" />
+              <line x1="25%" y1="55%" x2="50%" y2="82%" stroke="url(#bgpGradient)" strokeWidth="1" />
+              <line x1="75%" y1="55%" x2="50%" y2="82%" stroke="url(#bgpGradient)" strokeWidth="1" />
+            </>
+          ) : (
+            <>
+              <line x1="50%" y1="15%" x2="50%" y2="90%" stroke="url(#lineGradient)" strokeWidth="1" />
+              <line x1="20%" y1="25%" x2="80%" y2="25%" stroke="url(#lineGradient)" strokeWidth="1" />
+              <line x1="20%" y1="72%" x2="80%" y2="72%" stroke="url(#lineGradient)" strokeWidth="1" />
+            </>
+          )}
         </svg>
         
-        {tcpStates.map(state => (
+        {states.map(state => (
           <div
             key={state.id}
             className={cn(
               "absolute px-2 py-1 rounded text-xs font-mono transition-all duration-500",
               "-translate-x-1/2 -translate-y-1/2 z-10",
               state.id === currentState
-                ? "bg-gradient-to-r from-amber to-ember text-obsidian font-bold scale-110 glow-ember"
+                ? isBGPState
+                  ? "bg-gradient-to-r from-[#00d4aa] to-[#7c3aed] text-white font-bold scale-110 shadow-lg shadow-[#00d4aa]/30"
+                  : "bg-gradient-to-r from-amber to-ember text-obsidian font-bold scale-110 glow-ember"
                 : "bg-carbon text-text-muted border border-stone"
             )}
             style={{ left: `${state.x}%`, top: `${state.y}%` }}
           >
-            {state.id}
+            {state.id.replace("_", " ")}
           </div>
         ))}
       </div>
@@ -114,7 +148,10 @@ function StateMachineView({ currentState }: { currentState?: string }) {
       {currentState && (
         <div className="p-4 rounded-lg engraved">
           <span className="museum-label text-text-muted block mb-1">Current State</span>
-          <span className="font-mono font-bold text-lg text-gold">{currentState}</span>
+          <span className={cn(
+            "font-mono font-bold text-lg",
+            isBGPState ? "text-[#00d4aa]" : "text-gold"
+          )}>{currentState.replace("_", " ")}</span>
         </div>
       )}
     </div>
@@ -211,6 +248,30 @@ function GlossaryView({ terms }: { terms?: string[] }) {
     "reliable delivery": "Guarantee that data arrives complete, in order, and without errors",
     "flow control": "Mechanism to prevent sender from overwhelming receiver with data",
     "connection-oriented": "A protocol that establishes a dedicated connection before data transfer",
+    "AS": "Autonomous System — An independent network under single administrative control",
+    "ASN": "Autonomous System Number — A unique identifier assigned to each AS (e.g., AS15169 is Google)",
+    "autonomous-system": "A collection of IP networks under common administration with a unified routing policy",
+    "BGP": "Border Gateway Protocol — The routing protocol that exchanges routing information between autonomous systems",
+    "path-vector": "A routing protocol that maintains path information to prevent loops and enable policy decisions",
+    "peering": "A direct interconnection between two networks to exchange traffic without paying transit fees",
+    "transit": "A paid service where one AS carries traffic to destinations beyond its own network",
+    "IXP": "Internet Exchange Point — A physical location where multiple networks connect to exchange traffic",
+    "OPEN": "BGP message that initiates a session and negotiates capabilities between neighbors",
+    "KEEPALIVE": "BGP message sent periodically to confirm the session is still active",
+    "neighbor": "A BGP router with which a session has been established for exchanging routes",
+    "AS_PATH": "The sequence of AS numbers a route has traversed, used for loop prevention and path selection",
+    "prepending": "Adding extra copies of your ASN to make a path appear longer and less preferred",
+    "multipath": "The ability to learn and potentially use multiple paths to the same destination",
+    "route-diversity": "Having multiple distinct paths available for resilience and load balancing",
+    "LOCAL_PREF": "Local Preference — A BGP attribute used to prefer certain paths within an AS",
+    "best-path": "The single route selected from all available paths based on BGP's decision algorithm",
+    "MED": "Multi-Exit Discriminator — A hint to external neighbors about preferred entry points",
+    "convergence": "The process by which all routers reach a consistent view of network topology",
+    "routing-table": "A database that stores the best paths to all known network destinations",
+    "hijack": "Malicious or accidental announcement of IP prefixes belonging to another network",
+    "prefix-origin": "The AS that legitimately owns and announces an IP prefix",
+    "WITHDRAW": "BGP message that removes a previously announced route",
+    "reconvergence": "The process of finding new best paths after a route becomes unavailable",
   };
   
   const displayTerms = terms || Object.keys(glossary).slice(0, 4);
