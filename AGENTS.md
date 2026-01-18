@@ -1,5 +1,7 @@
 # AGENTS.md
 
+YOU MUST use the edit tool instead of create tool unless the vast majority of the file needs changing.
+
 ## Commands
 - `bun run dev` — Start dev server
 - `bun run build` — Typecheck and build for production
