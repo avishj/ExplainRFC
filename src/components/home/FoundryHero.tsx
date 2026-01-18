@@ -1,16 +1,23 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
 
-const BOOT_SEQUENCE = [
-  { text: "> INITIALIZING PROTOCOL MUSEUM v2.0", delay: 0 },
-  { text: "> LOADING RFC ARCHIVE...", delay: 400 },
-  { text: "  [████████████████████] 100%", delay: 800 },
-  { text: "> ESTABLISHING SECURE CHANNEL", delay: 1200 },
-  { text: "  SYN ────────────────────────►", delay: 1500 },
-  { text: "  ◄──────────────────── SYN-ACK", delay: 1900 },
-  { text: "  ACK ────────────────────────►", delay: 2200 },
-  { text: "> CONNECTION ESTABLISHED", delay: 2500 },
-  { text: "> WELCOME TO THE ARCHIVE", delay: 2900 },
+interface BootLine {
+  text: string;
+  typingSpeed: number;
+  postDelay: number;
+  isProgressBar?: boolean;
+}
+
+const BOOT_SEQUENCE: BootLine[] = [
+  { text: "> INITIALIZING PROTOCOL MUSEUM v2.0", typingSpeed: 35, postDelay: 300 },
+  { text: "> LOADING RFC ARCHIVE...", typingSpeed: 40, postDelay: 100 },
+  { text: "  [                    ] 0%", typingSpeed: 0, postDelay: 0, isProgressBar: true },
+  { text: "> ESTABLISHING SECURE CHANNEL", typingSpeed: 30, postDelay: 200 },
+  { text: "  SYN ────────────────────────►", typingSpeed: 15, postDelay: 350 },
+  { text: "  ◄──────────────────── SYN-ACK", typingSpeed: 15, postDelay: 350 },
+  { text: "  ACK ────────────────────────►", typingSpeed: 15, postDelay: 250 },
+  { text: "> CONNECTION ESTABLISHED", typingSpeed: 25, postDelay: 400 },
+  { text: "> WELCOME TO THE ARCHIVE", typingSpeed: 45, postDelay: 600 },
 ];
 
 const RFC_FRAGMENTS = [
@@ -113,8 +120,11 @@ export function FoundryHero() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [titleVisible, setTitleVisible] = useState(false);
   const [bootComplete, setBootComplete] = useState(false);
-  const [bootLines, setBootLines] = useState<string[]>([]);
+  const [bootLines, setBootLines] = useState<{ text: string; complete: boolean }[]>([]);
   const [showBootOverlay, setShowBootOverlay] = useState(true);
+  const [showInitialCursor, setShowInitialCursor] = useState(true);
+  const [progressPercent, setProgressPercent] = useState(0);
+  const bootStartedRef = useRef(false);
 
   const prefersReducedMotion =
     typeof window !== "undefined" &&
@@ -693,19 +703,74 @@ export function FoundryHero() {
       animationId = requestAnimationFrame(draw);
     };
 
-    BOOT_SEQUENCE.forEach(({ text, delay }) => {
-      setTimeout(() => {
-        setBootLines(prev => [...prev, text]);
-      }, delay);
-    });
+    const runBootSequence = async () => {
+      if (bootStartedRef.current) return;
+      bootStartedRef.current = true;
 
-    setTimeout(() => {
+      await new Promise(r => setTimeout(r, 800));
+      setShowInitialCursor(false);
+
+      for (let lineIdx = 0; lineIdx < BOOT_SEQUENCE.length; lineIdx++) {
+        const line = BOOT_SEQUENCE[lineIdx];
+        
+        if (line.isProgressBar) {
+          setBootLines(prev => [...prev, { text: "  [                    ] 0%", complete: false }]);
+          
+          const progressDuration = 1200;
+          const steps = 20;
+          const stepDuration = progressDuration / steps;
+          
+          for (let i = 1; i <= steps; i++) {
+            await new Promise(r => setTimeout(r, stepDuration));
+            const filled = "█".repeat(i);
+            const empty = " ".repeat(steps - i);
+            const percent = Math.round((i / steps) * 100);
+            setBootLines(prev => {
+              const updated = [...prev];
+              updated[updated.length - 1] = { 
+                text: `  [${filled}${empty}] ${percent}%`, 
+                complete: i === steps 
+              };
+              return updated;
+            });
+            setProgressPercent(Math.round((i / steps) * 100));
+          }
+          await new Promise(r => setTimeout(r, 200));
+        } else {
+          setBootLines(prev => [...prev, { text: "", complete: false }]);
+          
+          const chars = line.text.split("");
+          for (let charIdx = 0; charIdx < chars.length; charIdx++) {
+            await new Promise(r => setTimeout(r, line.typingSpeed + (Math.random() - 0.5) * 20));
+            setBootLines(prev => {
+              const updated = [...prev];
+              updated[updated.length - 1] = { 
+                text: line.text.slice(0, charIdx + 1), 
+                complete: false 
+              };
+              return updated;
+            });
+          }
+          
+          setBootLines(prev => {
+            const updated = [...prev];
+            updated[updated.length - 1] = { ...updated[updated.length - 1], complete: true };
+            return updated;
+          });
+          
+          await new Promise(r => setTimeout(r, line.postDelay));
+        }
+      }
+
+      await new Promise(r => setTimeout(r, 400));
       setShowBootOverlay(false);
       setBootComplete(true);
-    }, 3500);
+    };
 
-    setTimeout(() => setIsLoaded(true), 3600);
-    setTimeout(() => setTitleVisible(true), 4000);
+    runBootSequence();
+
+    setTimeout(() => setIsLoaded(true), 6500);
+    setTimeout(() => setTitleVisible(true), 6900);
     animationId = requestAnimationFrame(draw);
 
     return () => {
@@ -783,18 +848,28 @@ export function FoundryHero() {
       >
         <div className="max-w-2xl w-full px-8">
           <div className="font-mono text-sm text-amber space-y-1">
-            {bootLines.map((line, i) => (
-              <div
-                key={i}
-                className="animate-fadeIn"
-                style={{
-                  textShadow: "0 0 10px rgba(255, 170, 0, 0.5)",
-                }}
-              >
-                {line}
+            {showInitialCursor && (
+              <div style={{ textShadow: "0 0 10px rgba(255, 170, 0, 0.5)" }}>
+                <span className="inline-block w-2 h-4 bg-amber animate-pulse" />
               </div>
-            ))}
-            <span className="inline-block w-2 h-4 bg-amber animate-pulse ml-1" />
+            )}
+            {bootLines.map((line, i) => {
+              const isLastLine = i === bootLines.length - 1;
+              const showCursor = isLastLine && !line.complete;
+              return (
+                <div
+                  key={i}
+                  style={{
+                    textShadow: "0 0 10px rgba(255, 170, 0, 0.5)",
+                  }}
+                >
+                  {line.text}
+                  {showCursor && (
+                    <span className="inline-block w-2 h-4 bg-amber animate-pulse ml-0.5 align-middle" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
