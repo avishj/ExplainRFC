@@ -10,10 +10,13 @@ const fuse = new Fuse(rfcCatalog, {
 });
 
 interface RFCSearchProps {
-  onSelectRFC: (rfcId: number) => void;
+  baseUrl?: string;
 }
 
-export function RFCSearch({ onSelectRFC }: RFCSearchProps) {
+export function RFCSearch({ baseUrl = "/" }: RFCSearchProps) {
+  const handleSelectRFC = (rfcId: number) => {
+    window.location.href = `${baseUrl}rfc/${rfcId}`;
+  };
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<CatalogRFC[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -76,7 +79,7 @@ export function RFCSearch({ onSelectRFC }: RFCSearchProps) {
     } else if (e.key === "Enter" && results[selectedIndex]) {
       const rfc = results[selectedIndex];
       if (rfc.available) {
-        onSelectRFC(rfc.id);
+        handleSelectRFC(rfc.id);
       }
     } else if (e.key === "Escape") {
       setIsOpen(false);
@@ -156,13 +159,13 @@ export function RFCSearch({ onSelectRFC }: RFCSearchProps) {
           {results.map((rfc, index) => (
             <button
               key={rfc.id}
-              onClick={() => rfc.available && onSelectRFC(rfc.id)}
+              onClick={() => rfc.available && handleSelectRFC(rfc.id)}
               onMouseEnter={() => setSelectedIndex(index)}
               disabled={!rfc.available}
               className={`
                 w-full flex items-center gap-4 px-4 py-3 text-left transition-all
                 ${index === selectedIndex ? "bg-amber/10" : ""}
-                ${!rfc.available ? "opacity-50 cursor-not-allowed" : "hover:bg-amber/10"}
+                ${!rfc.available ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-amber/10"}
               `}
             >
               {/* RFC number badge */}
