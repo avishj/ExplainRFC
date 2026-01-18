@@ -1,6 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
 
+const BOOT_SEQUENCE = [
+  { text: "> INITIALIZING PROTOCOL MUSEUM v2.0", delay: 0 },
+  { text: "> LOADING RFC ARCHIVE...", delay: 400 },
+  { text: "  [████████████████████] 100%", delay: 800 },
+  { text: "> ESTABLISHING SECURE CHANNEL", delay: 1200 },
+  { text: "  SYN ────────────────────────►", delay: 1500 },
+  { text: "  ◄──────────────────── SYN-ACK", delay: 1900 },
+  { text: "  ACK ────────────────────────►", delay: 2200 },
+  { text: "> CONNECTION ESTABLISHED", delay: 2500 },
+  { text: "> WELCOME TO THE ARCHIVE", delay: 2900 },
+];
+
 const RFC_FRAGMENTS = [
   "SYN", "ACK", "FIN", "RST", "PSH", "URG",
   "RFC793", "RFC2616", "RFC7231", "RFC8446",
@@ -94,6 +106,8 @@ export function FoundryHero() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [titleVisible, setTitleVisible] = useState(false);
   const [bootComplete, setBootComplete] = useState(false);
+  const [bootLines, setBootLines] = useState<string[]>([]);
+  const [showBootOverlay, setShowBootOverlay] = useState(true);
 
   const prefersReducedMotion =
     typeof window !== "undefined" &&
@@ -606,8 +620,19 @@ export function FoundryHero() {
       animationId = requestAnimationFrame(draw);
     };
 
-    setTimeout(() => setIsLoaded(true), 500);
-    setTimeout(() => setTitleVisible(true), 1000);
+    BOOT_SEQUENCE.forEach(({ text, delay }) => {
+      setTimeout(() => {
+        setBootLines(prev => [...prev, text]);
+      }, delay);
+    });
+
+    setTimeout(() => {
+      setShowBootOverlay(false);
+      setBootComplete(true);
+    }, 3500);
+
+    setTimeout(() => setIsLoaded(true), 3600);
+    setTimeout(() => setTitleVisible(true), 4000);
     animationId = requestAnimationFrame(draw);
 
     return () => {
@@ -674,6 +699,31 @@ export function FoundryHero() {
       </div>
 
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-obsidian pointer-events-none z-10" />
+
+      <div
+        className={`
+          absolute inset-0 z-30 bg-obsidian flex items-center justify-center
+          transition-opacity duration-700
+          ${showBootOverlay ? "opacity-100" : "opacity-0 pointer-events-none"}
+        `}
+      >
+        <div className="max-w-2xl w-full px-8">
+          <div className="font-mono text-sm text-amber space-y-1">
+            {bootLines.map((line, i) => (
+              <div
+                key={i}
+                className="animate-fadeIn"
+                style={{
+                  textShadow: "0 0 10px rgba(255, 170, 0, 0.5)",
+                }}
+              >
+                {line}
+              </div>
+            ))}
+            <span className="inline-block w-2 h-4 bg-amber animate-pulse ml-1" />
+          </div>
+        </div>
+      </div>
 
       <div className="relative z-20 flex flex-col items-center justify-center w-full min-h-screen px-6 py-12">
         <div
