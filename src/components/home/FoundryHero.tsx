@@ -51,6 +51,34 @@ interface Ripple {
   alpha: number;
 }
 
+interface DataStream {
+  angle: number;
+  speed: number;
+  length: number;
+  progress: number;
+  hue: number;
+  width: number;
+}
+
+interface OrbitRing {
+  radius: number;
+  speed: number;
+  dashOffset: number;
+  alpha: number;
+  width: number;
+}
+
+interface GlyphTrail {
+  x: number;
+  y: number;
+  targetX: number;
+  targetY: number;
+  text: string;
+  progress: number;
+  delay: number;
+  alpha: number;
+}
+
 export function FoundryHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -58,9 +86,14 @@ export function FoundryHero() {
   const particlesRef = useRef<Particle[]>([]);
   const connectionsRef = useRef<Connection[]>([]);
   const ripplesRef = useRef<Ripple[]>([]);
+  const dataStreamsRef = useRef<DataStream[]>([]);
+  const orbitRingsRef = useRef<OrbitRing[]>([]);
+  const glyphTrailsRef = useRef<GlyphTrail[]>([]);
   const timeRef = useRef(0);
+  const bootPhaseRef = useRef(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [titleVisible, setTitleVisible] = useState(false);
+  const [bootComplete, setBootComplete] = useState(false);
 
   const prefersReducedMotion =
     typeof window !== "undefined" &&
@@ -135,6 +168,31 @@ export function FoundryHero() {
         active: false,
       });
     }
+
+    const dataStreams = dataStreamsRef.current;
+    for (let i = 0; i < 12; i++) {
+      dataStreams.push({
+        angle: (i / 12) * Math.PI * 2,
+        speed: 0.0003 + Math.random() * 0.0002,
+        length: 80 + Math.random() * 120,
+        progress: Math.random(),
+        hue: 25 + Math.random() * 20,
+        width: 1 + Math.random() * 2,
+      });
+    }
+
+    const orbitRings = orbitRingsRef.current;
+    for (let i = 0; i < 4; i++) {
+      orbitRings.push({
+        radius: 120 + i * 70,
+        speed: (0.0002 + i * 0.00005) * (i % 2 === 0 ? 1 : -1),
+        dashOffset: 0,
+        alpha: 0.15 - i * 0.03,
+        width: 1.5 - i * 0.2,
+      });
+    }
+
+    const glyphTrails = glyphTrailsRef.current;
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
@@ -220,6 +278,113 @@ export function FoundryHero() {
       gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
+
+      bootPhaseRef.current = Math.min(1, bootPhaseRef.current + dt * 0.0003);
+      const bootProgress = bootPhaseRef.current;
+
+      for (const ring of orbitRings) {
+        ring.dashOffset += ring.speed * dt;
+        const ringAlpha = ring.alpha * bootProgress;
+        
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, ring.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(255, 170, 0, ${ringAlpha * 0.3})`;
+        ctx.lineWidth = ring.width;
+        ctx.setLineDash([4, 12]);
+        ctx.lineDashOffset = ring.dashOffset * 1000;
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const nodeCount = Math.floor(ring.radius / 40);
+        for (let i = 0; i < nodeCount; i++) {
+          const nodeAngle = (i / nodeCount) * Math.PI * 2 + ring.dashOffset * 500;
+          const nx = centerX + Math.cos(nodeAngle) * ring.radius;
+          const ny = centerY + Math.sin(nodeAngle) * ring.radius;
+          
+          ctx.beginPath();
+          ctx.arc(nx, ny, 2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 199, 31, ${ringAlpha * 0.6})`;
+          ctx.fill();
+        }
+      }
+
+      for (const stream of dataStreams) {
+        stream.progress += stream.speed * dt;
+        if (stream.progress > 1) stream.progress = 0;
+        
+        const maxDist = Math.max(width, height) * 0.6;
+        const startDist = maxDist * (1 - stream.progress);
+        const endDist = Math.max(0, startDist - stream.length);
+        
+        const startX = centerX + Math.cos(stream.angle) * startDist;
+        const startY = centerY + Math.sin(stream.angle) * startDist;
+        const endX = centerX + Math.cos(stream.angle) * endDist;
+        const endY = centerY + Math.sin(stream.angle) * endDist;
+        
+        const streamGrad = ctx.createLinearGradient(startX, startY, endX, endY);
+        const streamAlpha = 0.6 * bootProgress * Math.sin(stream.progress * Math.PI);
+        streamGrad.addColorStop(0, `rgba(255, 140, 0, 0)`);
+        streamGrad.addColorStop(0.3, `rgba(255, 170, 0, ${streamAlpha * 0.5})`);
+        streamGrad.addColorStop(1, `rgba(255, 199, 31, ${streamAlpha})`);
+        
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.strokeStyle = streamGrad;
+        ctx.lineWidth = stream.width;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(endX, endY, 3 + Math.sin(timestamp * 0.01) * 1, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 199, 31, ${streamAlpha * 0.8})`;
+        ctx.shadowColor = `rgba(255, 170, 0, ${streamAlpha})`;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      for (let i = glyphTrails.length - 1; i >= 0; i--) {
+        const trail = glyphTrails[i];
+        if (trail.delay > 0) {
+          trail.delay -= dt;
+          continue;
+        }
+        
+        trail.progress += dt * 0.002;
+        const t = Math.min(1, trail.progress);
+        const eased = 1 - Math.pow(1 - t, 3);
+        
+        trail.x = trail.x + (trail.targetX - trail.x) * eased * 0.1;
+        trail.y = trail.y + (trail.targetY - trail.y) * eased * 0.1;
+        trail.alpha = (1 - t) * 0.8;
+        
+        if (t >= 1) {
+          glyphTrails.splice(i, 1);
+          continue;
+        }
+        
+        ctx.font = "600 14px 'IBM Plex Mono', monospace";
+        ctx.fillStyle = `rgba(255, 199, 31, ${trail.alpha})`;
+        ctx.shadowColor = `rgba(255, 140, 0, ${trail.alpha})`;
+        ctx.shadowBlur = 8;
+        ctx.fillText(trail.text, trail.x, trail.y);
+        ctx.shadowBlur = 0;
+      }
+
+      if (Math.random() < 0.02 * bootProgress && glyphTrails.length < 20) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 200 + Math.random() * 300;
+        glyphTrails.push({
+          x: centerX + Math.cos(angle) * dist,
+          y: centerY + Math.sin(angle) * dist,
+          targetX: centerX + (Math.random() - 0.5) * 100,
+          targetY: centerY + (Math.random() - 0.5) * 100,
+          text: RFC_FRAGMENTS[Math.floor(Math.random() * RFC_FRAGMENTS.length)],
+          progress: 0,
+          delay: Math.random() * 200,
+          alpha: 0.8,
+        });
+      }
 
       for (let i = ripples.length - 1; i >= 0; i--) {
         const ripple = ripples[i];
@@ -364,29 +529,79 @@ export function FoundryHero() {
         ctx.shadowBlur = 0;
       }
 
-      const gridOpacity = 0.03 + 0.01 * Math.sin(timestamp * 0.001);
-      ctx.strokeStyle = `rgba(255, 170, 0, ${gridOpacity})`;
+      const coreGlow = ctx.createRadialGradient(
+        centerX, centerY, 0,
+        centerX, centerY, 80
+      );
+      const corePulse = 0.3 + 0.2 * Math.sin(timestamp * 0.002);
+      coreGlow.addColorStop(0, `rgba(255, 140, 0, ${corePulse * bootProgress})`);
+      coreGlow.addColorStop(0.3, `rgba(255, 100, 0, ${corePulse * 0.5 * bootProgress})`);
+      coreGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = coreGlow;
+      ctx.fillRect(centerX - 100, centerY - 100, 200, 200);
+
+      const hexSize = 60;
+      const hexHeight = hexSize * Math.sqrt(3);
+      ctx.strokeStyle = `rgba(255, 170, 0, ${0.02 * bootProgress})`;
       ctx.lineWidth = 0.5;
       
-      const gridSize = 80;
-      for (let x = 0; x < width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
+      for (let row = -Math.ceil(height / hexHeight) - 1; row <= Math.ceil(height / hexHeight) + 1; row++) {
+        for (let col = -Math.ceil(width / (hexSize * 1.5)) - 1; col <= Math.ceil(width / (hexSize * 1.5)) + 1; col++) {
+          const x = centerX + col * hexSize * 1.5;
+          const y = centerY + row * hexHeight + (col % 2) * hexHeight / 2;
+          
+          const distFromCenter = Math.hypot(x - centerX, y - centerY);
+          const fadeAlpha = Math.max(0, 1 - distFromCenter / (Math.max(width, height) * 0.6));
+          
+          if (fadeAlpha > 0.05) {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+              const angle = (i * Math.PI) / 3 - Math.PI / 6;
+              const hx = x + Math.cos(angle) * hexSize * 0.5;
+              const hy = y + Math.sin(angle) * hexSize * 0.5;
+              if (i === 0) ctx.moveTo(hx, hy);
+              else ctx.lineTo(hx, hy);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = `rgba(255, 170, 0, ${fadeAlpha * 0.04 * bootProgress})`;
+            ctx.stroke();
+          }
+        }
       }
 
-      ctx.fillStyle = `rgba(255, 199, 31, 0.02)`;
+      ctx.fillStyle = `rgba(255, 199, 31, ${0.015 * bootProgress})`;
       for (let i = 0; i < 3; i++) {
-        const scanY = ((timestamp * 0.05 + i * height / 3) % height);
-        ctx.fillRect(0, scanY, width, 2);
+        const scanY = ((timestamp * 0.03 + i * height / 3) % height);
+        ctx.fillRect(0, scanY, width, 1);
       }
+
+      const cornerSize = 40;
+      ctx.strokeStyle = `rgba(255, 170, 0, ${0.15 * bootProgress})`;
+      ctx.lineWidth = 1;
+      
+      ctx.beginPath();
+      ctx.moveTo(20, 20 + cornerSize);
+      ctx.lineTo(20, 20);
+      ctx.lineTo(20 + cornerSize, 20);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(width - 20, 20 + cornerSize);
+      ctx.lineTo(width - 20, 20);
+      ctx.lineTo(width - 20 - cornerSize, 20);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(20, height - 20 - cornerSize);
+      ctx.lineTo(20, height - 20);
+      ctx.lineTo(20 + cornerSize, height - 20);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(width - 20, height - 20 - cornerSize);
+      ctx.lineTo(width - 20, height - 20);
+      ctx.lineTo(width - 20 - cornerSize, height - 20);
+      ctx.stroke();
 
       animationId = requestAnimationFrame(draw);
     };
@@ -403,6 +618,9 @@ export function FoundryHero() {
       particles.length = 0;
       connections.length = 0;
       ripples.length = 0;
+      dataStreams.length = 0;
+      orbitRings.length = 0;
+      glyphTrails.length = 0;
     };
   }, [createParticle, prefersReducedMotion]);
 
