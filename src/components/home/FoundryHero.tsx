@@ -27,6 +27,152 @@ const RFC_FRAGMENTS = [
   "port:443", "CONNECT", "LISTEN",
 ];
 
+// Content variations for the document assembly animation loop
+interface DocumentVariation {
+  id: string;
+  title: string;
+  rfcNumber: string;
+  fragments: { text: string; xOffset: number; yOffset: number; finalXOffset: number; finalYOffset: number }[];
+  documentLines: string[];
+  visualLabel: string;
+  nodeLabels: [string, string];
+  accentHue: "amber" | "cyan" | "emerald" | "violet";
+}
+
+const DOCUMENT_VARIATIONS: DocumentVariation[] = [
+  {
+    id: "tcp",
+    title: "TCP Handshake",
+    rfcNumber: "RFC 793",
+    fragments: [
+      { text: "SYN", xOffset: -0.15, yOffset: -0.12, finalXOffset: -0.03, finalYOffset: -0.08 },
+      { text: "ACK", xOffset: 0.12, yOffset: -0.10, finalXOffset: 0.02, finalYOffset: -0.05 },
+      { text: "seq=x", xOffset: -0.18, yOffset: 0.08, finalXOffset: -0.02, finalYOffset: 0.04 },
+      { text: "ESTABLISHED", xOffset: 0.15, yOffset: 0.12, finalXOffset: 0, finalYOffset: -0.10 },
+      { text: "window", xOffset: -0.20, yOffset: 0.02, finalXOffset: -0.03, finalYOffset: -0.01 },
+      { text: "checksum", xOffset: 0.18, yOffset: -0.04, finalXOffset: 0.02, finalYOffset: 0.01 },
+      { text: "§3.4", xOffset: -0.10, yOffset: -0.15, finalXOffset: 0.03, finalYOffset: -0.03 },
+      { text: "FIN", xOffset: 0.10, yOffset: 0.10, finalXOffset: -0.02, finalYOffset: 0.06 },
+    ],
+    documentLines: [
+      "The client MUST send SYN",
+      "Server SHALL respond SYN-ACK",
+      "Connection ESTABLISHED on ACK",
+      "Sequence numbers track order",
+      "Window controls flow rate",
+      "Checksum ensures integrity",
+    ],
+    visualLabel: "TCP HANDSHAKE",
+    nodeLabels: ["SYN", "ACK"],
+    accentHue: "amber",
+  },
+  {
+    id: "bgp",
+    title: "BGP Routing",
+    rfcNumber: "RFC 4271",
+    fragments: [
+      { text: "UPDATE", xOffset: -0.16, yOffset: -0.11, finalXOffset: -0.03, finalYOffset: -0.07 },
+      { text: "AS_PATH", xOffset: 0.14, yOffset: -0.09, finalXOffset: 0.02, finalYOffset: -0.04 },
+      { text: "OPEN", xOffset: -0.19, yOffset: 0.07, finalXOffset: -0.02, finalYOffset: 0.03 },
+      { text: "KEEPALIVE", xOffset: 0.16, yOffset: 0.11, finalXOffset: 0, finalYOffset: -0.09 },
+      { text: "prefix", xOffset: -0.21, yOffset: 0.01, finalXOffset: -0.03, finalYOffset: -0.02 },
+      { text: "LOCAL_PREF", xOffset: 0.17, yOffset: -0.05, finalXOffset: 0.02, finalYOffset: 0.02 },
+      { text: "§6.1", xOffset: -0.11, yOffset: -0.14, finalXOffset: 0.03, finalYOffset: -0.04 },
+      { text: "WITHDRAW", xOffset: 0.11, yOffset: 0.09, finalXOffset: -0.02, finalYOffset: 0.05 },
+    ],
+    documentLines: [
+      "Peers MUST exchange OPEN",
+      "UPDATE carries route info",
+      "AS_PATH prevents loops",
+      "LOCAL_PREF sets priority",
+      "KEEPALIVE maintains session",
+      "WITHDRAW removes routes",
+    ],
+    visualLabel: "BGP PEERING",
+    nodeLabels: ["AS1", "AS2"],
+    accentHue: "emerald",
+  },
+  {
+    id: "http",
+    title: "HTTP Request",
+    rfcNumber: "RFC 2616",
+    fragments: [
+      { text: "GET", xOffset: -0.17, yOffset: -0.10, finalXOffset: -0.03, finalYOffset: -0.06 },
+      { text: "200 OK", xOffset: 0.13, yOffset: -0.08, finalXOffset: 0.02, finalYOffset: -0.03 },
+      { text: "Host:", xOffset: -0.18, yOffset: 0.06, finalXOffset: -0.02, finalYOffset: 0.02 },
+      { text: "Content-Type", xOffset: 0.15, yOffset: 0.10, finalXOffset: 0, finalYOffset: -0.08 },
+      { text: "headers", xOffset: -0.22, yOffset: 0.00, finalXOffset: -0.03, finalYOffset: -0.03 },
+      { text: "Cache-Control", xOffset: 0.16, yOffset: -0.06, finalXOffset: 0.02, finalYOffset: 0.00 },
+      { text: "§5.1", xOffset: -0.12, yOffset: -0.13, finalXOffset: 0.03, finalYOffset: -0.05 },
+      { text: "POST", xOffset: 0.12, yOffset: 0.08, finalXOffset: -0.02, finalYOffset: 0.04 },
+    ],
+    documentLines: [
+      "Request MUST include method",
+      "GET retrieves resource",
+      "Headers define metadata",
+      "Status codes signal result",
+      "Body MAY contain payload",
+      "Connection can be reused",
+    ],
+    visualLabel: "HTTP REQUEST",
+    nodeLabels: ["REQ", "RES"],
+    accentHue: "cyan",
+  },
+  {
+    id: "dns",
+    title: "DNS Resolution",
+    rfcNumber: "RFC 1035",
+    fragments: [
+      { text: "QUERY", xOffset: -0.15, yOffset: -0.11, finalXOffset: -0.03, finalYOffset: -0.07 },
+      { text: "ANSWER", xOffset: 0.14, yOffset: -0.09, finalXOffset: 0.02, finalYOffset: -0.04 },
+      { text: "A record", xOffset: -0.19, yOffset: 0.07, finalXOffset: -0.02, finalYOffset: 0.03 },
+      { text: "CNAME", xOffset: 0.16, yOffset: 0.11, finalXOffset: 0, finalYOffset: -0.09 },
+      { text: "TTL", xOffset: -0.20, yOffset: 0.01, finalXOffset: -0.03, finalYOffset: -0.02 },
+      { text: "recursive", xOffset: 0.17, yOffset: -0.05, finalXOffset: 0.02, finalYOffset: 0.02 },
+      { text: "§4.1", xOffset: -0.11, yOffset: -0.14, finalXOffset: 0.03, finalYOffset: -0.04 },
+      { text: "NS", xOffset: 0.11, yOffset: 0.09, finalXOffset: -0.02, finalYOffset: 0.05 },
+    ],
+    documentLines: [
+      "Query MUST specify QNAME",
+      "Resolver checks cache first",
+      "A record maps to IPv4",
+      "CNAME aliases domain",
+      "TTL controls cache duration",
+      "Recursive queries delegate",
+    ],
+    visualLabel: "DNS LOOKUP",
+    nodeLabels: ["QRY", "ANS"],
+    accentHue: "violet",
+  },
+];
+
+const ACCENT_COLORS = {
+  amber: {
+    primary: "rgba(255, 170, 0, 0.8)",
+    secondary: "rgba(255, 140, 0, 0.6)",
+    glow: "rgba(255, 170, 0, 0.4)",
+    text: "#ffaa00",
+  },
+  cyan: {
+    primary: "rgba(0, 200, 255, 0.8)",
+    secondary: "rgba(0, 150, 200, 0.6)",
+    glow: "rgba(0, 200, 255, 0.4)",
+    text: "#00c8ff",
+  },
+  emerald: {
+    primary: "rgba(0, 200, 150, 0.8)",
+    secondary: "rgba(0, 160, 120, 0.6)",
+    glow: "rgba(0, 200, 150, 0.4)",
+    text: "#00c896",
+  },
+  violet: {
+    primary: "rgba(160, 100, 255, 0.8)",
+    secondary: "rgba(130, 80, 200, 0.6)",
+    glow: "rgba(160, 100, 255, 0.4)",
+    text: "#a064ff",
+  },
+};
+
 interface Particle {
   x: number;
   y: number;
@@ -107,22 +253,25 @@ export function FoundryHero() {
   const timeRef = useRef(0);
   const bootPhaseRef = useRef(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [titleVisible, setTitleVisible] = useState(false);
+  const [, setTitleVisible] = useState(false);
   const [bootComplete, setBootComplete] = useState(false);
   const [bootLines, setBootLines] = useState<{ text: string; complete: boolean }[]>([]);
   const [showBootOverlay, setShowBootOverlay] = useState(true);
   const [showInitialCursor, setShowInitialCursor] = useState(true);
-  const [progressPercent, setProgressPercent] = useState(0);
+  const [, setProgressPercent] = useState(0);
   const [showDocumentAssembly, setShowDocumentAssembly] = useState(false);
   const [hideCanvas, setHideCanvas] = useState(false);
   const bootStartedRef = useRef(false);
+  const [currentVariationIndex, setCurrentVariationIndex] = useState(0);
+  const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const loopActiveRef = useRef(false);
 
   const prefersReducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const createParticle = useCallback(
-    (width: number, height: number, existingParticles: Particle[]): Particle => {
+    (width: number, height: number, _existingParticles: Particle[]): Particle => {
       const centerX = width / 2;
       const centerY = height / 2;
       
@@ -804,220 +953,297 @@ export function FoundryHero() {
     return () => { tl.kill(); };
   }, [bootComplete]);
 
-  // Effect 2: When document assembly layer mounts, run the fragment animation
+  // Effect 2: When document assembly layer mounts, run the fragment animation in a loop
   useEffect(() => {
     if (!showDocumentAssembly) return;
+    if (prefersReducedMotion) {
+      // Skip animation for reduced motion, just show hero
+      setIsLoaded(true);
+      setTitleVisible(true);
+      return;
+    }
 
-    // Small delay to ensure DOM is rendered
-    const timeout = setTimeout(() => {
+    loopActiveRef.current = true;
+    let isFirstRun = true;
+
+    const runAnimationCycle = (variationIdx: number) => {
+      if (!loopActiveRef.current) return;
+
+      const variation = DOCUMENT_VARIATIONS[variationIdx];
+      const colors = ACCENT_COLORS[variation.accentHue];
+
+      // Query elements
       const fragments = document.querySelectorAll(".rfc-fragment");
       const magicParticles = document.querySelectorAll(".magic-particle");
       const visualizationPreview = document.querySelector(".visualization-preview");
+      const documentPage = document.querySelector(".document-page");
+      const docLines = document.querySelectorAll(".doc-line");
+      const docHeader = document.querySelector(".doc-header-text");
+      const docSubheader = document.querySelector(".doc-subheader-text");
+      const visualLabel = document.querySelector(".visual-label");
+      const nodeLeft = document.querySelector(".node-left-label");
+      const nodeRight = document.querySelector(".node-right-label");
+
       if (fragments.length === 0) return;
 
-      // Set initial positions from data attributes (far left side offset)
-      fragments.forEach((el) => {
-        const x = parseFloat(el.getAttribute("data-x") || "0");
-        const y = parseFloat(el.getAttribute("data-y") || "0");
-        gsap.set(el, { x: x - 350, y, opacity: 0, scale: 0.4 });
+      // Update content for this variation
+      fragments.forEach((el, i) => {
+        if (variation.fragments[i]) {
+          el.textContent = variation.fragments[i].text;
+        }
+      });
+      docLines.forEach((el, i) => {
+        if (variation.documentLines[i]) {
+          el.textContent = variation.documentLines[i];
+        }
+      });
+      if (docHeader) docHeader.textContent = variation.rfcNumber;
+      if (docSubheader) docSubheader.textContent = variation.title;
+      if (visualLabel) visualLabel.textContent = variation.visualLabel;
+      if (nodeLeft) nodeLeft.textContent = variation.nodeLabels[0];
+      if (nodeRight) nodeRight.textContent = variation.nodeLabels[1];
+
+      // Percentage-based offset for left/right balance (30% from center)
+      const sideOffset = 0.30; // 30% of viewport width
+
+      // Set initial positions - fragments start scattered on the left
+      fragments.forEach((el, i) => {
+        const frag = variation.fragments[i];
+        if (!frag) return;
+        gsap.set(el, { 
+          visibility: "visible",
+          x: 0, 
+          y: 0, 
+          left: `calc(50% + ${frag.xOffset * 100}vw - ${sideOffset * 100}vw)`,
+          top: `calc(50% + ${frag.yOffset * 100}vh)`,
+          opacity: 0, 
+          scale: 0.4 
+        });
       });
 
-      // Set initial state for magic particles
-      magicParticles.forEach((el) => {
-        gsap.set(el, { opacity: 0, scale: 0 });
+      // Set initial state for magic particles (around the document position on left)
+      magicParticles.forEach((el, i) => {
+        const angle = (i / 24) * Math.PI * 2;
+        const radius = 50 + (i % 3) * 25;
+        gsap.set(el, { 
+          visibility: "visible",
+          opacity: 0, 
+          scale: 0,
+          left: `calc(50% - ${sideOffset * 100}vw + ${Math.cos(angle) * radius}px)`,
+          top: `calc(50% + ${Math.sin(angle) * radius}px)`,
+          x: 0,
+          y: 0,
+          rotation: 0,
+        });
       });
 
-      // Set initial state for visualization preview
+      // Set initial state for document (left side)
+      if (documentPage) {
+        gsap.set(documentPage, { 
+          visibility: "visible",
+          opacity: 0, 
+          scale: 0.7, 
+          x: 0,
+          rotation: 0,
+          filter: "blur(0px)",
+          left: `calc(50% - ${sideOffset * 100}vw)`,
+          boxShadow: `0 0 25px ${colors.glow}`,
+        });
+      }
+
+      // Set initial state for visualization preview (hidden, positioned on right)
       if (visualizationPreview) {
-        gsap.set(visualizationPreview, { opacity: 0, scale: 0.3, x: 0 });
+        gsap.set(visualizationPreview, { 
+          visibility: "visible",
+          opacity: 0, 
+          scale: 0.3, 
+          x: 0,
+          y: 0,
+          left: `calc(50% + ${sideOffset * 100}vw)`,
+          boxShadow: `0 0 30px ${colors.glow}`,
+        });
+      }
+
+      // Kill any previous timeline
+      if (assemblyTimelineRef.current) {
+        assemblyTimelineRef.current.kill();
       }
 
       const mainTl = gsap.timeline({
         onComplete: () => {
-          setIsLoaded(true);
-          setTitleVisible(true);
+          if (isFirstRun) {
+            setIsLoaded(true);
+            setTitleVisible(true);
+            // Fade the background after first run
+            gsap.to(".document-assembly-layer", {
+              backgroundColor: "transparent",
+              duration: 0.6,
+              ease: "power2.out",
+            });
+            isFirstRun = false;
+          }
+          
+          // Schedule next variation
+          if (loopActiveRef.current) {
+            const nextIdx = (variationIdx + 1) % DOCUMENT_VARIATIONS.length;
+            setCurrentVariationIndex(nextIdx);
+            // Small delay before next cycle
+            setTimeout(() => runAnimationCycle(nextIdx), 800);
+          }
         }
       });
 
-      // Fragments fade in at their starting positions (left side)
+      assemblyTimelineRef.current = mainTl;
+
+      // ===== PHASE 1: Fragments appear and converge to document =====
+      
+      // Fragments fade in at scattered positions
       mainTl.to(".rfc-fragment", {
         opacity: 1,
         scale: 0.8,
-        duration: 0.8,
-        stagger: {
-          each: 0.06,
-          from: "random",
-        },
+        duration: 0.6,
+        stagger: { each: 0.05, from: "random" },
         ease: "power2.out",
       });
 
-      // Fragments converge toward document on the far left
+      // Fragments converge toward document
       fragments.forEach((el, i) => {
-        const finalX = parseFloat(el.getAttribute("data-final-x") || "0") - 350;
-        const finalY = parseFloat(el.getAttribute("data-final-y") || "0");
+        const frag = variation.fragments[i];
+        if (!frag) return;
         mainTl.to(el, {
-          x: finalX,
-          y: finalY,
-          duration: 1.4,
+          left: `calc(50% - ${sideOffset * 100}vw + ${frag.finalXOffset * 100}vw)`,
+          top: `calc(50% + ${frag.finalYOffset * 100}vh)`,
+          duration: 1.2,
           ease: "power3.inOut",
-        }, i === 0 ? "-=0.2" : "<0.04");
+        }, i === 0 ? "-=0.1" : "<0.03");
       });
 
-      // Document page fades in as fragments arrive
+      // Document page fades in
       mainTl.to(".document-page", {
         opacity: 1,
         scale: 1,
-        duration: 0.6,
+        duration: 0.5,
         ease: "power2.out",
-      }, "-=1.0");
+      }, "-=0.8");
 
-      // Document glows intensely
+      // Document glows
       mainTl.to(".document-page", {
-        boxShadow: "0 0 60px rgba(255, 170, 0, 0.7), 0 0 120px rgba(255, 140, 0, 0.4)",
-        duration: 0.4,
+        boxShadow: `0 0 60px ${colors.primary}, 0 0 120px ${colors.secondary}`,
+        duration: 0.3,
         ease: "power2.in",
       });
 
-      // Brief pause before transformation
-      mainTl.to({}, { duration: 0.2 });
+      // Brief pause
+      mainTl.to({}, { duration: 0.15 });
 
-      // ===== MAGIC TRANSFORMATION PHASE =====
+      // ===== PHASE 2: Magic transformation =====
       
-      // Fragments burst outward and become magic particles
+      // Fragments fade out
       mainTl.to(".rfc-fragment", {
         opacity: 0,
         scale: 0.2,
-        duration: 0.4,
+        duration: 0.3,
         stagger: 0.02,
         ease: "power2.in",
       });
 
-      // Magic particles appear and swirl
+      // Magic particles appear
       mainTl.to(".magic-particle", {
         opacity: 1,
         scale: 1,
-        duration: 0.3,
-        stagger: {
-          each: 0.02,
-          from: "random",
-        },
+        duration: 0.25,
+        stagger: { each: 0.015, from: "random" },
         ease: "back.out(1.7)",
-      }, "-=0.3");
+      }, "-=0.25");
 
-      // Document shrinks and moves far right with rotation
+      // Document moves right with whoosh
       mainTl.to(".document-page", {
-        x: 550,
+        left: `calc(50% + ${sideOffset * 100}vw)`,
         scale: 0.4,
         opacity: 0.6,
-        rotation: 15,
+        rotation: 12,
         filter: "blur(2px)",
-        boxShadow: "0 0 40px rgba(255, 170, 0, 0.5)",
-        duration: 1.0,
+        duration: 0.8,
         ease: "power2.inOut",
-      }, "-=0.3");
+      }, "-=0.2");
 
-      // Magic particles follow the document, creating a trail
+      // Magic particles trail behind document
       mainTl.to(".magic-particle", {
-        x: "+=600",
-        y: (i) => Math.sin(i * 0.5) * 60,
-        rotation: "+=360",
-        duration: 1.0,
+        left: `calc(50% + ${sideOffset * 100}vw)`,
+        y: (i: number) => Math.sin(i * 0.5) * 50,
+        rotation: 360,
+        duration: 0.8,
         ease: "power2.inOut",
-        stagger: {
-          each: 0.03,
-          from: "start",
-        },
-      }, "-=1.0");
+        stagger: { each: 0.02, from: "start" },
+      }, "-=0.8");
 
-      // Document fades out completely
+      // Document fades out
       mainTl.to(".document-page", {
         opacity: 0,
         scale: 0.2,
-        filter: "blur(8px)",
-        duration: 0.4,
+        filter: "blur(6px)",
+        duration: 0.3,
         ease: "power2.in",
-      }, "-=0.3");
+      }, "-=0.2");
 
-      // Visualization preview emerges from the magic on the far right
+      // ===== PHASE 3: Visualization emerges =====
+      
+      // Visualization appears
       mainTl.to(".visualization-preview", {
         opacity: 1,
         scale: 1,
-        duration: 0.6,
+        duration: 0.5,
         ease: "back.out(1.5)",
-      }, "-=0.3");
+      }, "-=0.25");
 
-      // Magic particles converge into the visualization
+      // Magic particles converge into visualization
       mainTl.to(".magic-particle", {
-        x: 450,
+        left: `calc(50% + ${sideOffset * 100}vw)`,
         y: 0,
         scale: 0.3,
         opacity: 0,
-        duration: 0.5,
-        stagger: 0.02,
-        ease: "power3.in",
-      }, "-=0.4");
-
-      // Visualization pulses with energy
-      mainTl.to(".visualization-preview", {
-        boxShadow: "0 0 50px rgba(0, 200, 255, 0.6), 0 0 100px rgba(255, 170, 0, 0.3)",
         duration: 0.4,
+        stagger: 0.015,
+        ease: "power3.in",
+      }, "-=0.3");
+
+      // Visualization pulses
+      mainTl.to(".visualization-preview", {
+        boxShadow: `0 0 50px ${colors.primary}, 0 0 100px ${colors.glow}`,
+        duration: 0.3,
         ease: "power2.in",
       });
 
       mainTl.to(".visualization-preview", {
-        boxShadow: "0 0 30px rgba(0, 200, 255, 0.4), 0 0 60px rgba(255, 170, 0, 0.2)",
-        duration: 0.3,
+        boxShadow: `0 0 30px ${colors.glow}`,
+        duration: 0.25,
         ease: "power2.out",
       });
 
-      // Brief hold
-      mainTl.to({}, { duration: 0.3 });
+      // Hold visualization
+      mainTl.to({}, { duration: 1.2 });
 
-      // Fade the assembly layer background so hero can show through
-      mainTl.to(".document-assembly-layer", {
-        backgroundColor: "transparent",
-        duration: 0.6,
-        ease: "power2.out",
-      });
-
-      // Fade to loop state - reduce opacity and start looping
+      // ===== PHASE 4: Fade out for next cycle =====
+      
       mainTl.to(".visualization-preview", {
-        opacity: 0.12,
-        scale: 0.85,
-        duration: 0.5,
-        ease: "power2.out",
-      }, "-=0.4");
-
-      // Start the ambient loop animation and hide assembly layer
-      mainTl.call(() => {
-        // Ambient floating animation for the visualization
-        gsap.to(".visualization-preview", {
-          y: -8,
-          duration: 2.5,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-        });
-        
-        // Subtle pulse
-        gsap.to(".visualization-preview", {
-          opacity: 0.18,
-          duration: 2,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-        });
-        
-        // After a brief moment, hide the assembly layer completely
-        setTimeout(() => {
-          setShowDocumentAssembly(false);
-        }, 500);
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.4,
+        ease: "power2.in",
       });
+    };
 
-    }, 50);
+    // Start first cycle after a small delay for DOM readiness
+    const timeout = setTimeout(() => runAnimationCycle(currentVariationIndex), 50);
 
-    return () => clearTimeout(timeout);
-  }, [showDocumentAssembly]);
+    return () => {
+      loopActiveRef.current = false;
+      clearTimeout(timeout);
+      if (assemblyTimelineRef.current) {
+        assemblyTimelineRef.current.kill();
+      }
+    };
+  }, [showDocumentAssembly, prefersReducedMotion]);
 
   // Effect 3: When hero is loaded, animate in the content
   useEffect(() => {
@@ -1129,31 +1355,33 @@ export function FoundryHero() {
       {/* Document Assembly Layer - RFC fragments converging into a document, then transforming to visualization */}
       {showDocumentAssembly && (
         <div className="document-assembly-layer absolute inset-0 z-25 flex items-center justify-center pointer-events-none bg-[#0a0a0a]">
-          {/* The document page - starts on the far left side, smaller */}
+          {/* The document page - positioned with viewport-relative units */}
           <div 
-            className="document-page absolute w-48 h-64 border-2 rounded"
+            className="document-page absolute w-44 h-56 sm:w-48 sm:h-64 border-2 rounded -translate-x-1/2 -translate-y-1/2"
             style={{
               opacity: 0,
-              transform: "scale(0.7) translateX(-350px)",
-              left: "calc(50% - 350px)",
+              visibility: "hidden",
+              left: "calc(50% - 30vw)",
+              top: "50%",
               borderColor: "rgba(255, 170, 0, 0.4)",
               backgroundColor: "#0a0a0a",
               boxShadow: "0 0 25px rgba(255, 170, 0, 0.3)",
             }}
           >
-            {/* Document header */}
+            {/* Document header with dynamic content */}
             <div className="p-2" style={{ borderBottom: "1px solid rgba(255, 170, 0, 0.2)" }}>
-              <div className="h-1.5 w-16 rounded-full" style={{ backgroundColor: "rgba(255, 170, 0, 0.3)" }} />
-              <div className="h-1 w-24 rounded-full mt-1.5" style={{ backgroundColor: "rgba(255, 170, 0, 0.15)" }} />
+              <div className="doc-header-text text-[9px] font-mono font-bold text-amber/80">RFC 793</div>
+              <div className="doc-subheader-text text-[7px] font-mono text-amber/50 mt-0.5">TCP Handshake</div>
             </div>
-            {/* Document lines */}
-            <div className="p-3 space-y-2">
-              {[85, 70, 90, 60, 80, 75].map((width, i) => (
+            {/* Document lines with dynamic content */}
+            <div className="p-2 space-y-1.5">
+              {DOCUMENT_VARIATIONS[0].documentLines.map((line, i) => (
                 <div
                   key={i}
-                  className="h-1 rounded-full"
-                  style={{ width: `${width}%`, backgroundColor: "rgba(255, 170, 0, 0.2)" }}
-                />
+                  className="doc-line text-[6px] font-mono text-amber/40 leading-tight truncate"
+                >
+                  {line}
+                </div>
               ))}
             </div>
           </div>
@@ -1165,9 +1393,11 @@ export function FoundryHero() {
             return (
               <div
                 key={`magic-${i}`}
-                className="magic-particle absolute"
+                className="magic-particle absolute -translate-x-1/2 -translate-y-1/2"
                 style={{
-                  left: `calc(50% - 350px + ${Math.cos(angle) * radius}px)`,
+                  opacity: 0,
+                  visibility: "hidden",
+                  left: `calc(50% - 30vw + ${Math.cos(angle) * radius}px)`,
                   top: `calc(50% + ${Math.sin(angle) * radius}px)`,
                   width: 4 + (i % 3) * 2,
                   height: 4 + (i % 3) * 2,
@@ -1183,13 +1413,14 @@ export function FoundryHero() {
             );
           })}
 
-          {/* Visualization preview - appears on the far right after transformation */}
+          {/* Visualization preview - positioned on the right with viewport-relative units */}
           <div 
-            className="visualization-preview absolute w-56 h-40 rounded-lg overflow-hidden"
+            className="visualization-preview absolute w-48 h-36 sm:w-56 sm:h-40 rounded-lg overflow-hidden -translate-x-1/2 -translate-y-1/2"
             style={{
               opacity: 0,
-              left: "calc(50% + 280px)",
-              transform: "translateX(-50%)",
+              visibility: "hidden",
+              left: "calc(50% + 30vw)",
+              top: "50%",
               background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)",
               border: "1px solid rgba(0, 200, 255, 0.3)",
               boxShadow: "0 0 30px rgba(0, 200, 255, 0.3), 0 0 60px rgba(255, 170, 0, 0.15)",
@@ -1219,7 +1450,7 @@ export function FoundryHero() {
                   </linearGradient>
                 </defs>
                 <path 
-                  d="M 40 90 Q 130 60 220 90" 
+                  d="M 40 70 Q 110 45 180 70" 
                   stroke="url(#lineGrad)" 
                   strokeWidth="2" 
                   fill="none"
@@ -1227,7 +1458,7 @@ export function FoundryHero() {
                   className="animate-dash"
                 />
                 <path 
-                  d="M 50 120 Q 130 150 210 120" 
+                  d="M 45 95 Q 110 115 175 95" 
                   stroke="url(#lineGrad)" 
                   strokeWidth="2" 
                   fill="none"
@@ -1238,9 +1469,9 @@ export function FoundryHero() {
 
               {/* Node representations */}
               <div 
-                className="absolute w-10 h-10 rounded-lg flex items-center justify-center"
+                className="absolute w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center"
                 style={{
-                  left: 20,
+                  left: 15,
                   top: "50%",
                   transform: "translateY(-50%)",
                   background: "linear-gradient(135deg, rgba(255, 170, 0, 0.3) 0%, rgba(255, 100, 0, 0.2) 100%)",
@@ -1248,13 +1479,13 @@ export function FoundryHero() {
                   boxShadow: "0 0 15px rgba(255, 170, 0, 0.4)",
                 }}
               >
-                <span className="text-[8px] font-mono text-amber font-bold">SYN</span>
+                <span className="node-left-label text-[7px] sm:text-[8px] font-mono text-amber font-bold">SYN</span>
               </div>
               
               <div 
-                className="absolute w-10 h-10 rounded-lg flex items-center justify-center"
+                className="absolute w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center"
                 style={{
-                  right: 20,
+                  right: 15,
                   top: "50%",
                   transform: "translateY(-50%)",
                   background: "linear-gradient(135deg, rgba(0, 200, 255, 0.3) 0%, rgba(0, 100, 200, 0.2) 100%)",
@@ -1262,12 +1493,12 @@ export function FoundryHero() {
                   boxShadow: "0 0 15px rgba(0, 200, 255, 0.4)",
                 }}
               >
-                <span className="text-[8px] font-mono text-cyan-400 font-bold">ACK</span>
+                <span className="node-right-label text-[7px] sm:text-[8px] font-mono text-cyan-400 font-bold">ACK</span>
               </div>
 
               {/* Floating packet indicator */}
               <div 
-                className="absolute w-3 h-3 rounded-full animate-pulse"
+                className="absolute w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full animate-pulse"
                 style={{
                   left: "50%",
                   top: "50%",
@@ -1279,7 +1510,7 @@ export function FoundryHero() {
 
               {/* Label */}
               <div 
-                className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-mono tracking-wider"
+                className="visual-label absolute bottom-1.5 sm:bottom-2 left-1/2 -translate-x-1/2 text-[7px] sm:text-[8px] font-mono tracking-wider"
                 style={{
                   color: "rgba(255, 255, 255, 0.5)",
                 }}
@@ -1289,28 +1520,16 @@ export function FoundryHero() {
             </div>
           </div>
 
-          {/* Floating RFC fragments - start on the left side */}
-          {[
-            { text: "MUST", x: -180, y: -140, finalX: -50, finalY: -100 },
-            { text: "SHALL", x: 60, y: -120, finalX: 30, finalY: -70 },
-            { text: "seq", x: -140, y: 100, finalX: -20, finalY: 50 },
-            { text: "RFC 793", x: 100, y: 140, finalX: 0, finalY: -120 },
-            { text: "header", x: -200, y: 20, finalX: -40, finalY: -15 },
-            { text: "proto", x: 160, y: -50, finalX: 25, finalY: 15 },
-            { text: "§3.1", x: -80, y: -170, finalX: 45, finalY: -45 },
-            { text: "ACK", x: 80, y: 110, finalX: -30, finalY: 75 },
-            { text: "SYN", x: -120, y: -60, finalX: 35, finalY: 100 },
-            { text: "FIN", x: 140, y: 45, finalX: -15, finalY: -60 },
-          ].map((frag, i) => (
+          {/* Floating RFC fragments - 8 fragments, dynamically positioned */}
+          {DOCUMENT_VARIATIONS[0].fragments.map((frag, i) => (
             <span
               key={i}
-              className="rfc-fragment absolute font-mono text-xs font-semibold"
-              data-x={frag.x}
-              data-y={frag.y}
-              data-final-x={frag.finalX}
-              data-final-y={frag.finalY}
+              className="rfc-fragment absolute font-mono text-xs font-semibold -translate-x-1/2 -translate-y-1/2"
               style={{
                 opacity: 0,
+                visibility: "hidden",
+                left: `calc(50% - 30vw + ${frag.xOffset * 100}vw)`,
+                top: `calc(50% + ${frag.yOffset * 100}vh)`,
                 color: "#ffaa00",
                 textShadow: "0 0 10px rgba(255, 170, 0, 0.7), 0 0 20px rgba(255, 140, 0, 0.4)",
               }}
