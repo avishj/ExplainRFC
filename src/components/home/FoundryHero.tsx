@@ -815,11 +815,11 @@ export function FoundryHero() {
       const visualizationPreview = document.querySelector(".visualization-preview");
       if (fragments.length === 0) return;
 
-      // Set initial positions from data attributes (left side offset)
+      // Set initial positions from data attributes (far left side offset)
       fragments.forEach((el) => {
         const x = parseFloat(el.getAttribute("data-x") || "0");
         const y = parseFloat(el.getAttribute("data-y") || "0");
-        gsap.set(el, { x: x - 200, y, opacity: 0, scale: 0.4 });
+        gsap.set(el, { x: x - 350, y, opacity: 0, scale: 0.4 });
       });
 
       // Set initial state for magic particles
@@ -851,9 +851,9 @@ export function FoundryHero() {
         ease: "power2.out",
       });
 
-      // Fragments converge toward document on the left
+      // Fragments converge toward document on the far left
       fragments.forEach((el, i) => {
-        const finalX = parseFloat(el.getAttribute("data-final-x") || "0") - 200;
+        const finalX = parseFloat(el.getAttribute("data-final-x") || "0") - 350;
         const finalY = parseFloat(el.getAttribute("data-final-y") || "0");
         mainTl.to(el, {
           x: finalX,
@@ -904,9 +904,9 @@ export function FoundryHero() {
         ease: "back.out(1.7)",
       }, "-=0.3");
 
-      // Document shrinks and moves right with rotation
+      // Document shrinks and moves far right with rotation
       mainTl.to(".document-page", {
-        x: 280,
+        x: 550,
         scale: 0.4,
         opacity: 0.6,
         rotation: 15,
@@ -918,7 +918,7 @@ export function FoundryHero() {
 
       // Magic particles follow the document, creating a trail
       mainTl.to(".magic-particle", {
-        x: "+=350",
+        x: "+=600",
         y: (i) => Math.sin(i * 0.5) * 60,
         rotation: "+=360",
         duration: 1.0,
@@ -938,7 +938,7 @@ export function FoundryHero() {
         ease: "power2.in",
       }, "-=0.3");
 
-      // Visualization preview emerges from the magic
+      // Visualization preview emerges from the magic on the far right
       mainTl.to(".visualization-preview", {
         opacity: 1,
         scale: 1,
@@ -948,7 +948,7 @@ export function FoundryHero() {
 
       // Magic particles converge into the visualization
       mainTl.to(".magic-particle", {
-        x: 280,
+        x: 450,
         y: 0,
         scale: 0.3,
         opacity: 0,
@@ -973,20 +973,27 @@ export function FoundryHero() {
       // Brief hold
       mainTl.to({}, { duration: 0.3 });
 
-      // Fade to loop state - reduce opacity and start looping
-      mainTl.to(".visualization-preview", {
-        opacity: 0.15,
-        scale: 0.9,
-        duration: 0.5,
+      // Fade the assembly layer background so hero can show through
+      mainTl.to(".document-assembly-layer", {
+        backgroundColor: "transparent",
+        duration: 0.6,
         ease: "power2.out",
       });
 
-      // Start the ambient loop animation
+      // Fade to loop state - reduce opacity and start looping
+      mainTl.to(".visualization-preview", {
+        opacity: 0.12,
+        scale: 0.85,
+        duration: 0.5,
+        ease: "power2.out",
+      }, "-=0.4");
+
+      // Start the ambient loop animation and hide assembly layer
       mainTl.call(() => {
         // Ambient floating animation for the visualization
         gsap.to(".visualization-preview", {
-          y: -10,
-          duration: 2,
+          y: -8,
+          duration: 2.5,
           ease: "sine.inOut",
           yoyo: true,
           repeat: -1,
@@ -994,12 +1001,17 @@ export function FoundryHero() {
         
         // Subtle pulse
         gsap.to(".visualization-preview", {
-          opacity: 0.2,
-          duration: 1.5,
+          opacity: 0.18,
+          duration: 2,
           ease: "sine.inOut",
           yoyo: true,
           repeat: -1,
         });
+        
+        // After a brief moment, hide the assembly layer completely
+        setTimeout(() => {
+          setShowDocumentAssembly(false);
+        }, 500);
       });
 
     }, 50);
@@ -1117,13 +1129,13 @@ export function FoundryHero() {
       {/* Document Assembly Layer - RFC fragments converging into a document, then transforming to visualization */}
       {showDocumentAssembly && (
         <div className="document-assembly-layer absolute inset-0 z-25 flex items-center justify-center pointer-events-none bg-[#0a0a0a]">
-          {/* The document page - starts on the left side, smaller */}
+          {/* The document page - starts on the far left side, smaller */}
           <div 
-            className="document-page absolute w-56 h-72 border-2 rounded"
+            className="document-page absolute w-48 h-64 border-2 rounded"
             style={{
               opacity: 0,
-              transform: "scale(0.7) translateX(-200px)",
-              left: "calc(50% - 200px)",
+              transform: "scale(0.7) translateX(-350px)",
+              left: "calc(50% - 350px)",
               borderColor: "rgba(255, 170, 0, 0.4)",
               backgroundColor: "#0a0a0a",
               boxShadow: "0 0 25px rgba(255, 170, 0, 0.3)",
@@ -1149,13 +1161,13 @@ export function FoundryHero() {
           {/* Magic particles for the transformation effect */}
           {Array.from({ length: 24 }).map((_, i) => {
             const angle = (i / 24) * Math.PI * 2;
-            const radius = 60 + (i % 3) * 30;
+            const radius = 50 + (i % 3) * 25;
             return (
               <div
                 key={`magic-${i}`}
                 className="magic-particle absolute"
                 style={{
-                  left: `calc(50% - 200px + ${Math.cos(angle) * radius}px)`,
+                  left: `calc(50% - 350px + ${Math.cos(angle) * radius}px)`,
                   top: `calc(50% + ${Math.sin(angle) * radius}px)`,
                   width: 4 + (i % 3) * 2,
                   height: 4 + (i % 3) * 2,
@@ -1171,12 +1183,12 @@ export function FoundryHero() {
             );
           })}
 
-          {/* Visualization preview - appears on the right after transformation */}
+          {/* Visualization preview - appears on the far right after transformation */}
           <div 
-            className="visualization-preview absolute w-64 h-48 rounded-lg overflow-hidden"
+            className="visualization-preview absolute w-56 h-40 rounded-lg overflow-hidden"
             style={{
               opacity: 0,
-              left: "calc(50% + 150px)",
+              left: "calc(50% + 280px)",
               transform: "translateX(-50%)",
               background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)",
               border: "1px solid rgba(0, 200, 255, 0.3)",
