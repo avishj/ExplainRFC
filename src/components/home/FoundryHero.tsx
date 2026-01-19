@@ -843,82 +843,164 @@ export function FoundryHero() {
       animationId = requestAnimationFrame(draw);
     };
 
-    const waitWithRAF = (duration: number): Promise<void> => {
-      return new Promise(resolve => {
-        const start = performance.now();
-        const tick = (now: number) => {
-          if (now - start >= duration) {
-            resolve();
-          } else {
-            requestAnimationFrame(tick);
-          }
-        };
-        requestAnimationFrame(tick);
-      });
-    };
-
-    const runBootSequence = async () => {
+    const runBootSequence = () => {
       if (bootStartedRef.current) return;
       bootStartedRef.current = true;
 
-      await waitWithRAF(800);
-      setShowInitialCursor(false);
-
-      for (let lineIdx = 0; lineIdx < BOOT_SEQUENCE.length; lineIdx++) {
-        const line = BOOT_SEQUENCE[lineIdx];
-        
-        if (line.isProgressBar) {
-          setBootLines(prev => [...prev, { text: "  [                    ] 0%", complete: false }]);
-          
-          const progressDuration = 800;
-          const steps = 20;
-          const baseStepDuration = progressDuration / steps;
-          
-          for (let i = 1; i <= steps; i++) {
-            const variance = (Math.random() - 0.5) * 30;
-            await waitWithRAF(Math.max(15, baseStepDuration + variance));
-            const filled = "█".repeat(i);
-            const empty = " ".repeat(steps - i);
-            const percent = Math.round((i / steps) * 100);
-            setBootLines(prev => {
-              const updated = [...prev];
-              updated[updated.length - 1] = { 
-                text: `  [${filled}${empty}] ${percent}%`, 
-                complete: i === steps 
-              };
-              return updated;
-            });
-            setProgressPercent(Math.round((i / steps) * 100));
-          }
-          await waitWithRAF(200);
-        } else {
-          setBootLines(prev => [...prev, { text: "", complete: false }]);
-          
-          const chars = line.text.split("");
-          for (let charIdx = 0; charIdx < chars.length; charIdx++) {
-            await waitWithRAF(line.typingSpeed + (Math.random() - 0.5) * 35);
-            setBootLines(prev => {
-              const updated = [...prev];
-              updated[updated.length - 1] = { 
-                text: line.text.slice(0, charIdx + 1), 
-                complete: false 
-              };
-              return updated;
-            });
-          }
-          
-          setBootLines(prev => {
-            const updated = [...prev];
-            updated[updated.length - 1] = { ...updated[updated.length - 1], complete: true };
-            return updated;
-          });
-          
-          await waitWithRAF(line.postDelay);
-        }
+      interface BootState {
+        phase: 'initial-wait' | 'typing' | 'post-delay' | 'progress-bar' | 'final-wait' | 'done';
+        lineIdx: number;
+        charIdx: number;
+        progressStep: number;
+        elapsed: number;
+        nextCharTime: number;
+        charTimings: number[];
       }
 
-      await waitWithRAF(400);
-      setBootComplete(true);
+      const generateCharTimings = (text: string, baseSpeed: number): number[] => {
+        return text.split("").map((char, i) => {
+          let delay = baseSpeed;
+          if (char === ' ') delay *= 0.3;
+          else if (char === '>' || char === '[' || char === ']') delay *= 0.5;
+          else if (char === '─' || char === '►' || char === '◄') delay *= 0.15;
+          else delay += (Math.random() - 0.5) * baseSpeed * 1.2;
+          if (i > 0 && i % (5 + Math.floor(Math.random() * 4)) === 0) {
+            delay += 30 + Math.random() * 50;
+          }
+          return Math.max(5, delay);
+        });
+      };
+
+      const state: BootState = {
+        phase: 'initial-wait',
+        lineIdx: 0,
+        charIdx: 0,
+        progressStep: 0,
+        elapsed: 0,
+        nextCharTime: 0,
+        charTimings: [],
+      };
+
+      let lastTime = performance.now();
+
+      const tick = (now: number) => {
+        const dt = now - lastTime;
+        lastTime = now;
+        state.elapsed += dt;
+
+        switch (state.phase) {
+          case 'initial-wait':
+            if (state.elapsed >= 800) {
+              setShowInitialCursor(false);
+              state.elapsed = 0;
+              state.phase = 'typing';
+              const line = BOOT_SEQUENCE[state.lineIdx];
+              if (line.isProgressBar) {
+                setBootLines(prev => [...prev, { text: "  [                    ] 0%", complete: false }]);
+                state.phase = 'progress-bar';
+              } else {
+                setBootLines(prev => [...prev, { text: "", complete: false }]);
+                state.charTimings = generateCharTimings(line.text, line.typingSpeed);
+                state.nextCharTime = state.charTimings[0] || 0;
+              }
+            }
+            break;
+
+          case 'typing': {
+            const line = BOOT_SEQUENCE[state.lineIdx];
+            while (state.elapsed >= state.nextCharTime && state.charIdx < line.text.length) {
+              state.charIdx++;
+              const visibleText = line.text.slice(0, state.charIdx);
+              setBootLines(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { text: visibleText, complete: false };
+                return updated;
+              });
+              if (state.charIdx < line.text.length) {
+                state.nextCharTime += state.charTimings[state.charIdx];
+              }
+            }
+            if (state.charIdx >= line.text.length) {
+              setBootLines(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { ...updated[updated.length - 1], complete: true };
+                return updated;
+              });
+              state.elapsed = 0;
+              state.phase = 'post-delay';
+            }
+            break;
+          }
+
+          case 'post-delay': {
+            const line = BOOT_SEQUENCE[state.lineIdx];
+            if (state.elapsed >= line.postDelay) {
+              state.lineIdx++;
+              state.charIdx = 0;
+              state.elapsed = 0;
+              if (state.lineIdx >= BOOT_SEQUENCE.length) {
+                state.phase = 'final-wait';
+              } else {
+                const nextLine = BOOT_SEQUENCE[state.lineIdx];
+                if (nextLine.isProgressBar) {
+                  setBootLines(prev => [...prev, { text: "  [                    ] 0%", complete: false }]);
+                  state.progressStep = 0;
+                  state.phase = 'progress-bar';
+                } else {
+                  setBootLines(prev => [...prev, { text: "", complete: false }]);
+                  state.charTimings = generateCharTimings(nextLine.text, nextLine.typingSpeed);
+                  state.nextCharTime = state.charTimings[0] || 0;
+                  state.phase = 'typing';
+                }
+              }
+            }
+            break;
+          }
+
+          case 'progress-bar': {
+            const progressDuration = 800;
+            const steps = 20;
+            const stepDuration = progressDuration / steps;
+            const targetStep = Math.min(steps, Math.floor(state.elapsed / stepDuration) + 1);
+            
+            while (state.progressStep < targetStep) {
+              state.progressStep++;
+              const filled = "█".repeat(state.progressStep);
+              const empty = " ".repeat(steps - state.progressStep);
+              const percent = Math.round((state.progressStep / steps) * 100);
+              setBootLines(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { 
+                  text: `  [${filled}${empty}] ${percent}%`, 
+                  complete: state.progressStep === steps 
+                };
+                return updated;
+              });
+              setProgressPercent(percent);
+            }
+            
+            if (state.progressStep >= steps && state.elapsed >= progressDuration + 200) {
+              state.elapsed = 0;
+              state.phase = 'post-delay';
+            }
+            break;
+          }
+
+          case 'final-wait':
+            if (state.elapsed >= 400) {
+              setBootComplete(true);
+              state.phase = 'done';
+            }
+            break;
+
+          case 'done':
+            return;
+        }
+
+        requestAnimationFrame(tick);
+      };
+
+      requestAnimationFrame(tick);
     };
 
     runBootSequence();
