@@ -9,15 +9,15 @@ interface BootLine {
 }
 
 const BOOT_SEQUENCE: BootLine[] = [
-  { text: "> INITIALIZING PROTOCOL MUSEUM v2.0", typingSpeed: 35, postDelay: 300 },
-  { text: "> ESTABLISHING SECURE CHANNEL", typingSpeed: 30, postDelay: 200 },
-  { text: "  SYN ────────────────────────►", typingSpeed: 15, postDelay: 350 },
-  { text: "  ◄──────────────────── SYN-ACK", typingSpeed: 15, postDelay: 350 },
-  { text: "  ACK ────────────────────────►", typingSpeed: 15, postDelay: 250 },
-  { text: "> CONNECTION ESTABLISHED", typingSpeed: 25, postDelay: 300 },
-  { text: "> LOADING RFC ARCHIVE...", typingSpeed: 40, postDelay: 100 },
+  { text: "> INITIALIZING PROTOCOL MUSEUM v2.0", typingSpeed: 25, postDelay: 200 },
+  { text: "> ESTABLISHING SECURE CHANNEL", typingSpeed: 22, postDelay: 150 },
+  { text: "  SYN ────────────────────────►", typingSpeed: 10, postDelay: 250 },
+  { text: "  ◄──────────────────── SYN-ACK", typingSpeed: 10, postDelay: 250 },
+  { text: "  ACK ────────────────────────►", typingSpeed: 10, postDelay: 180 },
+  { text: "> CONNECTION ESTABLISHED", typingSpeed: 18, postDelay: 200 },
+  { text: "> LOADING RFC ARCHIVE...", typingSpeed: 28, postDelay: 80 },
   { text: "  [                    ] 0%", typingSpeed: 0, postDelay: 0, isProgressBar: true },
-  { text: "> WELCOME TO THE ARCHIVE", typingSpeed: 45, postDelay: 500 },
+  { text: "> WELCOME TO THE ARCHIVE!", typingSpeed: 32, postDelay: 400 },
 ];
 
 const RFC_FRAGMENTS = [
@@ -707,12 +707,13 @@ export function FoundryHero() {
         if (line.isProgressBar) {
           setBootLines(prev => [...prev, { text: "  [                    ] 0%", complete: false }]);
           
-          const progressDuration = 1200;
+          const progressDuration = 800;
           const steps = 20;
-          const stepDuration = progressDuration / steps;
+          const baseStepDuration = progressDuration / steps;
           
           for (let i = 1; i <= steps; i++) {
-            await new Promise(r => setTimeout(r, stepDuration));
+            const variance = (Math.random() - 0.5) * 30;
+            await new Promise(r => setTimeout(r, Math.max(15, baseStepDuration + variance)));
             const filled = "█".repeat(i);
             const empty = " ".repeat(steps - i);
             const percent = Math.round((i / steps) * 100);
@@ -732,7 +733,7 @@ export function FoundryHero() {
           
           const chars = line.text.split("");
           for (let charIdx = 0; charIdx < chars.length; charIdx++) {
-            await new Promise(r => setTimeout(r, line.typingSpeed + (Math.random() - 0.5) * 20));
+            await new Promise(r => setTimeout(r, line.typingSpeed + (Math.random() - 0.5) * 35));
             setBootLines(prev => {
               const updated = [...prev];
               updated[updated.length - 1] = { 
