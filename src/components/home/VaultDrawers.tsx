@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { CatalogRFC, BookImage, BookPlacement } from "@/types";
 import { rfcCatalog } from "@/data";
+import { TransitionCLI, TRANSITION_SEQUENCES } from "@/components/ui";
 
 const featuredRFCIds = [793, 791, 1035, 8446, 7540, 9000, 768, 2616, 5321];
 const featuredRFCs: CatalogRFC[] = featuredRFCIds
@@ -8,7 +9,6 @@ const featuredRFCs: CatalogRFC[] = featuredRFCIds
   .filter((rfc): rfc is CatalogRFC => rfc !== undefined);
 
 interface VaultDrawersProps {
-  onSelectRFC: (rfcId: number) => void;
   baseUrl?: string;
 }
 
@@ -107,10 +107,21 @@ const bookColors: Record<BookImage, { text: string; shadow: string }> = {
   "book_left1.png": { text: "#d4a44c", shadow: "rgba(0,0,0,0.9)" },
 };
 
-export function VaultDrawers({ onSelectRFC, baseUrl = '' }: VaultDrawersProps) {
+export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
   const [openBook, setOpenBook] = useState<number | null>(null);
   const [closingBook, setClosingBook] = useState<number | null>(null);
   const [hoveredBook, setHoveredBook] = useState<number | null>(null);
+  const [navigatingTo, setNavigatingTo] = useState<CatalogRFC | null>(null);
+  
+  const handleNavigateToRfc = (rfc: CatalogRFC) => {
+    setNavigatingTo(rfc);
+  };
+  
+  const handleTransitionComplete = () => {
+    if (navigatingTo) {
+      window.location.href = `${baseUrl}rfc/${navigatingTo.id}`;
+    }
+  };
   
   const handleBookClick = (rfc: CatalogRFC) => {
     if (openBook === rfc.id) {
@@ -385,9 +396,9 @@ export function VaultDrawers({ onSelectRFC, baseUrl = '' }: VaultDrawersProps) {
                         {rfc.description}
                       </p>
                       <div className="mt-auto pt-4">
-                        <a
-                          href={`${baseUrl}rfc/${rfc.id}`}
-                          className="block w-full text-center py-3 rounded transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                        <button
+                          onClick={() => handleNavigateToRfc(rfc)}
+                          className="block w-full text-center py-3 rounded transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer"
                           style={{
                             fontFamily: "var(--font-mono)",
                             fontSize: "0.7rem",
@@ -399,7 +410,7 @@ export function VaultDrawers({ onSelectRFC, baseUrl = '' }: VaultDrawersProps) {
                           }}
                         >
                           OPEN EXHIBIT →
-                        </a>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -451,6 +462,13 @@ export function VaultDrawers({ onSelectRFC, baseUrl = '' }: VaultDrawersProps) {
           </>
         );
       })()}
+      
+      {navigatingTo && (
+        <TransitionCLI
+          sequence={TRANSITION_SEQUENCES.toRfc(navigatingTo.id, navigatingTo.name)}
+          onComplete={handleTransitionComplete}
+        />
+      )}
     </section>
   );
 }

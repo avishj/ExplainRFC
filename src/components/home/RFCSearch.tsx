@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import Fuse from "fuse.js";
 import type { CatalogRFC } from "@/types";
 import { rfcCatalog } from "@/data";
+import { TransitionCLI, TRANSITION_SEQUENCES } from "@/components/ui";
 
 const fuse = new Fuse(rfcCatalog, {
   keys: ["id", "name", "title", "layer"],
@@ -14,8 +15,16 @@ interface RFCSearchProps {
 }
 
 export function RFCSearch({ baseUrl = "/" }: RFCSearchProps) {
-  const handleSelectRFC = (rfcId: number) => {
-    window.location.href = `${baseUrl}rfc/${rfcId}`;
+  const [navigatingTo, setNavigatingTo] = useState<CatalogRFC | null>(null);
+  
+  const handleSelectRFC = (rfc: CatalogRFC) => {
+    setNavigatingTo(rfc);
+  };
+  
+  const handleTransitionComplete = () => {
+    if (navigatingTo) {
+      window.location.href = `${baseUrl}rfc/${navigatingTo.id}`;
+    }
   };
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<CatalogRFC[]>([]);
@@ -79,7 +88,7 @@ export function RFCSearch({ baseUrl = "/" }: RFCSearchProps) {
     } else if (e.key === "Enter" && results[selectedIndex]) {
       const rfc = results[selectedIndex];
       if (rfc.available) {
-        handleSelectRFC(rfc.id);
+        handleSelectRFC(rfc);
       }
     } else if (e.key === "Escape") {
       setIsOpen(false);
@@ -159,7 +168,7 @@ export function RFCSearch({ baseUrl = "/" }: RFCSearchProps) {
           {results.map((rfc, index) => (
             <button
               key={rfc.id}
-              onClick={() => rfc.available && handleSelectRFC(rfc.id)}
+              onClick={() => rfc.available && handleSelectRFC(rfc)}
               onMouseEnter={() => setSelectedIndex(index)}
               disabled={!rfc.available}
               className={`
@@ -217,6 +226,13 @@ export function RFCSearch({ baseUrl = "/" }: RFCSearchProps) {
         >
           <p className="text-text-muted text-sm">No RFCs found for "{query}"</p>
         </div>
+      )}
+      
+      {navigatingTo && (
+        <TransitionCLI
+          sequence={TRANSITION_SEQUENCES.toRfc(navigatingTo.id, navigatingTo.name)}
+          onComplete={handleTransitionComplete}
+        />
       )}
     </div>
   );
