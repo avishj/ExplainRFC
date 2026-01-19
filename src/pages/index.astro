@@ -15,14 +15,14 @@ const base = import.meta.env.BASE_URL;
     <OrnateDivider className="pt-12" />
     
     <!-- Search Section -->
-    <section id="vault" class="pt-8 pb-6 px-6">
+    <section id="vault" class="py-8 px-6">
       <div class="max-w-6xl mx-auto">
         <div class="text-center mb-8">
           <p class="museum-label text-amber mb-3">Search the Archive</p>
           <h2 class="font-display text-4xl md:text-5xl font-bold text-text-bright mb-4">
             Find an <span class="text-gold">RFC</span>
           </h2>
-          <p class="text-text-secondary max-w-xl mx-auto mb-8">
+          <p class="text-text-secondary max-w-xl mx-auto">
             Search by RFC number, protocol name, or topic to find what you're looking for.
           </p>
         </div>
@@ -31,7 +31,7 @@ const base = import.meta.env.BASE_URL;
     </section>
     
     <!-- Divider before library -->
-    <OrnateDivider className="py-8" />
+    <OrnateDivider className="py-12" />
     
     <!-- Featured RFCs Section -->
     <VaultDrawers client:visible baseUrl={base} onSelectRFC={(id) => window.location.href = `${base}rfc/${id}`} />
