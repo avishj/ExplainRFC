@@ -153,7 +153,7 @@ export function VaultDrawers({ onSelectRFC, baseUrl = '' }: VaultDrawersProps) {
         >
           {/* Table image */}
           <img 
-            src={`${baseUrl}table.png`} 
+            src={`${baseUrl}table.jpg`} 
             alt="Antique wooden table"
             className="w-full h-auto"
             style={{ display: "block" }}
