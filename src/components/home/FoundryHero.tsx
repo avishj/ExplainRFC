@@ -811,81 +811,197 @@ export function FoundryHero() {
     // Small delay to ensure DOM is rendered
     const timeout = setTimeout(() => {
       const fragments = document.querySelectorAll(".rfc-fragment");
+      const magicParticles = document.querySelectorAll(".magic-particle");
+      const visualizationPreview = document.querySelector(".visualization-preview");
       if (fragments.length === 0) return;
 
-      // Set initial positions from data attributes
+      // Set initial positions from data attributes (left side offset)
       fragments.forEach((el) => {
         const x = parseFloat(el.getAttribute("data-x") || "0");
         const y = parseFloat(el.getAttribute("data-y") || "0");
-        gsap.set(el, { x, y, opacity: 0, scale: 0.5 });
+        gsap.set(el, { x: x - 200, y, opacity: 0, scale: 0.4 });
       });
 
-      const tl = gsap.timeline({
+      // Set initial state for magic particles
+      magicParticles.forEach((el) => {
+        gsap.set(el, { opacity: 0, scale: 0 });
+      });
+
+      // Set initial state for visualization preview
+      if (visualizationPreview) {
+        gsap.set(visualizationPreview, { opacity: 0, scale: 0.3, x: 0 });
+      }
+
+      const mainTl = gsap.timeline({
         onComplete: () => {
-          setShowDocumentAssembly(false);
           setIsLoaded(true);
           setTitleVisible(true);
         }
       });
 
-      // Fragments fade in at their starting positions
-      tl.to(".rfc-fragment", {
+      // Fragments fade in at their starting positions (left side)
+      mainTl.to(".rfc-fragment", {
         opacity: 1,
-        scale: 1,
-        duration: 1.0,
+        scale: 0.8,
+        duration: 0.8,
         stagger: {
-          each: 0.08,
+          each: 0.06,
           from: "random",
         },
         ease: "power2.out",
       });
 
-      // Fragments converge toward their final positions within the document
+      // Fragments converge toward document on the left
       fragments.forEach((el, i) => {
-        const finalX = parseFloat(el.getAttribute("data-final-x") || "0");
+        const finalX = parseFloat(el.getAttribute("data-final-x") || "0") - 200;
         const finalY = parseFloat(el.getAttribute("data-final-y") || "0");
-        tl.to(el, {
+        mainTl.to(el, {
           x: finalX,
           y: finalY,
-          duration: 1.8,
+          duration: 1.4,
           ease: "power3.inOut",
-        }, i === 0 ? "-=0.3" : "<0.05");
+        }, i === 0 ? "-=0.2" : "<0.04");
       });
 
       // Document page fades in as fragments arrive
-      tl.to(".document-page", {
+      mainTl.to(".document-page", {
         opacity: 1,
         scale: 1,
-        duration: 0.7,
+        duration: 0.6,
         ease: "power2.out",
-      }, "-=1.2");
+      }, "-=1.0");
 
       // Document glows intensely
-      tl.to(".document-page", {
-        boxShadow: "0 0 80px rgba(255, 170, 0, 0.8), 0 0 150px rgba(255, 140, 0, 0.5)",
-        duration: 0.5,
+      mainTl.to(".document-page", {
+        boxShadow: "0 0 60px rgba(255, 170, 0, 0.7), 0 0 120px rgba(255, 140, 0, 0.4)",
+        duration: 0.4,
         ease: "power2.in",
       });
 
-      // Small pause
-      tl.to({}, { duration: 0.3 });
+      // Brief pause before transformation
+      mainTl.to({}, { duration: 0.2 });
 
-      // Everything dissolves
-      tl.to(".rfc-fragment", {
+      // ===== MAGIC TRANSFORMATION PHASE =====
+      
+      // Fragments burst outward and become magic particles
+      mainTl.to(".rfc-fragment", {
         opacity: 0,
-        scale: 0.3,
-        duration: 0.5,
+        scale: 0.2,
+        duration: 0.4,
         stagger: 0.02,
         ease: "power2.in",
       });
 
-      tl.to(".document-page", {
+      // Magic particles appear and swirl
+      mainTl.to(".magic-particle", {
+        opacity: 1,
+        scale: 1,
+        duration: 0.3,
+        stagger: {
+          each: 0.02,
+          from: "random",
+        },
+        ease: "back.out(1.7)",
+      }, "-=0.3");
+
+      // Document shrinks and moves right with rotation
+      mainTl.to(".document-page", {
+        x: 280,
+        scale: 0.4,
+        opacity: 0.6,
+        rotation: 15,
+        filter: "blur(2px)",
+        boxShadow: "0 0 40px rgba(255, 170, 0, 0.5)",
+        duration: 1.0,
+        ease: "power2.inOut",
+      }, "-=0.3");
+
+      // Magic particles follow the document, creating a trail
+      mainTl.to(".magic-particle", {
+        x: "+=350",
+        y: (i) => Math.sin(i * 0.5) * 60,
+        rotation: "+=360",
+        duration: 1.0,
+        ease: "power2.inOut",
+        stagger: {
+          each: 0.03,
+          from: "start",
+        },
+      }, "-=1.0");
+
+      // Document fades out completely
+      mainTl.to(".document-page", {
         opacity: 0,
-        scale: 1.2,
-        filter: "blur(15px)",
-        duration: 0.5,
+        scale: 0.2,
+        filter: "blur(8px)",
+        duration: 0.4,
         ease: "power2.in",
+      }, "-=0.3");
+
+      // Visualization preview emerges from the magic
+      mainTl.to(".visualization-preview", {
+        opacity: 1,
+        scale: 1,
+        duration: 0.6,
+        ease: "back.out(1.5)",
+      }, "-=0.3");
+
+      // Magic particles converge into the visualization
+      mainTl.to(".magic-particle", {
+        x: 280,
+        y: 0,
+        scale: 0.3,
+        opacity: 0,
+        duration: 0.5,
+        stagger: 0.02,
+        ease: "power3.in",
       }, "-=0.4");
+
+      // Visualization pulses with energy
+      mainTl.to(".visualization-preview", {
+        boxShadow: "0 0 50px rgba(0, 200, 255, 0.6), 0 0 100px rgba(255, 170, 0, 0.3)",
+        duration: 0.4,
+        ease: "power2.in",
+      });
+
+      mainTl.to(".visualization-preview", {
+        boxShadow: "0 0 30px rgba(0, 200, 255, 0.4), 0 0 60px rgba(255, 170, 0, 0.2)",
+        duration: 0.3,
+        ease: "power2.out",
+      });
+
+      // Brief hold
+      mainTl.to({}, { duration: 0.3 });
+
+      // Fade to loop state - reduce opacity and start looping
+      mainTl.to(".visualization-preview", {
+        opacity: 0.15,
+        scale: 0.9,
+        duration: 0.5,
+        ease: "power2.out",
+      });
+
+      // Start the ambient loop animation
+      mainTl.call(() => {
+        // Ambient floating animation for the visualization
+        gsap.to(".visualization-preview", {
+          y: -10,
+          duration: 2,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+        });
+        
+        // Subtle pulse
+        gsap.to(".visualization-preview", {
+          opacity: 0.2,
+          duration: 1.5,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+        });
+      });
+
     }, 50);
 
     return () => clearTimeout(timeout);
@@ -998,56 +1114,185 @@ export function FoundryHero() {
         </div>
       </div>
 
-      {/* Document Assembly Layer - RFC fragments converging into a document */}
+      {/* Document Assembly Layer - RFC fragments converging into a document, then transforming to visualization */}
       {showDocumentAssembly && (
         <div className="document-assembly-layer absolute inset-0 z-25 flex items-center justify-center pointer-events-none bg-[#0a0a0a]">
-          {/* The document page that fragments converge into */}
+          {/* The document page - starts on the left side, smaller */}
           <div 
-            className="document-page absolute w-72 h-96 border-2 rounded"
+            className="document-page absolute w-56 h-72 border-2 rounded"
             style={{
               opacity: 0,
-              transform: "scale(0.8)",
+              transform: "scale(0.7) translateX(-200px)",
+              left: "calc(50% - 200px)",
               borderColor: "rgba(255, 170, 0, 0.4)",
               backgroundColor: "#0a0a0a",
-              boxShadow: "0 0 30px rgba(255, 170, 0, 0.3)",
+              boxShadow: "0 0 25px rgba(255, 170, 0, 0.3)",
             }}
           >
             {/* Document header */}
-            <div className="p-3" style={{ borderBottom: "1px solid rgba(255, 170, 0, 0.2)" }}>
-              <div className="h-2 w-20 rounded-full" style={{ backgroundColor: "rgba(255, 170, 0, 0.3)" }} />
-              <div className="h-1.5 w-32 rounded-full mt-2" style={{ backgroundColor: "rgba(255, 170, 0, 0.15)" }} />
+            <div className="p-2" style={{ borderBottom: "1px solid rgba(255, 170, 0, 0.2)" }}>
+              <div className="h-1.5 w-16 rounded-full" style={{ backgroundColor: "rgba(255, 170, 0, 0.3)" }} />
+              <div className="h-1 w-24 rounded-full mt-1.5" style={{ backgroundColor: "rgba(255, 170, 0, 0.15)" }} />
             </div>
             {/* Document lines */}
-            <div className="p-4 space-y-3">
-              {[85, 70, 90, 60, 80, 75, 65, 85].map((width, i) => (
+            <div className="p-3 space-y-2">
+              {[85, 70, 90, 60, 80, 75].map((width, i) => (
                 <div
                   key={i}
-                  className="h-1.5 rounded-full"
+                  className="h-1 rounded-full"
                   style={{ width: `${width}%`, backgroundColor: "rgba(255, 170, 0, 0.2)" }}
                 />
               ))}
             </div>
           </div>
 
-          {/* Floating RFC fragments - GSAP will set x/y from data attributes */}
-          {/* Each fragment has start position (x,y) and final position (finalX, finalY) within the document */}
+          {/* Magic particles for the transformation effect */}
+          {Array.from({ length: 24 }).map((_, i) => {
+            const angle = (i / 24) * Math.PI * 2;
+            const radius = 60 + (i % 3) * 30;
+            return (
+              <div
+                key={`magic-${i}`}
+                className="magic-particle absolute"
+                style={{
+                  left: `calc(50% - 200px + ${Math.cos(angle) * radius}px)`,
+                  top: `calc(50% + ${Math.sin(angle) * radius}px)`,
+                  width: 4 + (i % 3) * 2,
+                  height: 4 + (i % 3) * 2,
+                  borderRadius: "50%",
+                  background: i % 2 === 0 
+                    ? "radial-gradient(circle, rgba(255, 200, 100, 1) 0%, rgba(255, 140, 0, 0.6) 50%, transparent 100%)"
+                    : "radial-gradient(circle, rgba(100, 200, 255, 1) 0%, rgba(0, 150, 255, 0.6) 50%, transparent 100%)",
+                  boxShadow: i % 2 === 0 
+                    ? "0 0 10px rgba(255, 170, 0, 0.8), 0 0 20px rgba(255, 140, 0, 0.4)"
+                    : "0 0 10px rgba(0, 200, 255, 0.8), 0 0 20px rgba(0, 150, 255, 0.4)",
+                }}
+              />
+            );
+          })}
+
+          {/* Visualization preview - appears on the right after transformation */}
+          <div 
+            className="visualization-preview absolute w-64 h-48 rounded-lg overflow-hidden"
+            style={{
+              opacity: 0,
+              left: "calc(50% + 150px)",
+              transform: "translateX(-50%)",
+              background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)",
+              border: "1px solid rgba(0, 200, 255, 0.3)",
+              boxShadow: "0 0 30px rgba(0, 200, 255, 0.3), 0 0 60px rgba(255, 170, 0, 0.15)",
+            }}
+          >
+            {/* Mini visualization scene representation */}
+            <div className="relative w-full h-full">
+              {/* Grid lines */}
+              <div 
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: `
+                    linear-gradient(rgba(0, 200, 255, 0.1) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 200, 255, 0.1) 1px, transparent 1px)
+                  `,
+                  backgroundSize: "20px 20px",
+                }}
+              />
+              
+              {/* Animated connection lines */}
+              <svg className="absolute inset-0 w-full h-full">
+                <defs>
+                  <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="rgba(255, 170, 0, 0)" />
+                    <stop offset="50%" stopColor="rgba(255, 170, 0, 0.8)" />
+                    <stop offset="100%" stopColor="rgba(0, 200, 255, 0.8)" />
+                  </linearGradient>
+                </defs>
+                <path 
+                  d="M 40 90 Q 130 60 220 90" 
+                  stroke="url(#lineGrad)" 
+                  strokeWidth="2" 
+                  fill="none"
+                  strokeDasharray="8 4"
+                  className="animate-dash"
+                />
+                <path 
+                  d="M 50 120 Q 130 150 210 120" 
+                  stroke="url(#lineGrad)" 
+                  strokeWidth="2" 
+                  fill="none"
+                  strokeDasharray="8 4"
+                  className="animate-dash-reverse"
+                />
+              </svg>
+
+              {/* Node representations */}
+              <div 
+                className="absolute w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{
+                  left: 20,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "linear-gradient(135deg, rgba(255, 170, 0, 0.3) 0%, rgba(255, 100, 0, 0.2) 100%)",
+                  border: "1px solid rgba(255, 170, 0, 0.5)",
+                  boxShadow: "0 0 15px rgba(255, 170, 0, 0.4)",
+                }}
+              >
+                <span className="text-[8px] font-mono text-amber font-bold">SYN</span>
+              </div>
+              
+              <div 
+                className="absolute w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{
+                  right: 20,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "linear-gradient(135deg, rgba(0, 200, 255, 0.3) 0%, rgba(0, 100, 200, 0.2) 100%)",
+                  border: "1px solid rgba(0, 200, 255, 0.5)",
+                  boxShadow: "0 0 15px rgba(0, 200, 255, 0.4)",
+                }}
+              >
+                <span className="text-[8px] font-mono text-cyan-400 font-bold">ACK</span>
+              </div>
+
+              {/* Floating packet indicator */}
+              <div 
+                className="absolute w-3 h-3 rounded-full animate-pulse"
+                style={{
+                  left: "50%",
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
+                  background: "radial-gradient(circle, rgba(255, 220, 100, 1) 0%, rgba(255, 170, 0, 0.5) 100%)",
+                  boxShadow: "0 0 10px rgba(255, 200, 0, 0.8)",
+                }}
+              />
+
+              {/* Label */}
+              <div 
+                className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-mono tracking-wider"
+                style={{
+                  color: "rgba(255, 255, 255, 0.5)",
+                }}
+              >
+                TCP HANDSHAKE
+              </div>
+            </div>
+          </div>
+
+          {/* Floating RFC fragments - start on the left side */}
           {[
-            { text: "MUST", x: -280, y: -180, finalX: -60, finalY: -140 },
-            { text: "SHALL", x: 260, y: -150, finalX: 40, finalY: -100 },
-            { text: "sequence number", x: -220, y: 120, finalX: -30, finalY: 60 },
-            { text: "RFC 793", x: 200, y: 180, finalX: 0, finalY: -160 },
-            { text: "header", x: -300, y: 30, finalX: -50, finalY: -20 },
-            { text: "protocol", x: 280, y: -60, finalX: 30, finalY: 20 },
-            { text: "§3.1", x: -120, y: -220, finalX: 60, finalY: -60 },
-            { text: "ACK", x: 160, y: 140, finalX: -40, finalY: 100 },
-            { text: "SYN", x: -180, y: -80, finalX: 50, finalY: 140 },
-            { text: "FIN", x: 220, y: 60, finalX: -20, finalY: -80 },
-            { text: "TTL", x: -250, y: 180, finalX: 20, finalY: 40 },
-            { text: "port:443", x: 140, y: -200, finalX: -10, finalY: 80 },
+            { text: "MUST", x: -180, y: -140, finalX: -50, finalY: -100 },
+            { text: "SHALL", x: 60, y: -120, finalX: 30, finalY: -70 },
+            { text: "seq", x: -140, y: 100, finalX: -20, finalY: 50 },
+            { text: "RFC 793", x: 100, y: 140, finalX: 0, finalY: -120 },
+            { text: "header", x: -200, y: 20, finalX: -40, finalY: -15 },
+            { text: "proto", x: 160, y: -50, finalX: 25, finalY: 15 },
+            { text: "§3.1", x: -80, y: -170, finalX: 45, finalY: -45 },
+            { text: "ACK", x: 80, y: 110, finalX: -30, finalY: 75 },
+            { text: "SYN", x: -120, y: -60, finalX: 35, finalY: 100 },
+            { text: "FIN", x: 140, y: 45, finalX: -15, finalY: -60 },
           ].map((frag, i) => (
             <span
               key={i}
-              className="rfc-fragment absolute font-mono text-sm font-semibold"
+              className="rfc-fragment absolute font-mono text-xs font-semibold"
               data-x={frag.x}
               data-y={frag.y}
               data-final-x={frag.finalX}
@@ -1055,7 +1300,7 @@ export function FoundryHero() {
               style={{
                 opacity: 0,
                 color: "#ffaa00",
-                textShadow: "0 0 12px rgba(255, 170, 0, 0.7), 0 0 24px rgba(255, 140, 0, 0.4)",
+                textShadow: "0 0 10px rgba(255, 170, 0, 0.7), 0 0 20px rgba(255, 140, 0, 0.4)",
               }}
             >
               {frag.text}

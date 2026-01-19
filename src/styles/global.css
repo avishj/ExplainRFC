@@ -257,6 +257,25 @@ body::before {
   animation: heartbeat 1.5s ease-in-out infinite;
 }
 
+/* Animated dashed lines for visualization preview */
+@keyframes dash-flow {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes dash-flow-reverse {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 24; }
+}
+
+.animate-dash {
+  animation: dash-flow 1s linear infinite;
+}
+
+.animate-dash-reverse {
+  animation: dash-flow-reverse 1s linear infinite;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
