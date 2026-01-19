@@ -843,11 +843,25 @@ export function FoundryHero() {
       animationId = requestAnimationFrame(draw);
     };
 
+    const waitWithRAF = (duration: number): Promise<void> => {
+      return new Promise(resolve => {
+        const start = performance.now();
+        const tick = (now: number) => {
+          if (now - start >= duration) {
+            resolve();
+          } else {
+            requestAnimationFrame(tick);
+          }
+        };
+        requestAnimationFrame(tick);
+      });
+    };
+
     const runBootSequence = async () => {
       if (bootStartedRef.current) return;
       bootStartedRef.current = true;
 
-      await new Promise(r => setTimeout(r, 800));
+      await waitWithRAF(800);
       setShowInitialCursor(false);
 
       for (let lineIdx = 0; lineIdx < BOOT_SEQUENCE.length; lineIdx++) {
@@ -862,7 +876,7 @@ export function FoundryHero() {
           
           for (let i = 1; i <= steps; i++) {
             const variance = (Math.random() - 0.5) * 30;
-            await new Promise(r => setTimeout(r, Math.max(15, baseStepDuration + variance)));
+            await waitWithRAF(Math.max(15, baseStepDuration + variance));
             const filled = "█".repeat(i);
             const empty = " ".repeat(steps - i);
             const percent = Math.round((i / steps) * 100);
@@ -876,13 +890,13 @@ export function FoundryHero() {
             });
             setProgressPercent(Math.round((i / steps) * 100));
           }
-          await new Promise(r => setTimeout(r, 200));
+          await waitWithRAF(200);
         } else {
           setBootLines(prev => [...prev, { text: "", complete: false }]);
           
           const chars = line.text.split("");
           for (let charIdx = 0; charIdx < chars.length; charIdx++) {
-            await new Promise(r => setTimeout(r, line.typingSpeed + (Math.random() - 0.5) * 35));
+            await waitWithRAF(line.typingSpeed + (Math.random() - 0.5) * 35);
             setBootLines(prev => {
               const updated = [...prev];
               updated[updated.length - 1] = { 
@@ -899,11 +913,11 @@ export function FoundryHero() {
             return updated;
           });
           
-          await new Promise(r => setTimeout(r, line.postDelay));
+          await waitWithRAF(line.postDelay);
         }
       }
 
-      await new Promise(r => setTimeout(r, 400));
+      await waitWithRAF(400);
       setBootComplete(true);
     };
 
