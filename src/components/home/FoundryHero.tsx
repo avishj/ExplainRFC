@@ -1354,7 +1354,7 @@ export function FoundryHero() {
 
       {/* Document Assembly Layer - RFC fragments converging into a document, then transforming to visualization */}
       {showDocumentAssembly && (
-        <div className="document-assembly-layer absolute inset-0 z-25 flex items-center justify-center pointer-events-none bg-[#0a0a0a]">
+        <div className="document-assembly-layer absolute inset-0 z-25 flex items-center justify-center pointer-events-none bg-obsidian">
           {/* The document page - positioned with viewport-relative units */}
           <div 
             className="document-page absolute w-44 h-56 sm:w-48 sm:h-64 border-2 rounded -translate-x-1/2 -translate-y-1/2"
@@ -1364,7 +1364,7 @@ export function FoundryHero() {
               left: "calc(50% - 30vw)",
               top: "50%",
               borderColor: "rgba(255, 170, 0, 0.4)",
-              backgroundColor: "#0a0a0a",
+              backgroundColor: "#000000",
               boxShadow: "0 0 25px rgba(255, 170, 0, 0.3)",
             }}
           >
