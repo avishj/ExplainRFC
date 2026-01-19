@@ -19,6 +19,8 @@ YOU MUST use the edit tool instead of create tool unless the vast majority of th
 - **Sign-off:** Always use `-s --author="Avish <avish.j@protonmail.com>"`
 - **Examples:** `feat: add jwt auth impl`, `fix: null ptr in parser`
 - Only stage files related to current logical block—never batch unrelated changes
+- **Push after commit** — always `git push` after committing
+- **Shared files with multiple changes:** Use `git add -p` to stage hunks selectively, commit smallest logical unit first
 
 ## Architecture
 Astro static site with React islands for interactivity. Three.js for 3D visualizations, GSAP for animations, Tailwind CSS v4 for styling.
