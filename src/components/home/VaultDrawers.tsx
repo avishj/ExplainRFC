@@ -16,7 +16,7 @@ const bookPlacements: BookPlacement[] = [
   // Left stack - 3 books
   { 
     rfcIndex: 0, 
-    image: "book_straight1.png", 
+    image: "book_straight1.webp", 
     x: 25, y: 32, 
     scale: 0.50, 
     zIndex: 3, 
@@ -25,7 +25,7 @@ const bookPlacements: BookPlacement[] = [
   },
   { 
     rfcIndex: 1, 
-    image: "book_straight2.png", 
+    image: "book_straight2.webp", 
     x: 26, y: 44, 
     scale: 0.48, 
     zIndex: 2, 
@@ -34,7 +34,7 @@ const bookPlacements: BookPlacement[] = [
   },
   { 
     rfcIndex: 2, 
-    image: "book_left1.png", 
+    image: "book_left1.webp", 
     x: 26, y: 60, 
     scale: 0.46, 
     zIndex: 1, 
@@ -45,7 +45,7 @@ const bookPlacements: BookPlacement[] = [
   // Center stack - 3 books  
   { 
     rfcIndex: 3, 
-    image: "book_left1.png", 
+    image: "book_left1.webp", 
     x: 49, y: 34, 
     scale: 0.52, 
     zIndex: 3, 
@@ -54,7 +54,7 @@ const bookPlacements: BookPlacement[] = [
   },
   { 
     rfcIndex: 4, 
-    image: "book_straight1.png", 
+    image: "book_straight1.webp", 
     x: 51, y: 42, 
     scale: 0.48, 
     zIndex: 2, 
@@ -63,7 +63,7 @@ const bookPlacements: BookPlacement[] = [
   },
   { 
     rfcIndex: 5, 
-    image: "book_straight2.png", 
+    image: "book_straight2.webp", 
     x: 48, y: 56, 
     scale: 0.46, 
     zIndex: 1, 
@@ -74,7 +74,7 @@ const bookPlacements: BookPlacement[] = [
   // Right stack - 3 books
   { 
     rfcIndex: 6, 
-    image: "book_straight2.png", 
+    image: "book_straight2.webp", 
     x: 75, y: 28, 
     scale: 0.50, 
     zIndex: 3, 
@@ -83,7 +83,7 @@ const bookPlacements: BookPlacement[] = [
   },
   { 
     rfcIndex: 7, 
-    image: "book_left1.png", 
+    image: "book_left1.webp", 
     x: 73, y: 44, 
     scale: 0.49, 
     zIndex: 2, 
@@ -92,7 +92,7 @@ const bookPlacements: BookPlacement[] = [
   },
   { 
     rfcIndex: 8, 
-    image: "book_straight1.png", 
+    image: "book_straight1.webp", 
     x: 74, y: 54, 
     scale: 0.46, 
     zIndex: 1, 
@@ -102,9 +102,9 @@ const bookPlacements: BookPlacement[] = [
 ];
 
 const bookColors: Record<BookImage, { text: string; shadow: string }> = {
-  "book_straight1.png": { text: "#d4af37", shadow: "rgba(0,0,0,0.9)" },
-  "book_straight2.png": { text: "#c9a227", shadow: "rgba(0,0,0,0.9)" },
-  "book_left1.png": { text: "#d4a44c", shadow: "rgba(0,0,0,0.9)" },
+  "book_straight1.webp": { text: "#d4af37", shadow: "rgba(0,0,0,0.9)" },
+  "book_straight2.webp": { text: "#c9a227", shadow: "rgba(0,0,0,0.9)" },
+  "book_left1.webp": { text: "#d4a44c", shadow: "rgba(0,0,0,0.9)" },
 };
 
 export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
@@ -164,7 +164,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
         >
           {/* Table image */}
           <img 
-            src={`${baseUrl}table.jpg`} 
+            src={`${baseUrl}table.webp`} 
             alt="Antique wooden table"
             className="w-full h-auto"
             style={{ display: "block" }}

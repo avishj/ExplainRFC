@@ -84,7 +84,7 @@ export type SceneInitFn = (
   accentColors: [string, string]
 ) => Promise<SceneController>;
 
-export type BookImage = "book_straight1.png" | "book_straight2.png" | "book_left1.png";
+export type BookImage = "book_straight1.webp" | "book_straight2.webp" | "book_left1.webp";
 
 export interface SpineConfig {
   x: number;
