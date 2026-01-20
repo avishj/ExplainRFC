@@ -282,14 +282,16 @@ export function FoundryHero() {
     if (rfcVisitedAt) {
       // Clear immediately so refresh plays animations
       sessionStorage.removeItem('rfcVisitedAt');
-      // Skip all animations - go straight to final hero state
+      // Skip CLI boot only - show document assembly loop + hero content immediately
       skipAnimationsRef.current = true;
+      bootPhaseRef.current = 1;
       setShowInitialCursor(false);
       setShowBootOverlay(false);
       setBootComplete(true);
-      setShowDocumentAssembly(false);
+      setShowDocumentAssembly(true);
       setHideCanvas(true);
-      setIsLoaded(true);
+      // Small delay to ensure DOM is ready for GSAP animations
+      setTimeout(() => setIsLoaded(true), 50);
       return;
     }
 
@@ -1078,7 +1080,13 @@ export function FoundryHero() {
     }
 
     loopActiveRef.current = true;
-    let isFirstRun = true;
+    // When skipping intro, treat as if first run already happened
+    let isFirstRun = !skipAnimationsRef.current;
+    
+    // If skipping, immediately make background transparent (normally happens after first run)
+    if (skipAnimationsRef.current) {
+      gsap.set(".document-assembly-layer", { backgroundColor: "transparent" });
+    }
 
     const runAnimationCycle = (variationIdx: number) => {
       if (!loopActiveRef.current) return;
@@ -1423,11 +1431,9 @@ export function FoundryHero() {
 
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-obsidian pointer-events-none z-10" />
 
+      {showBootOverlay && (
       <div
-        className={`
-          boot-overlay absolute inset-0 z-30 bg-obsidian flex items-center justify-center
-          ${!showBootOverlay ? "pointer-events-none" : ""}
-        `}
+        className="boot-overlay absolute inset-0 z-30 bg-obsidian flex items-center justify-center"
       >
         <div 
           className="boot-scanline absolute inset-x-0 top-0 h-full pointer-events-none origin-top"
@@ -1466,6 +1472,7 @@ export function FoundryHero() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Document Assembly Layer - RFC fragments converging into a document, then transforming to visualization */}
       {showDocumentAssembly && (
