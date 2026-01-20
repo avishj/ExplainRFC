@@ -10,9 +10,9 @@ interface NarrationPanelProps {
   onPrev: () => void;
   onNext: () => void;
   onSeek: (index: number) => void;
+  onExit: () => void;
   progress: number;
   rfc: RFC;
-  baseUrl?: string;
 }
 
 export function NarrationPanel({
@@ -24,23 +24,23 @@ export function NarrationPanel({
   onPrev,
   onNext,
   onSeek,
+  onExit,
   progress,
   rfc,
-  baseUrl = '',
 }: NarrationPanelProps) {
   return (
     <aside className="w-80 lg:w-96 border-r border-carbon bg-void/80 backdrop-blur-sm flex flex-col">
       {/* RFC Header */}
       <div className="p-6 border-b border-carbon">
-        <a 
-          href={baseUrl || './'}
-          className="inline-flex items-center gap-2 text-text-muted hover:text-gold transition-colors text-sm mb-4 group"
+        <button 
+          onClick={onExit}
+          className="inline-flex items-center gap-2 text-text-muted hover:text-gold transition-colors text-sm mb-4 group cursor-pointer"
         >
           <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Exit to Museum
-        </a>
+        </button>
         
         <div className="flex items-center gap-4">
           {/* RFC badge */}

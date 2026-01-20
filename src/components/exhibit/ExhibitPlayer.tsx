@@ -1,10 +1,10 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import type { RFC, StoryboardStep, SceneController } from "@/types";
 import { NarrationPanel } from "./NarrationPanel";
 import { InstrumentsPanel } from "./InstrumentsPanel";
 import { SceneCanvas } from "./SceneCanvas";
-import { Header } from "@/components/ui";
+import { Header, TransitionCLI, TRANSITION_SEQUENCES } from "@/components/ui";
 
 interface ExhibitPlayerProps {
   rfc: RFC;
@@ -17,6 +17,29 @@ export function ExhibitPlayer({ rfc, storyboard, baseUrl = '' }: ExhibitPlayerPr
   const [isPlaying, setIsPlaying] = useState(false);
   const [showInstruments, setShowInstruments] = useState(true);
   const [sceneController, setSceneController] = useState<SceneController | null>(null);
+  const [isExiting, setIsExiting] = useState(false);
+  const exitHandledRef = useRef(false);
+  
+  const handleExit = useCallback(() => {
+    if (exitHandledRef.current) return;
+    exitHandledRef.current = true;
+    setIsExiting(true);
+  }, []);
+  
+  const handleExitComplete = useCallback(() => {
+    window.location.href = baseUrl || '/';
+  }, [baseUrl]);
+  
+  useEffect(() => {
+    const handlePopState = () => {
+      handleExit();
+    };
+    
+    history.pushState(null, '', location.href);
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [handleExit]);
   
   const step = storyboard[currentStep];
   const totalSteps = storyboard.length;
@@ -99,9 +122,9 @@ export function ExhibitPlayer({ rfc, storyboard, baseUrl = '' }: ExhibitPlayerPr
           onPrev={prevStep}
           onNext={nextStep}
           onSeek={goToStep}
+          onExit={handleExit}
           progress={progress}
           rfc={rfc}
-          baseUrl={baseUrl}
         />
         
         {/* Scene Canvas - Center */}
@@ -145,6 +168,13 @@ export function ExhibitPlayer({ rfc, storyboard, baseUrl = '' }: ExhibitPlayerPr
           />
         )}
       </main>
+      
+      {isExiting && (
+        <TransitionCLI
+          sequence={TRANSITION_SEQUENCES.toHome()}
+          onComplete={handleExitComplete}
+        />
+      )}
     </div>
   );
 }
