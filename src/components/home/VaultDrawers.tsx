@@ -343,7 +343,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     style={{
                       width: "280px",
                       height: "360px",
-                      left: "10px",
+                      left: "-290px",
                       top: "10px",
                       background: "linear-gradient(135deg, #f5ebe0 0%, #e8dcc8 100%)",
                       borderRadius: "2px",
@@ -375,7 +375,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     style={{
                       width: "280px",
                       height: "360px",
-                      right: "10px",
+                      left: "10px",
                       top: "10px",
                       background: "linear-gradient(225deg, #f5ebe0 0%, #e8dcc8 100%)",
                       borderRadius: "2px",
