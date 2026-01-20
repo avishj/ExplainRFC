@@ -262,6 +262,7 @@ export function FoundryHero() {
   const [showDocumentAssembly, setShowDocumentAssembly] = useState(false);
   const [hideCanvas, setHideCanvas] = useState(false);
   const bootStartedRef = useRef(false);
+  const skipAnimationsRef = useRef(false);
   const [currentVariationIndex, setCurrentVariationIndex] = useState(0);
   const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const loopActiveRef = useRef(false);
@@ -282,6 +283,7 @@ export function FoundryHero() {
       const oneDayMs = 24 * 60 * 60 * 1000;
       if (Date.now() - visitTime < oneDayMs) {
         // Skip all animations - go straight to final hero state
+        skipAnimationsRef.current = true;
         setShowInitialCursor(false);
         setShowBootOverlay(false);
         setBootComplete(true);
@@ -1044,6 +1046,7 @@ export function FoundryHero() {
   // Effect 1: When boot completes, fade out boot overlay and show document assembly
   useEffect(() => {
     if (!bootComplete) return;
+    if (skipAnimationsRef.current) return;
 
     const tl = gsap.timeline();
     
