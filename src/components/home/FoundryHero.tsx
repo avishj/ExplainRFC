@@ -276,25 +276,21 @@ export function FoundryHero() {
     if (bootStartedRef.current) return;
     bootStartedRef.current = true;
 
-    // Check if user has visited an RFC within the last 24 hours - skip all intro animations
-    const rfcVisitedAt = localStorage.getItem('rfcVisitedAt');
+    // Check if user came back from an RFC - skip all intro animations
+    // Uses sessionStorage so it clears on page refresh
+    const rfcVisitedAt = sessionStorage.getItem('rfcVisitedAt');
     if (rfcVisitedAt) {
-      const visitTime = parseInt(rfcVisitedAt, 10);
-      const oneDayMs = 24 * 60 * 60 * 1000;
-      if (Date.now() - visitTime < oneDayMs) {
-        // Skip all animations - go straight to final hero state
-        skipAnimationsRef.current = true;
-        setShowInitialCursor(false);
-        setShowBootOverlay(false);
-        setBootComplete(true);
-        setShowDocumentAssembly(false);
-        setHideCanvas(true);
-        setIsLoaded(true);
-        return;
-      } else {
-        // Expired - remove the flag
-        localStorage.removeItem('rfcVisitedAt');
-      }
+      // Clear immediately so refresh plays animations
+      sessionStorage.removeItem('rfcVisitedAt');
+      // Skip all animations - go straight to final hero state
+      skipAnimationsRef.current = true;
+      setShowInitialCursor(false);
+      setShowBootOverlay(false);
+      setBootComplete(true);
+      setShowDocumentAssembly(false);
+      setHideCanvas(true);
+      setIsLoaded(true);
+      return;
     }
 
     interface BootState {

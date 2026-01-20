@@ -30,9 +30,9 @@ export function ExhibitPlayer({ rfc, storyboard, baseUrl = '' }: ExhibitPlayerPr
     window.location.href = baseUrl || '/';
   }, [baseUrl]);
   
-  // Mark that user has visited an RFC - persists for 24 hours
+  // Mark that user has visited an RFC - persists until page refresh
   useEffect(() => {
-    localStorage.setItem('rfcVisitedAt', Date.now().toString());
+    sessionStorage.setItem('rfcVisitedAt', '1');
   }, []);
   
   useEffect(() => {
