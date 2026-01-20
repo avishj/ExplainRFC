@@ -251,18 +251,25 @@ export function FoundryHero() {
   const glyphTrailsRef = useRef<GlyphTrail[]>([]);
   const electricArcsRef = useRef<ElectricArc[]>([]);
   const timeRef = useRef(0);
-  const bootPhaseRef = useRef(0);
+  // Check skip condition once to set correct initial states (avoids flash)
+  const skipIntroRef = useRef(
+    typeof window !== "undefined" && !!sessionStorage.getItem('rfcVisitedAt')
+  );
+  const skipIntro = skipIntroRef.current;
+  
+  const bootPhaseRef = useRef(skipIntro ? 1 : 0);
+  
   const [isLoaded, setIsLoaded] = useState(false);
   const [, setTitleVisible] = useState(false);
-  const [bootComplete, setBootComplete] = useState(false);
+  const [bootComplete, setBootComplete] = useState(skipIntro);
   const [bootLines, setBootLines] = useState<{ text: string; complete: boolean }[]>([]);
-  const [showBootOverlay, setShowBootOverlay] = useState(true);
-  const [showInitialCursor, setShowInitialCursor] = useState(true);
+  const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro);
+  const [showInitialCursor, setShowInitialCursor] = useState(!skipIntro);
   const [, setProgressPercent] = useState(0);
-  const [showDocumentAssembly, setShowDocumentAssembly] = useState(false);
-  const [hideCanvas, setHideCanvas] = useState(false);
+  const [showDocumentAssembly, setShowDocumentAssembly] = useState(skipIntro);
+  const [hideCanvas, setHideCanvas] = useState(skipIntro);
   const bootStartedRef = useRef(false);
-  const skipAnimationsRef = useRef(false);
+  const skipAnimationsRef = useRef(skipIntro);
   const [currentVariationIndex, setCurrentVariationIndex] = useState(0);
   const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const loopActiveRef = useRef(false);
@@ -276,20 +283,9 @@ export function FoundryHero() {
     if (bootStartedRef.current) return;
     bootStartedRef.current = true;
 
-    // Check if user came back from an RFC - skip all intro animations
-    // Uses sessionStorage so it clears on page refresh
-    const rfcVisitedAt = sessionStorage.getItem('rfcVisitedAt');
-    if (rfcVisitedAt) {
-      // Clear immediately so refresh plays animations
+    // If skipping intro (states already initialized correctly), just clear flag and trigger hero
+    if (skipAnimationsRef.current) {
       sessionStorage.removeItem('rfcVisitedAt');
-      // Skip CLI boot only - show document assembly loop + hero content immediately
-      skipAnimationsRef.current = true;
-      bootPhaseRef.current = 1;
-      setShowInitialCursor(false);
-      setShowBootOverlay(false);
-      setBootComplete(true);
-      setShowDocumentAssembly(true);
-      setHideCanvas(true);
       // Small delay to ensure DOM is ready for GSAP animations
       setTimeout(() => setIsLoaded(true), 50);
       return;
