@@ -3,9 +3,17 @@ import { cn } from "@/lib/utils";
 interface HeaderProps {
   currentRFC?: string;
   baseUrl?: string;
+  onExit?: () => void;
 }
 
-export function Header({ currentRFC, baseUrl = '' }: HeaderProps) {
+export function Header({ currentRFC, baseUrl = '', onExit }: HeaderProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    if (onExit) {
+      e.preventDefault();
+      onExit();
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <div 
@@ -18,6 +26,7 @@ export function Header({ currentRFC, baseUrl = '' }: HeaderProps) {
           {/* Logo */}
           <a 
             href={baseUrl || './'} 
+            onClick={handleClick}
             className="flex items-center gap-3 text-text-primary hover:text-gold transition-colors group"
           >
             <div 
@@ -54,17 +63,19 @@ export function Header({ currentRFC, baseUrl = '' }: HeaderProps) {
           )}
           
           {/* Actions */}
-          <div className="flex items-center gap-4">
-            <a
-              href={baseUrl || './'}
-              className={cn(
-                "font-mono text-xs uppercase tracking-wider",
-                "text-text-muted hover:text-gold transition-colors"
-              )}
-            >
-              ← Exit Exhibit
-            </a>
-          </div>
+          {onExit && (
+            <div className="flex items-center gap-4">
+              <button
+                onClick={onExit}
+                className={cn(
+                  "font-mono text-xs uppercase tracking-wider cursor-pointer",
+                  "text-text-muted hover:text-gold transition-colors"
+                )}
+              >
+                ← Exit Exhibit
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

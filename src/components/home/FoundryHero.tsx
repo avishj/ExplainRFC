@@ -275,6 +275,26 @@ export function FoundryHero() {
     if (bootStartedRef.current) return;
     bootStartedRef.current = true;
 
+    // Check if user has visited an RFC within the last 24 hours - skip all intro animations
+    const rfcVisitedAt = localStorage.getItem('rfcVisitedAt');
+    if (rfcVisitedAt) {
+      const visitTime = parseInt(rfcVisitedAt, 10);
+      const oneDayMs = 24 * 60 * 60 * 1000;
+      if (Date.now() - visitTime < oneDayMs) {
+        // Skip all animations - go straight to final hero state
+        setShowInitialCursor(false);
+        setShowBootOverlay(false);
+        setBootComplete(true);
+        setShowDocumentAssembly(false);
+        setHideCanvas(true);
+        setIsLoaded(true);
+        return;
+      } else {
+        // Expired - remove the flag
+        localStorage.removeItem('rfcVisitedAt');
+      }
+    }
+
     interface BootState {
       phase: 'initial-wait' | 'typing' | 'post-delay' | 'progress-bar' | 'final-wait' | 'done';
       lineIdx: number;

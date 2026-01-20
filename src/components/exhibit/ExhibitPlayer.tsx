@@ -30,8 +30,14 @@ export function ExhibitPlayer({ rfc, storyboard, baseUrl = '' }: ExhibitPlayerPr
     window.location.href = baseUrl || '/';
   }, [baseUrl]);
   
+  // Mark that user has visited an RFC - persists for 24 hours
+  useEffect(() => {
+    localStorage.setItem('rfcVisitedAt', Date.now().toString());
+  }, []);
+  
   useEffect(() => {
     const handlePopState = () => {
+      history.pushState(null, '', location.href);
       handleExit();
     };
     
@@ -108,7 +114,7 @@ export function ExhibitPlayer({ rfc, storyboard, baseUrl = '' }: ExhibitPlayerPr
   
   return (
     <div className="min-h-screen flex flex-col">
-      <Header currentRFC={`RFC ${rfc.id} — ${rfc.shortTitle}`} baseUrl={baseUrl} />
+      <Header currentRFC={`RFC ${rfc.id} — ${rfc.shortTitle}`} baseUrl={baseUrl} onExit={handleExit} />
       
       {/* Main content */}
       <main className="flex-1 pt-16 flex">
