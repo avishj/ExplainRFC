@@ -313,7 +313,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       background: "linear-gradient(135deg, #5C1616 0%, #8B2323 50%, #6a1a1a 100%)",
                       borderRadius: "4px",
                       boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
-                      transform: "translateZ(-15px)",
+                      transform: "translateZ(-100px)",
                     }}
                   />
                   
@@ -327,7 +327,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       top: "5px",
                       background: "linear-gradient(90deg, #d4c4a8 0%, #e8dcc8 10%, #f5ebe0 50%, #e8dcc8 90%, #d4c4a8 100%)",
                       borderRadius: "2px 4px 4px 2px",
-                      transform: "translateZ(-7px)",
+                      transform: "translateZ(-50px)",
                       boxShadow: "inset 0 0 10px rgba(0,0,0,0.1)",
                     }}
                   >
@@ -337,19 +337,64 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     }} />
                   </div>
                   
+                  {/* Front cover - flips open (rendered before pages so pages appear on top) */}
+                  <div
+                    className={`absolute ${isClosing ? 'cover-close' : 'cover-open'}`}
+                    style={{
+                      width: "300px",
+                      height: "380px",
+                      borderRadius: "4px",
+                      transform: "translateZ(-30px)",
+                      transformOrigin: "left center",
+                      transformStyle: "preserve-3d",
+                    }}
+                  >
+                    {/* Cover front face */}
+                    <div 
+                      className="absolute inset-0 rounded"
+                      style={{
+                        background: "linear-gradient(135deg, #8B2323 0%, #a52a2a 30%, #8B2323 70%, #5C1616 100%)",
+                        boxShadow: "2px 0 10px rgba(0,0,0,0.3)",
+                        backfaceVisibility: "hidden",
+                      }}
+                    >
+                      {/* Cover decoration */}
+                      <div className="absolute inset-4 border border-amber-600/30 rounded" />
+                      <div className="absolute inset-8 border border-amber-600/20 rounded" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.8rem", fontWeight: "700", color: "#d4af37", textShadow: "2px 2px 4px rgba(0,0,0,0.5)", letterSpacing: "0.1em" }}>
+                            RFC {rfc.id}
+                          </div>
+                          <div className="mt-2" style={{ width: "80px", height: "2px", background: "linear-gradient(90deg, transparent, #d4af37, transparent)", margin: "0 auto" }} />
+                          <div className="mt-2" style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", color: "#c9a227", letterSpacing: "0.15em" }}>
+                            {rfc.name}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Cover back side (visible when flipping) */}
+                    <div 
+                      className="absolute inset-0 rounded"
+                      style={{ 
+                        background: "linear-gradient(135deg, #e8dcc8 0%, #f5ebe0 100%)",
+                        transform: "rotateY(180deg)",
+                        backfaceVisibility: "hidden",
+                      }} 
+                    />
+                  </div>
+                  
                   {/* Left page (revealed when book opens) */}
                   <div
                     className={`absolute ${isClosing ? 'page-close-left' : 'page-open-left'}`}
                     style={{
                       width: "280px",
                       height: "360px",
-                      left: "-290px",
+                      left: "-270px",
                       top: "10px",
                       background: "linear-gradient(135deg, #f5ebe0 0%, #e8dcc8 100%)",
                       borderRadius: "2px",
                       transformOrigin: "right center",
-                      transformStyle: "preserve-3d",
-                      backfaceVisibility: "hidden",
                     }}
                   >
                     <div className="relative p-8 h-full flex flex-col items-center justify-center text-center">
@@ -380,8 +425,6 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       background: "linear-gradient(225deg, #f5ebe0 0%, #e8dcc8 100%)",
                       borderRadius: "2px",
                       transformOrigin: "left center",
-                      transformStyle: "preserve-3d",
-                      backfaceVisibility: "hidden",
                     }}
                   >
                     <div className="relative p-8 h-full flex flex-col">
@@ -413,44 +456,6 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                         </button>
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Front cover - flips open */}
-                  <div
-                    className={`absolute ${isClosing ? 'cover-close' : 'cover-open'}`}
-                    style={{
-                      width: "300px",
-                      height: "380px",
-                      background: "linear-gradient(135deg, #8B2323 0%, #a52a2a 30%, #8B2323 70%, #5C1616 100%)",
-                      borderRadius: "4px",
-                      transformOrigin: "left center",
-                      transformStyle: "preserve-3d",
-                      boxShadow: "2px 0 10px rgba(0,0,0,0.3)",
-                    }}
-                  >
-                    {/* Cover decoration */}
-                    <div className="absolute inset-4 border border-amber-600/30 rounded" />
-                    <div className="absolute inset-8 border border-amber-600/20 rounded" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.8rem", fontWeight: "700", color: "#d4af37", textShadow: "2px 2px 4px rgba(0,0,0,0.5)", letterSpacing: "0.1em" }}>
-                          RFC {rfc.id}
-                        </div>
-                        <div className="mt-2" style={{ width: "80px", height: "2px", background: "linear-gradient(90deg, transparent, #d4af37, transparent)", margin: "0 auto" }} />
-                        <div className="mt-2" style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", color: "#c9a227", letterSpacing: "0.15em" }}>
-                          {rfc.name}
-                        </div>
-                      </div>
-                    </div>
-                    {/* Cover back side (visible when flipping) */}
-                    <div 
-                      className="absolute inset-0 rounded"
-                      style={{ 
-                        background: "linear-gradient(135deg, #e8dcc8 0%, #f5ebe0 100%)",
-                        transform: "rotateY(180deg)",
-                        backfaceVisibility: "hidden",
-                      }} 
-                    />
                   </div>
                 </div>
                 
