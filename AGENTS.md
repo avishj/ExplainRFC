@@ -42,20 +42,55 @@ Astro static site with React islands for interactivity. Three.js for 3D visualiz
 - Tailwind classes inline; no separate CSS files for components
 - Scene modules export `SceneInitFn` returning `SceneController`
 
+## Base Path Handling
+- **Use `import.meta.env.BASE_URL`** for all asset paths and internal navigation links
+- Pass `baseUrl` prop to React components from Astro pages: `<Component client:visible baseUrl={import.meta.env.BASE_URL} />`
+- Config sets `/ExplainRFC` in prod, `/` locally via `process.env.NODE_ENV === 'production'` check in `astro.config.mjs`
+- Assets: `src={`${baseUrl}table.png`}` not `src="table.png"`
+- Links: `href={`${baseUrl}rfc/${id}`}` not `href={`rfc/${id}`}`
+
 ## GSAP Animation Patterns
 - **Timeline cleanup:** Always `tl.kill()` in useEffect cleanup to prevent memory leaks
 - **Sequential effects:** Use separate useEffect hooks for each animation phase, triggered by state flags (e.g., `bootComplete`, `showDocumentAssembly`, `isLoaded`)
 - **DOM readiness:** Use small `setTimeout` (50ms) inside useEffect when querying dynamically rendered elements
 - **Staggering:** Use relative timing (`"-=0.3"`, `"<0.05"`) for tight, staggered sequences
-- **Initial visibility:** Set `opacity: 0` in inline styles to prevent flash before GSAP runs
+- **Initial visibility:** Set `opacity: 0` or `visibility: hidden` in inline styles to prevent flash before GSAP runs
 - **Element positioning:** Use `data-x`, `data-y`, `data-final-x`, `data-final-y` attributes for GSAP to read positions
 - **Frame-rate independence:** Use `requestAnimationFrame` with delta time (`dt`) for canvas animations
+- **Looping animations:** Use refs (`loopActiveRef`) to control lifecycle; set `false` in cleanup, check before scheduling next cycle
+
+## State & Effect Race Conditions
+- **Skip logic guards:** When skipping animations via sessionStorage/localStorage, use a dedicated ref (`skipAnimationsRef`) to prevent subsequent effects from re-enabling animation phases
+- **Effect dependency chains:** If `effectA` sets `stateB` which triggers `effectB`, ensure `effectB` checks refs/guards before overwriting skip logic
+- **Initial state from storage:** Initialize state in the state declaration itself (not in effects) when skip conditions depend on sessionStorage: `useState(() => shouldSkip ? finalValue : initialValue)`
+- **sessionStorage vs localStorage:** Use `sessionStorage` for skip flags that should reset on browser restart but persist across in-app navigation
+
+## Navigation & Transitions
+- **Browser back hijacking:** Use `history.pushState(null, '', location.href)` immediately in `popstate` handler to cancel navigation, then run exit transition
+- **Exit transition pattern:** Set transition state → render `TransitionCLI` → call `window.location.href` only in `onComplete` callback
+- **Header/logo clicks:** Convert `<a>` to `<button>` with `onClick` that triggers exit state and `e.preventDefault()`
+- **Home skip after RFC visit:** Store timestamp in `sessionStorage` (e.g., `rfcVisitedAt`), check on home mount, skip boot sequence if recent
+
+## 3D CSS Transforms (Books/Cards)
+- **Z-index with 3D:** `z-index` alone doesn't work in 3D space; use `translateZ()` to layer elements
+- **DOM order matters:** When `translateZ` values are similar, elements rendered later in JSX appear on top
+- **Clickable bounding box:** Apply `scale()` to the clickable parent wrapper, not inner content, so hit area matches visible size
+- **Transform origin:** For book/page turns, set `transformOrigin` correctly (e.g., `right center` for left page pivoting from spine)
+- **Keyframe sync:** Any `translateZ` change in base styles must be mirrored in animation keyframes
 
 ## Scene Implementation (Three.js)
 - **Controller pattern:** `init` function returns `SceneController` with `apply(step)`, `setProgress`, `dispose`
 - **Entity management:** Create entities in `createEntities`, manage via `Map<string, Entity>` interface
 - **Animation control:** GSAP timelines in `apply` method, keyed by `step.scene.action`
 - **Visual metaphor:** Each RFC needs a unique, consistent metaphor (TCP: endpoints + packets, BGP: crystalline nodes + wave propagation)
+- **Render order:** Use `mesh.renderOrder = N` and appropriate `depthWrite`/`depthTest` settings for layering (particles behind solids)
+- **Material for overlays:** Use `side: THREE.DoubleSide` and dark colors for container meshes that should occlude particles
+
+## CLI Typing Animation
+- **Single rAF loop:** Use one `requestAnimationFrame` loop with `performance.now()` elapsed-time tracking, not per-character `setTimeout`
+- **State machine phases:** `'initial-wait' | 'typing' | 'progress-bar' | 'post-delay' | 'done'`
+- **Character timing variance:** Spaces fast (0.3x), control chars near-instant (0.5x), inject micro-pauses every 5-8 chars
+- **Initial cursor display:** Show `> ` prompt with blinking cursor before typing starts
 
 ## Astro/React Integration
 - **No function props:** Astro cannot serialize functions to client-hydrated React components
@@ -67,6 +102,7 @@ Astro static site with React islands for interactivity. Three.js for 3D visualiz
 - **Navigation hints:** Show all keyboard shortcuts in control areas (e.g., `← back · → or Space advance`)
 - **Play button behavior:** When user presses play, advance immediately—don't wait for auto-advance timer
 - **Accessibility:** Check `prefers-reduced-motion` and skip complex animations if true
+- **Debug clicks:** Use `document.elementFromPoint(x, y)` to confirm which element receives click when layered CSS is involved
 
 ## Animation Sequencing (Complex Transitions)
 1. Break into distinct phases via state flags (`bootComplete` → `showDocumentAssembly` → `isLoaded`)
@@ -85,3 +121,9 @@ Astro static site with React islands for interactivity. Three.js for 3D visualiz
 - **Scanline wipes:** Dedicated element for vertical wipe during transitions
 - **Easing variety:** `power3.in` for exits, `back.out(1.5)` for playful entrances
 - **Core effects:** Radial gradients, text-shadow glow, noise textures for atmosphere
+
+## Common Debugging Patterns
+- **Animation not running:** Check if elements exist in DOM when GSAP queries them; add `setTimeout(50)` or trigger from state change
+- **Elements hidden/occluded:** In 3D, check `translateZ`, DOM order, and `renderOrder`; use browser devtools 3D view
+- **Clicks not registering:** Check for overlays with high z-index (ensure `pointer-events: none`), verify element at click point with `elementFromPoint`
+- **Hydration failures:** If interactivity fails after load, restart dev server and clear cache; test with `dev-browser` skill
