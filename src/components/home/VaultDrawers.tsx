@@ -265,6 +265,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
         if (!rfc) return null;
         const isClosing = !!closingBook;
         
+        const pageWidth = 260;
+        const pageHeight = 340;
+        const spineWidth = 30;
+        
         return (
           <>
             {/* Backdrop */}
@@ -283,7 +287,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
               className="fixed inset-0 flex items-center justify-center p-4"
               style={{ 
                 zIndex: 200,
-                perspective: "2000px",
+                perspective: "1800px",
                 pointerEvents: isClosing ? "none" : "auto",
               }}
               onClick={(e) => {
@@ -296,86 +300,56 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                 style={{ transformStyle: "preserve-3d" }}
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Book structure */}
+                {/* Book structure - centered spine with covers opening outward */}
                 <div
                   className="relative"
                   style={{
                     transformStyle: "preserve-3d",
-                    transform: "rotateX(8deg)",
+                    transform: "rotateX(5deg)",
                   }}
                 >
-                  {/* Back cover (red, visible when book is closed) */}
+                  {/* Center spine */}
                   <div
-                    className="absolute"
                     style={{
-                      width: "300px",
-                      height: "380px",
-                      background: "linear-gradient(135deg, #5C1616 0%, #8B2323 50%, #6a1a1a 100%)",
-                      borderRadius: "4px",
+                      position: "absolute",
+                      width: `${spineWidth}px`,
+                      height: `${pageHeight}px`,
+                      left: "50%",
+                      top: "0",
+                      transform: "translateX(-50%) translateZ(-5px)",
+                      background: "linear-gradient(90deg, #5C1616 0%, #8B2323 50%, #5C1616 100%)",
                       boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
-                      transform: "translateZ(-100px)",
                     }}
                   />
                   
-                  {/* Pages block (cream colored, between covers) */}
+                  {/* Left cover - opens outward to the left */}
                   <div
-                    className="absolute"
+                    className={isClosing ? 'cover-close-left' : 'cover-open-left'}
                     style={{
-                      width: "290px",
-                      height: "370px",
-                      left: "5px",
-                      top: "5px",
-                      background: "linear-gradient(90deg, #d4c4a8 0%, #e8dcc8 10%, #f5ebe0 50%, #e8dcc8 90%, #d4c4a8 100%)",
-                      borderRadius: "2px 4px 4px 2px",
-                      transform: "translateZ(-50px)",
-                      boxShadow: "inset 0 0 10px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    {/* Page lines */}
-                    <div className="absolute right-0 top-2 bottom-2 w-1" style={{ 
-                      background: "repeating-linear-gradient(to bottom, #c9b896 0px, #c9b896 1px, transparent 1px, transparent 3px)" 
-                    }} />
-                  </div>
-                  
-                  {/* Front cover - flips open (rendered before pages so pages appear on top) */}
-                  <div
-                    className={`absolute ${isClosing ? 'cover-close' : 'cover-open'}`}
-                    style={{
-                      width: "300px",
-                      height: "380px",
-                      borderRadius: "4px",
-                      transform: "translateZ(-30px)",
-                      transformOrigin: "left center",
+                      position: "absolute",
+                      width: `${pageWidth}px`,
+                      height: `${pageHeight}px`,
+                      right: "50%",
+                      top: "0",
+                      transformOrigin: "right center",
                       transformStyle: "preserve-3d",
                     }}
                   >
-                    {/* Cover front face */}
+                    {/* Cover outer face */}
                     <div 
-                      className="absolute inset-0 rounded"
+                      className="absolute inset-0"
                       style={{
                         background: "linear-gradient(135deg, #8B2323 0%, #a52a2a 30%, #8B2323 70%, #5C1616 100%)",
-                        boxShadow: "2px 0 10px rgba(0,0,0,0.3)",
+                        boxShadow: "-2px 0 15px rgba(0,0,0,0.3)",
                         backfaceVisibility: "hidden",
                       }}
                     >
-                      {/* Cover decoration */}
-                      <div className="absolute inset-4 border border-amber-600/30 rounded" />
-                      <div className="absolute inset-8 border border-amber-600/20 rounded" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center">
-                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.8rem", fontWeight: "700", color: "#d4af37", textShadow: "2px 2px 4px rgba(0,0,0,0.5)", letterSpacing: "0.1em" }}>
-                            RFC {rfc.id}
-                          </div>
-                          <div className="mt-2" style={{ width: "80px", height: "2px", background: "linear-gradient(90deg, transparent, #d4af37, transparent)", margin: "0 auto" }} />
-                          <div className="mt-2" style={{ fontFamily: "'Cinzel', serif", fontSize: "1rem", color: "#c9a227", letterSpacing: "0.15em" }}>
-                            {rfc.name}
-                          </div>
-                        </div>
-                      </div>
+                      <div className="absolute inset-3 border border-amber-600/30" />
+                      <div className="absolute inset-6 border border-amber-600/20" />
                     </div>
-                    {/* Cover back side (visible when flipping) */}
+                    {/* Cover inner face */}
                     <div 
-                      className="absolute inset-0 rounded"
+                      className="absolute inset-0"
                       style={{ 
                         background: "linear-gradient(135deg, #e8dcc8 0%, #f5ebe0 100%)",
                         transform: "rotateY(180deg)",
@@ -384,67 +358,182 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     />
                   </div>
                   
-                  {/* Left page (revealed when book opens) */}
+                  {/* Right cover - opens outward to the right */}
                   <div
-                    className={`absolute ${isClosing ? 'page-close-left' : 'page-open-left'}`}
+                    className={isClosing ? 'cover-close-right' : 'cover-open-right'}
                     style={{
-                      width: "280px",
-                      height: "360px",
-                      left: "-270px",
-                      top: "10px",
-                      background: "linear-gradient(135deg, #f5ebe0 0%, #e8dcc8 100%)",
-                      borderRadius: "2px",
-                      transformOrigin: "right center",
+                      position: "absolute",
+                      width: `${pageWidth}px`,
+                      height: `${pageHeight}px`,
+                      left: "50%",
+                      top: "0",
+                      transformOrigin: "left center",
+                      transformStyle: "preserve-3d",
                     }}
                   >
-                    <div className="relative p-8 h-full flex flex-col items-center justify-center text-center">
-                      <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", color: "#8b6b54", letterSpacing: "0.25em" }}>
+                    {/* Cover outer face */}
+                    <div 
+                      className="absolute inset-0"
+                      style={{
+                        background: "linear-gradient(225deg, #8B2323 0%, #a52a2a 30%, #8B2323 70%, #5C1616 100%)",
+                        boxShadow: "2px 0 15px rgba(0,0,0,0.3)",
+                        backfaceVisibility: "hidden",
+                      }}
+                    >
+                      <div className="absolute inset-3 border border-amber-600/30" />
+                      <div className="absolute inset-6 border border-amber-600/20" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <div style={{ fontFamily: "'Cinzel', serif", fontSize: "1.6rem", fontWeight: "700", color: "#d4af37", textShadow: "2px 2px 4px rgba(0,0,0,0.5)", letterSpacing: "0.1em" }}>
+                            RFC {rfc.id}
+                          </div>
+                          <div className="mt-2" style={{ width: "70px", height: "2px", background: "linear-gradient(90deg, transparent, #d4af37, transparent)", margin: "0 auto" }} />
+                          <div className="mt-2" style={{ fontFamily: "'Cinzel', serif", fontSize: "0.9rem", color: "#c9a227", letterSpacing: "0.15em" }}>
+                            {rfc.name}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Cover inner face */}
+                    <div 
+                      className="absolute inset-0"
+                      style={{ 
+                        background: "linear-gradient(225deg, #e8dcc8 0%, #f5ebe0 100%)",
+                        transform: "rotateY(180deg)",
+                        backfaceVisibility: "hidden",
+                      }} 
+                    />
+                  </div>
+                  
+                  {/* Interior page flipping left - page 1 */}
+                  <div
+                    className={isClosing ? 'page-unflip-left-1' : 'page-flip-left-1'}
+                    style={{
+                      position: "absolute",
+                      width: `${pageWidth - 10}px`,
+                      height: `${pageHeight - 10}px`,
+                      right: "50%",
+                      top: "5px",
+                      transformOrigin: "right center",
+                      transformStyle: "preserve-3d",
+                      background: "linear-gradient(90deg, #f5ebe0 0%, #e8dcc8 100%)",
+                      boxShadow: "-1px 0 3px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  
+                  {/* Interior page flipping left - page 2 */}
+                  <div
+                    className={isClosing ? 'page-unflip-left-2' : 'page-flip-left-2'}
+                    style={{
+                      position: "absolute",
+                      width: `${pageWidth - 15}px`,
+                      height: `${pageHeight - 10}px`,
+                      right: "50%",
+                      top: "5px",
+                      transformOrigin: "right center",
+                      transformStyle: "preserve-3d",
+                      background: "linear-gradient(90deg, #f0e6d5 0%, #e5d9c5 100%)",
+                      boxShadow: "-1px 0 3px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  
+                  {/* Interior page flipping right - page 1 */}
+                  <div
+                    className={isClosing ? 'page-unflip-right-1' : 'page-flip-right-1'}
+                    style={{
+                      position: "absolute",
+                      width: `${pageWidth - 10}px`,
+                      height: `${pageHeight - 10}px`,
+                      left: "50%",
+                      top: "5px",
+                      transformOrigin: "left center",
+                      transformStyle: "preserve-3d",
+                      background: "linear-gradient(270deg, #f5ebe0 0%, #e8dcc8 100%)",
+                      boxShadow: "1px 0 3px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  
+                  {/* Interior page flipping right - page 2 */}
+                  <div
+                    className={isClosing ? 'page-unflip-right-2' : 'page-flip-right-2'}
+                    style={{
+                      position: "absolute",
+                      width: `${pageWidth - 15}px`,
+                      height: `${pageHeight - 10}px`,
+                      left: "50%",
+                      top: "5px",
+                      transformOrigin: "left center",
+                      transformStyle: "preserve-3d",
+                      background: "linear-gradient(270deg, #f0e6d5 0%, #e5d9c5 100%)",
+                      boxShadow: "1px 0 3px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  
+                  {/* Left content page (final resting position with content) */}
+                  <div
+                    className={isClosing ? 'content-page-close-left' : 'content-page-left'}
+                    style={{
+                      position: "absolute",
+                      width: `${pageWidth - 20}px`,
+                      height: `${pageHeight - 20}px`,
+                      right: `calc(50% + 5px)`,
+                      top: "10px",
+                      transformOrigin: "right center",
+                      transformStyle: "preserve-3d",
+                      background: "linear-gradient(135deg, #f5ebe0 0%, #e8dcc8 100%)",
+                      boxShadow: "-2px 2px 8px rgba(0,0,0,0.15)",
+                    }}
+                  >
+                    <div className="relative p-6 h-full flex flex-col items-center justify-center text-center">
+                      <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.5rem", color: "#8b6b54", letterSpacing: "0.25em" }}>
                         REQUEST FOR COMMENTS
                       </div>
-                      <div style={{ fontFamily: "var(--font-display)", fontSize: "4.5rem", fontWeight: "bold", color: "#3d2817", lineHeight: 1, textShadow: "2px 2px 0 rgba(139,107,84,0.1)" }}>
+                      <div style={{ fontFamily: "var(--font-display)", fontSize: "3.5rem", fontWeight: "bold", color: "#3d2817", lineHeight: 1, textShadow: "2px 2px 0 rgba(139,107,84,0.1)" }}>
                         {rfc.id}
                       </div>
-                      <div className="my-4" style={{ width: "100px", height: "2px", background: "linear-gradient(90deg, transparent, #8b6b54, transparent)" }} />
-                      <div style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", fontWeight: "600", color: "#4a3525", letterSpacing: "0.1em" }}>
+                      <div className="my-3" style={{ width: "80px", height: "2px", background: "linear-gradient(90deg, transparent, #8b6b54, transparent)" }} />
+                      <div style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: "600", color: "#4a3525", letterSpacing: "0.1em" }}>
                         {rfc.name}
                       </div>
-                      <div className="mt-6" style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "#8b6b54", letterSpacing: "0.15em" }}>
+                      <div className="mt-4" style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "#8b6b54", letterSpacing: "0.15em" }}>
                         ESTABLISHED {rfc.year}
                       </div>
                     </div>
                   </div>
                   
-                  {/* Right page (revealed when book opens) */}
+                  {/* Right content page (final resting position with content) */}
                   <div
-                    className={`absolute ${isClosing ? 'page-close-right' : 'page-open-right'}`}
+                    className={isClosing ? 'content-page-close-right' : 'content-page-right'}
                     style={{
-                      width: "280px",
-                      height: "360px",
-                      left: "10px",
+                      position: "absolute",
+                      width: `${pageWidth - 20}px`,
+                      height: `${pageHeight - 20}px`,
+                      left: `calc(50% + 5px)`,
                       top: "10px",
-                      background: "linear-gradient(225deg, #f5ebe0 0%, #e8dcc8 100%)",
-                      borderRadius: "2px",
                       transformOrigin: "left center",
+                      transformStyle: "preserve-3d",
+                      background: "linear-gradient(225deg, #f5ebe0 0%, #e8dcc8 100%)",
+                      boxShadow: "2px 2px 8px rgba(0,0,0,0.15)",
                     }}
                   >
-                    <div className="relative p-8 h-full flex flex-col">
-                      <div className="self-end mb-4 px-3 py-1 rounded" style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", letterSpacing: "0.15em", color: "#6b5040", background: "rgba(139,107,84,0.1)", border: "1px solid rgba(139,107,84,0.2)" }}>
+                    <div className="relative p-5 h-full flex flex-col">
+                      <div className="self-end mb-3 px-2 py-1 rounded" style={{ fontFamily: "var(--font-mono)", fontSize: "0.5rem", letterSpacing: "0.15em", color: "#6b5040", background: "rgba(139,107,84,0.1)", border: "1px solid rgba(139,107,84,0.2)" }}>
                         {rfc.layer.toUpperCase()} LAYER
                       </div>
-                      <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.4rem", fontWeight: "bold", color: "#2d1810", lineHeight: 1.3, marginBottom: "0.5rem" }}>
+                      <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: "bold", color: "#2d1810", lineHeight: 1.3, marginBottom: "0.4rem" }}>
                         {rfc.title}
                       </h3>
-                      <div className="my-4" style={{ width: "60px", height: "1px", background: "#8b6b54" }} />
-                      <p className="flex-1" style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", color: "#4a3828", lineHeight: 1.7 }}>
+                      <div className="my-3" style={{ width: "50px", height: "1px", background: "#8b6b54" }} />
+                      <p className="flex-1" style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", color: "#4a3828", lineHeight: 1.6 }}>
                         {rfc.description}
                       </p>
-                      <div className="mt-auto pt-4">
+                      <div className="mt-auto pt-3">
                         <button
                           onClick={() => handleNavigateToRfc(rfc)}
-                          className="block w-full text-center py-3 rounded transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer"
+                          className="block w-full text-center py-2.5 rounded transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer"
                           style={{
                             fontFamily: "var(--font-mono)",
-                            fontSize: "0.7rem",
+                            fontSize: "0.6rem",
                             letterSpacing: "0.12em",
                             color: "#f5e6d3",
                             background: "linear-gradient(135deg, #8B2323 0%, #5C1616 100%)",
