@@ -390,7 +390,7 @@ body::before {
   }
 }
 
-/* Content pages settle with slight tilt - pushed forward in Z to avoid occlusion */
+/* Content pages settle with tilt matching opened book angle */
 @keyframes contentPageLeft {
   0% { 
     transform: translateZ(150px) rotateY(0deg);
@@ -400,7 +400,7 @@ body::before {
     opacity: 1;
   }
   100% { 
-    transform: translateZ(150px) rotateY(-12deg);
+    transform: translateZ(150px) rotateY(30deg);
     opacity: 1;
   }
 }
@@ -414,7 +414,7 @@ body::before {
     opacity: 1;
   }
   100% { 
-    transform: translateZ(150px) rotateY(12deg);
+    transform: translateZ(150px) rotateY(-30deg);
     opacity: 1;
   }
 }
@@ -422,7 +422,7 @@ body::before {
 /* Content pages close */
 @keyframes contentPageCloseLeft {
   0% { 
-    transform: translateZ(150px) rotateY(-12deg);
+    transform: translateZ(150px) rotateY(30deg);
     opacity: 1;
   }
   70% {
@@ -436,7 +436,7 @@ body::before {
 
 @keyframes contentPageCloseRight {
   0% { 
-    transform: translateZ(150px) rotateY(12deg);
+    transform: translateZ(150px) rotateY(-30deg);
     opacity: 1;
   }
   70% {
