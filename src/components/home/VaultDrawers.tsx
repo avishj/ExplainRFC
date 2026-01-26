@@ -405,66 +405,118 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     />
                   </div>
                   
-                  {/* Interior page flipping left - page 1 */}
+                  {/* Interior pages flipping left - 4 pages for realistic look */}
                   <div
                     className={isClosing ? 'page-unflip-left-1' : 'page-flip-left-1'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 10}px`,
-                      height: `${pageHeight - 10}px`,
+                      width: `${pageWidth - 8}px`,
+                      height: `${pageHeight - 8}px`,
                       right: "50%",
-                      top: "5px",
+                      top: "4px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(90deg, #f5ebe0 0%, #e8dcc8 100%)",
                       boxShadow: "-1px 0 3px rgba(0,0,0,0.1)",
                     }}
                   />
-                  
-                  {/* Interior page flipping left - page 2 */}
                   <div
                     className={isClosing ? 'page-unflip-left-2' : 'page-flip-left-2'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 15}px`,
-                      height: `${pageHeight - 10}px`,
+                      width: `${pageWidth - 12}px`,
+                      height: `${pageHeight - 8}px`,
                       right: "50%",
-                      top: "5px",
+                      top: "4px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(90deg, #f0e6d5 0%, #e5d9c5 100%)",
                       boxShadow: "-1px 0 3px rgba(0,0,0,0.1)",
                     }}
                   />
+                  <div
+                    className={isClosing ? 'page-unflip-left-3' : 'page-flip-left-3'}
+                    style={{
+                      position: "absolute",
+                      width: `${pageWidth - 16}px`,
+                      height: `${pageHeight - 8}px`,
+                      right: "50%",
+                      top: "4px",
+                      transformOrigin: "right center",
+                      transformStyle: "preserve-3d",
+                      background: "linear-gradient(90deg, #ebe1d0 0%, #e0d4c0 100%)",
+                      boxShadow: "-1px 0 3px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  <div
+                    className={isClosing ? 'page-unflip-left-4' : 'page-flip-left-4'}
+                    style={{
+                      position: "absolute",
+                      width: `${pageWidth - 20}px`,
+                      height: `${pageHeight - 8}px`,
+                      right: "50%",
+                      top: "4px",
+                      transformOrigin: "right center",
+                      transformStyle: "preserve-3d",
+                      background: "linear-gradient(90deg, #e6dcc8 0%, #dbd0bc 100%)",
+                      boxShadow: "-1px 0 3px rgba(0,0,0,0.1)",
+                    }}
+                  />
                   
-                  {/* Interior page flipping right - page 1 */}
+                  {/* Interior pages flipping right - 4 pages for realistic look */}
                   <div
                     className={isClosing ? 'page-unflip-right-1' : 'page-flip-right-1'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 10}px`,
-                      height: `${pageHeight - 10}px`,
+                      width: `${pageWidth - 8}px`,
+                      height: `${pageHeight - 8}px`,
                       left: "50%",
-                      top: "5px",
+                      top: "4px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(270deg, #f5ebe0 0%, #e8dcc8 100%)",
                       boxShadow: "1px 0 3px rgba(0,0,0,0.1)",
                     }}
                   />
-                  
-                  {/* Interior page flipping right - page 2 */}
                   <div
                     className={isClosing ? 'page-unflip-right-2' : 'page-flip-right-2'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 15}px`,
-                      height: `${pageHeight - 10}px`,
+                      width: `${pageWidth - 12}px`,
+                      height: `${pageHeight - 8}px`,
                       left: "50%",
-                      top: "5px",
+                      top: "4px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(270deg, #f0e6d5 0%, #e5d9c5 100%)",
+                      boxShadow: "1px 0 3px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  <div
+                    className={isClosing ? 'page-unflip-right-3' : 'page-flip-right-3'}
+                    style={{
+                      position: "absolute",
+                      width: `${pageWidth - 16}px`,
+                      height: `${pageHeight - 8}px`,
+                      left: "50%",
+                      top: "4px",
+                      transformOrigin: "left center",
+                      transformStyle: "preserve-3d",
+                      background: "linear-gradient(270deg, #ebe1d0 0%, #e0d4c0 100%)",
+                      boxShadow: "1px 0 3px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  <div
+                    className={isClosing ? 'page-unflip-right-4' : 'page-flip-right-4'}
+                    style={{
+                      position: "absolute",
+                      width: `${pageWidth - 20}px`,
+                      height: `${pageHeight - 8}px`,
+                      left: "50%",
+                      top: "4px",
+                      transformOrigin: "left center",
+                      transformStyle: "preserve-3d",
+                      background: "linear-gradient(270deg, #e6dcc8 0%, #dbd0bc 100%)",
                       boxShadow: "1px 0 3px rgba(0,0,0,0.1)",
                     }}
                   />
@@ -477,7 +529,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       width: `${pageWidth - 20}px`,
                       height: `${pageHeight - 20}px`,
                       right: `calc(50% + 5px)`,
-                      top: "10px",
+                      top: "25px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(135deg, #f5ebe0 0%, #e8dcc8 100%)",
@@ -509,7 +561,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       width: `${pageWidth - 20}px`,
                       height: `${pageHeight - 20}px`,
                       left: `calc(50% + 5px)`,
-                      top: "10px",
+                      top: "25px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(225deg, #f5ebe0 0%, #e8dcc8 100%)",

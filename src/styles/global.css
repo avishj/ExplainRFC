@@ -492,64 +492,112 @@ body::before {
 }
 
 /* Interior page flip animations */
-/* page-2 animates first (rendered on top in DOM, so should move first) */
+/* Pages animate from innermost (4) to outermost (1) - later DOM = on top = animates first */
 .page-flip-left-1 {
-  animation: pageFlipLeft 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
-  animation-delay: 0.75s;
+  animation: pageFlipLeft 0.4s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: 0.9s;
   will-change: transform;
 }
 
 .page-flip-left-2 {
-  animation: pageFlipLeft 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
-  animation-delay: 0.6s;
+  animation: pageFlipLeft 0.4s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: 0.78s;
+  will-change: transform;
+}
+
+.page-flip-left-3 {
+  animation: pageFlipLeft 0.4s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: 0.66s;
+  will-change: transform;
+}
+
+.page-flip-left-4 {
+  animation: pageFlipLeft 0.4s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: 0.54s;
   will-change: transform;
 }
 
 .page-flip-right-1 {
-  animation: pageFlipRight 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
-  animation-delay: 0.8s;
+  animation: pageFlipRight 0.4s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: 0.93s;
   will-change: transform;
 }
 
 .page-flip-right-2 {
-  animation: pageFlipRight 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
-  animation-delay: 0.65s;
+  animation: pageFlipRight 0.4s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: 0.81s;
+  will-change: transform;
+}
+
+.page-flip-right-3 {
+  animation: pageFlipRight 0.4s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: 0.69s;
+  will-change: transform;
+}
+
+.page-flip-right-4 {
+  animation: pageFlipRight 0.4s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: 0.57s;
   will-change: transform;
 }
 
 /* Interior page unflip (close) animations */
 .page-unflip-left-1 {
-  animation: pageUnflipLeft 0.35s cubic-bezier(0.7, 0, 0.84, 0) both;
-  animation-delay: 0.15s;
+  animation: pageUnflipLeft 0.3s cubic-bezier(0.7, 0, 0.84, 0) both;
   will-change: transform;
 }
 
 .page-unflip-left-2 {
-  animation: pageUnflipLeft 0.35s cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation: pageUnflipLeft 0.3s cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation-delay: 0.08s;
+  will-change: transform;
+}
+
+.page-unflip-left-3 {
+  animation: pageUnflipLeft 0.3s cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation-delay: 0.16s;
+  will-change: transform;
+}
+
+.page-unflip-left-4 {
+  animation: pageUnflipLeft 0.3s cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation-delay: 0.24s;
   will-change: transform;
 }
 
 .page-unflip-right-1 {
-  animation: pageUnflipRight 0.35s cubic-bezier(0.7, 0, 0.84, 0) both;
-  animation-delay: 0.12s;
+  animation: pageUnflipRight 0.3s cubic-bezier(0.7, 0, 0.84, 0) both;
   will-change: transform;
 }
 
 .page-unflip-right-2 {
-  animation: pageUnflipRight 0.35s cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation: pageUnflipRight 0.3s cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation-delay: 0.06s;
+  will-change: transform;
+}
+
+.page-unflip-right-3 {
+  animation: pageUnflipRight 0.3s cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation-delay: 0.12s;
+  will-change: transform;
+}
+
+.page-unflip-right-4 {
+  animation: pageUnflipRight 0.3s cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation-delay: 0.18s;
   will-change: transform;
 }
 
 /* Content page animations */
 .content-page-left {
   animation: contentPageLeft 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
-  animation-delay: 0.95s;
+  animation-delay: 1.1s;
   will-change: transform, opacity;
 }
 
 .content-page-right {
   animation: contentPageRight 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
-  animation-delay: 1s;
+  animation-delay: 1.15s;
   will-change: transform, opacity;
 }
 
