@@ -310,39 +310,29 @@ body::before {
   }
 }
 
-/* Left cover opens outward to the left (viewer sees inner face initially) */
+/* Left cover opens - starts vertical (90deg, showing edge), opens to 170deg (flat, showing inner face) */
 @keyframes coverOpenLeft {
-  0% { 
-    transform: rotateY(-90deg);
-  }
-  100% { 
-    transform: rotateY(-170deg);
-  }
-}
-
-/* Right cover opens outward to the right (viewer sees inner face initially) */
-@keyframes coverOpenRight {
   0% { 
     transform: rotateY(90deg);
   }
   100% { 
     transform: rotateY(170deg);
+  }
+}
+
+/* Right cover opens - starts vertical (-90deg, showing edge), opens to -170deg (flat, showing inner face) */
+@keyframes coverOpenRight {
+  0% { 
+    transform: rotateY(-90deg);
+  }
+  100% { 
+    transform: rotateY(-170deg);
   }
 }
 
 /* Left cover closes back */
 @keyframes coverCloseLeft {
   0% { 
-    transform: rotateY(-170deg);
-  }
-  100% { 
-    transform: rotateY(-90deg);
-  }
-}
-
-/* Right cover closes back */
-@keyframes coverCloseRight {
-  0% { 
     transform: rotateY(170deg);
   }
   100% { 
@@ -350,71 +340,81 @@ body::before {
   }
 }
 
-/* Interior pages flip left */
-@keyframes pageFlipLeft {
+/* Right cover closes back */
+@keyframes coverCloseRight {
   0% { 
-    transform: rotateY(-90deg);
+    transform: rotateY(-170deg);
   }
   100% { 
-    transform: rotateY(-165deg);
+    transform: rotateY(-90deg);
   }
 }
 
-/* Interior pages flip right */
-@keyframes pageFlipRight {
+/* Interior pages flip left - starts vertical (90deg), opens to 160deg */
+@keyframes pageFlipLeft {
   0% { 
     transform: rotateY(90deg);
   }
   100% { 
-    transform: rotateY(165deg);
+    transform: rotateY(160deg);
+  }
+}
+
+/* Interior pages flip right - starts vertical (-90deg), opens to -160deg */
+@keyframes pageFlipRight {
+  0% { 
+    transform: rotateY(-90deg);
+  }
+  100% { 
+    transform: rotateY(-160deg);
   }
 }
 
 /* Interior pages close back left */
 @keyframes pageUnflipLeft {
   0% { 
-    transform: rotateY(-165deg);
-  }
-  100% { 
-    transform: rotateY(-90deg);
-  }
-}
-
-/* Interior pages close back right */
-@keyframes pageUnflipRight {
-  0% { 
-    transform: rotateY(165deg);
+    transform: rotateY(160deg);
   }
   100% { 
     transform: rotateY(90deg);
   }
 }
 
+/* Interior pages close back right */
+@keyframes pageUnflipRight {
+  0% { 
+    transform: rotateY(-160deg);
+  }
+  100% { 
+    transform: rotateY(-90deg);
+  }
+}
+
 /* Content pages settle with slight tilt - pushed forward in Z to avoid occlusion */
 @keyframes contentPageLeft {
   0% { 
-    transform: translateZ(20px) rotateY(0deg);
+    transform: translateZ(150px) rotateY(0deg);
     opacity: 0;
   }
   30% {
     opacity: 1;
   }
   100% { 
-    transform: translateZ(20px) rotateY(-12deg);
+    transform: translateZ(150px) rotateY(-12deg);
     opacity: 1;
   }
 }
 
 @keyframes contentPageRight {
   0% { 
-    transform: translateZ(20px) rotateY(0deg);
+    transform: translateZ(150px) rotateY(0deg);
     opacity: 0;
   }
   30% {
     opacity: 1;
   }
   100% { 
-    transform: translateZ(20px) rotateY(12deg);
+    transform: translateZ(150px) rotateY(12deg);
     opacity: 1;
   }
 }
@@ -422,28 +422,28 @@ body::before {
 /* Content pages close */
 @keyframes contentPageCloseLeft {
   0% { 
-    transform: translateZ(20px) rotateY(-12deg);
+    transform: translateZ(150px) rotateY(-12deg);
     opacity: 1;
   }
   70% {
     opacity: 1;
   }
   100% { 
-    transform: translateZ(20px) rotateY(0deg);
+    transform: translateZ(150px) rotateY(0deg);
     opacity: 0;
   }
 }
 
 @keyframes contentPageCloseRight {
   0% { 
-    transform: translateZ(20px) rotateY(12deg);
+    transform: translateZ(150px) rotateY(12deg);
     opacity: 1;
   }
   70% {
     opacity: 1;
   }
   100% { 
-    transform: translateZ(20px) rotateY(0deg);
+    transform: translateZ(150px) rotateY(0deg);
     opacity: 0;
   }
 }
@@ -492,27 +492,28 @@ body::before {
 }
 
 /* Interior page flip animations */
+/* page-2 animates first (rendered on top in DOM, so should move first) */
 .page-flip-left-1 {
-  animation: pageFlipLeft 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
-  animation-delay: 0.6s;
-  will-change: transform;
-}
-
-.page-flip-left-2 {
   animation: pageFlipLeft 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
   animation-delay: 0.75s;
   will-change: transform;
 }
 
+.page-flip-left-2 {
+  animation: pageFlipLeft 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: 0.6s;
+  will-change: transform;
+}
+
 .page-flip-right-1 {
   animation: pageFlipRight 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
-  animation-delay: 0.65s;
+  animation-delay: 0.8s;
   will-change: transform;
 }
 
 .page-flip-right-2 {
   animation: pageFlipRight 0.5s cubic-bezier(0.33, 1, 0.68, 1) both;
-  animation-delay: 0.8s;
+  animation-delay: 0.65s;
   will-change: transform;
 }
 
