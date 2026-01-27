@@ -622,7 +622,17 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                   </div>
                 </div>
                 
-                <div className="text-center mt-8" style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "#8b7355", letterSpacing: "0.1em" }}>
+                <div 
+                  className="text-center absolute left-1/2 -translate-x-1/2" 
+                  style={{ 
+                    fontFamily: "var(--font-mono)", 
+                    fontSize: "0.6rem", 
+                    color: "#8b7355", 
+                    letterSpacing: "0.1em",
+                    top: "-30px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   CLICK OUTSIDE TO CLOSE
                 </div>
               </div>
