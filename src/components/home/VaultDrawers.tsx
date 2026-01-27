@@ -539,7 +539,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                   
                   {/* Left content page (final resting position with content) */}
                   <div
-                    className={isClosing ? 'content-page-close-left' : 'content-page-left'}
+                    className={`paper-texture ${isClosing ? 'content-page-close-left' : 'content-page-left'}`}
                     style={{
                       position: "absolute",
                       width: `${pageWidth - 20}px`,
@@ -548,10 +548,11 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       top: "25px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(135deg, #faf6f0 0%, #f5ebe0 30%, #ede3d4 100%)",
-                      boxShadow: "-2px 2px 12px rgba(0,0,0,0.2), inset 0 0 30px rgba(139,107,84,0.06)",
-                      border: "1px solid rgba(139,107,84,0.18)",
-                      borderRight: "2px solid rgba(139,107,84,0.3)",
+                      background: "linear-gradient(135deg, #fdfaf6 0%, #f8f0e3 25%, #f2e8d9 60%, #ebe0cf 100%)",
+                      boxShadow: "-2px 2px 12px rgba(0,0,0,0.2), inset 2px 0 8px rgba(139,107,84,0.08), inset 0 0 30px rgba(139,107,84,0.04)",
+                      border: "1px solid rgba(139,107,84,0.15)",
+                      borderRight: "3px solid rgba(139,107,84,0.25)",
+                      borderRadius: "1px 0 0 1px",
                     }}
                   >
                     <div className="relative p-6 h-full flex flex-col items-center justify-center text-center">
@@ -573,7 +574,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                   
                   {/* Right content page (final resting position with content) */}
                   <div
-                    className={isClosing ? 'content-page-close-right' : 'content-page-right'}
+                    className={`paper-texture ${isClosing ? 'content-page-close-right' : 'content-page-right'}`}
                     style={{
                       position: "absolute",
                       width: `${pageWidth - 20}px`,
@@ -582,10 +583,11 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       top: "25px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(225deg, #faf6f0 0%, #f5ebe0 30%, #ede3d4 100%)",
-                      boxShadow: "2px 2px 12px rgba(0,0,0,0.2), inset 0 0 30px rgba(139,107,84,0.06)",
-                      border: "1px solid rgba(139,107,84,0.18)",
-                      borderLeft: "2px solid rgba(139,107,84,0.3)",
+                      background: "linear-gradient(225deg, #fdfaf6 0%, #f8f0e3 25%, #f2e8d9 60%, #ebe0cf 100%)",
+                      boxShadow: "2px 2px 12px rgba(0,0,0,0.2), inset -2px 0 8px rgba(139,107,84,0.08), inset 0 0 30px rgba(139,107,84,0.04)",
+                      border: "1px solid rgba(139,107,84,0.15)",
+                      borderLeft: "3px solid rgba(139,107,84,0.25)",
+                      borderRadius: "0 1px 1px 0",
                     }}
                   >
                     <div className="relative p-5 h-full flex flex-col">
