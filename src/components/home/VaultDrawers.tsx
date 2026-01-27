@@ -410,42 +410,48 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     className={isClosing ? 'page-unflip-left-1' : 'page-flip-left-1'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 8}px`,
-                      height: `${pageHeight - 8}px`,
-                      right: "50%",
-                      top: "4px",
+                      width: `${pageWidth - 17}px`,
+                      height: `${pageHeight - 17}px`,
+                      right: "calc(50% + 3px)",
+                      top: "22px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(90deg, #f5ebe0 0%, #e8dcc8 100%)",
-                      boxShadow: "-1px 0 3px rgba(0,0,0,0.1)",
+                      background: "linear-gradient(135deg, #faf6f0 0%, #f5ebe0 40%, #ede3d4 100%)",
+                      boxShadow: "-1px 0 4px rgba(0,0,0,0.15), inset 0 0 20px rgba(139,107,84,0.05)",
+                      border: "1px solid rgba(139,107,84,0.15)",
+                      borderRight: "2px solid rgba(139,107,84,0.25)",
                     }}
                   />
                   <div
                     className={isClosing ? 'page-unflip-left-2' : 'page-flip-left-2'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 12}px`,
-                      height: `${pageHeight - 8}px`,
-                      right: "50%",
-                      top: "4px",
+                      width: `${pageWidth - 18}px`,
+                      height: `${pageHeight - 18}px`,
+                      right: "calc(50% + 4px)",
+                      top: "23px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(90deg, #f0e6d5 0%, #e5d9c5 100%)",
-                      boxShadow: "-1px 0 3px rgba(0,0,0,0.1)",
+                      background: "linear-gradient(135deg, #f7f2ea 0%, #f0e6d5 40%, #e8dcc8 100%)",
+                      boxShadow: "-1px 0 4px rgba(0,0,0,0.12), inset 0 0 15px rgba(139,107,84,0.04)",
+                      border: "1px solid rgba(139,107,84,0.12)",
+                      borderRight: "2px solid rgba(139,107,84,0.2)",
                     }}
                   />
                   <div
                     className={isClosing ? 'page-unflip-left-3' : 'page-flip-left-3'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 16}px`,
-                      height: `${pageHeight - 8}px`,
-                      right: "50%",
-                      top: "4px",
+                      width: `${pageWidth - 19}px`,
+                      height: `${pageHeight - 19}px`,
+                      right: "calc(50% + 4px)",
+                      top: "24px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(90deg, #ebe1d0 0%, #e0d4c0 100%)",
-                      boxShadow: "-1px 0 3px rgba(0,0,0,0.1)",
+                      background: "linear-gradient(135deg, #f5efe5 0%, #ebe1d0 40%, #e3d7c5 100%)",
+                      boxShadow: "-1px 0 3px rgba(0,0,0,0.1), inset 0 0 12px rgba(139,107,84,0.03)",
+                      border: "1px solid rgba(139,107,84,0.1)",
+                      borderRight: "2px solid rgba(139,107,84,0.18)",
                     }}
                   />
                   <div
@@ -453,13 +459,15 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     style={{
                       position: "absolute",
                       width: `${pageWidth - 20}px`,
-                      height: `${pageHeight - 8}px`,
-                      right: "50%",
-                      top: "4px",
+                      height: `${pageHeight - 20}px`,
+                      right: "calc(50% + 5px)",
+                      top: "25px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(90deg, #e6dcc8 0%, #dbd0bc 100%)",
-                      boxShadow: "-1px 0 3px rgba(0,0,0,0.1)",
+                      background: "linear-gradient(135deg, #f2ebe0 0%, #e6dcc8 40%, #ded2c0 100%)",
+                      boxShadow: "-1px 0 3px rgba(0,0,0,0.08), inset 0 0 10px rgba(139,107,84,0.02)",
+                      border: "1px solid rgba(139,107,84,0.08)",
+                      borderRight: "2px solid rgba(139,107,84,0.15)",
                     }}
                   />
                   
@@ -468,42 +476,48 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     className={isClosing ? 'page-unflip-right-1' : 'page-flip-right-1'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 8}px`,
-                      height: `${pageHeight - 8}px`,
-                      left: "50%",
-                      top: "4px",
+                      width: `${pageWidth - 17}px`,
+                      height: `${pageHeight - 17}px`,
+                      left: "calc(50% + 3px)",
+                      top: "22px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(270deg, #f5ebe0 0%, #e8dcc8 100%)",
-                      boxShadow: "1px 0 3px rgba(0,0,0,0.1)",
+                      background: "linear-gradient(225deg, #faf6f0 0%, #f5ebe0 40%, #ede3d4 100%)",
+                      boxShadow: "1px 0 4px rgba(0,0,0,0.15), inset 0 0 20px rgba(139,107,84,0.05)",
+                      border: "1px solid rgba(139,107,84,0.15)",
+                      borderLeft: "2px solid rgba(139,107,84,0.25)",
                     }}
                   />
                   <div
                     className={isClosing ? 'page-unflip-right-2' : 'page-flip-right-2'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 12}px`,
-                      height: `${pageHeight - 8}px`,
-                      left: "50%",
-                      top: "4px",
+                      width: `${pageWidth - 18}px`,
+                      height: `${pageHeight - 18}px`,
+                      left: "calc(50% + 4px)",
+                      top: "23px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(270deg, #f0e6d5 0%, #e5d9c5 100%)",
-                      boxShadow: "1px 0 3px rgba(0,0,0,0.1)",
+                      background: "linear-gradient(225deg, #f7f2ea 0%, #f0e6d5 40%, #e8dcc8 100%)",
+                      boxShadow: "1px 0 4px rgba(0,0,0,0.12), inset 0 0 15px rgba(139,107,84,0.04)",
+                      border: "1px solid rgba(139,107,84,0.12)",
+                      borderLeft: "2px solid rgba(139,107,84,0.2)",
                     }}
                   />
                   <div
                     className={isClosing ? 'page-unflip-right-3' : 'page-flip-right-3'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 16}px`,
-                      height: `${pageHeight - 8}px`,
-                      left: "50%",
-                      top: "4px",
+                      width: `${pageWidth - 19}px`,
+                      height: `${pageHeight - 19}px`,
+                      left: "calc(50% + 4px)",
+                      top: "24px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(270deg, #ebe1d0 0%, #e0d4c0 100%)",
-                      boxShadow: "1px 0 3px rgba(0,0,0,0.1)",
+                      background: "linear-gradient(225deg, #f5efe5 0%, #ebe1d0 40%, #e3d7c5 100%)",
+                      boxShadow: "1px 0 3px rgba(0,0,0,0.1), inset 0 0 12px rgba(139,107,84,0.03)",
+                      border: "1px solid rgba(139,107,84,0.1)",
+                      borderLeft: "2px solid rgba(139,107,84,0.18)",
                     }}
                   />
                   <div
@@ -511,13 +525,15 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     style={{
                       position: "absolute",
                       width: `${pageWidth - 20}px`,
-                      height: `${pageHeight - 8}px`,
-                      left: "50%",
-                      top: "4px",
+                      height: `${pageHeight - 20}px`,
+                      left: "calc(50% + 5px)",
+                      top: "25px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(270deg, #e6dcc8 0%, #dbd0bc 100%)",
-                      boxShadow: "1px 0 3px rgba(0,0,0,0.1)",
+                      background: "linear-gradient(225deg, #f2ebe0 0%, #e6dcc8 40%, #ded2c0 100%)",
+                      boxShadow: "1px 0 3px rgba(0,0,0,0.08), inset 0 0 10px rgba(139,107,84,0.02)",
+                      border: "1px solid rgba(139,107,84,0.08)",
+                      borderLeft: "2px solid rgba(139,107,84,0.15)",
                     }}
                   />
                   
@@ -532,8 +548,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       top: "25px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(135deg, #f5ebe0 0%, #e8dcc8 100%)",
-                      boxShadow: "-2px 2px 8px rgba(0,0,0,0.15)",
+                      background: "linear-gradient(135deg, #faf6f0 0%, #f5ebe0 30%, #ede3d4 100%)",
+                      boxShadow: "-2px 2px 12px rgba(0,0,0,0.2), inset 0 0 30px rgba(139,107,84,0.06)",
+                      border: "1px solid rgba(139,107,84,0.18)",
+                      borderRight: "2px solid rgba(139,107,84,0.3)",
                     }}
                   >
                     <div className="relative p-6 h-full flex flex-col items-center justify-center text-center">
@@ -564,8 +582,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       top: "25px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
-                      background: "linear-gradient(225deg, #f5ebe0 0%, #e8dcc8 100%)",
-                      boxShadow: "2px 2px 8px rgba(0,0,0,0.15)",
+                      background: "linear-gradient(225deg, #faf6f0 0%, #f5ebe0 30%, #ede3d4 100%)",
+                      boxShadow: "2px 2px 12px rgba(0,0,0,0.2), inset 0 0 30px rgba(139,107,84,0.06)",
+                      border: "1px solid rgba(139,107,84,0.18)",
+                      borderLeft: "2px solid rgba(139,107,84,0.3)",
                     }}
                   >
                     <div className="relative p-5 h-full flex flex-col">
