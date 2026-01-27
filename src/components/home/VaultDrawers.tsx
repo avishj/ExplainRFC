@@ -308,7 +308,7 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     transform: "rotateX(5deg)",
                   }}
                 >
-                  {/* Center spine */}
+                  {/* Center spine with page edges */}
                   <div
                     style={{
                       position: "absolute",
@@ -316,11 +316,61 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       height: `${pageHeight}px`,
                       left: "50%",
                       top: "0",
-                      transform: "translateX(-50%) translateZ(-5px)",
-                      background: "linear-gradient(90deg, #5C1616 0%, #8B2323 50%, #5C1616 100%)",
-                      boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                      transform: "translateX(-50%) translateZ(50px)",
+                      transformStyle: "preserve-3d",
                     }}
-                  />
+                  >
+                    {/* Spine base - curved binding */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: `
+                          radial-gradient(ellipse 100% 50% at 50% 50%, #3d1a1a 0%, transparent 70%),
+                          linear-gradient(90deg, 
+                            #2a0f0f 0%, 
+                            #4a1f1f 15%, 
+                            #5C1616 30%,
+                            #6b2020 50%,
+                            #5C1616 70%,
+                            #4a1f1f 85%,
+                            #2a0f0f 100%
+                          )
+                        `,
+                        borderRadius: "2px",
+                        boxShadow: "inset 0 0 20px rgba(0,0,0,0.8)",
+                      }}
+                    />
+                    {/* Stacked page edges visible in spine */}
+                    {[...Array(12)].map((_, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          position: "absolute",
+                          left: `${4 + (i % 2) * 2}px`,
+                          right: `${4 + ((i + 1) % 2) * 2}px`,
+                          top: `${10 + i * 2}px`,
+                          height: `${pageHeight - 20 - i * 4}px`,
+                          background: `linear-gradient(90deg, 
+                            rgba(${235 - i * 3}, ${220 - i * 3}, ${200 - i * 3}, 0.9) 0%,
+                            rgba(${245 - i * 2}, ${235 - i * 2}, ${215 - i * 2}, 0.95) 50%,
+                            rgba(${235 - i * 3}, ${220 - i * 3}, ${200 - i * 3}, 0.9) 100%
+                          )`,
+                          borderRadius: "1px",
+                          boxShadow: "0 0.5px 0 rgba(139,107,84,0.2)",
+                        }}
+                      />
+                    ))}
+                    {/* Center crease shadow */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "linear-gradient(90deg, rgba(0,0,0,0.4) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.4) 100%)",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  </div>
                   
                   {/* Left cover - opens outward to the left */}
                   <div
@@ -553,8 +603,22 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       border: "1px solid rgba(139,107,84,0.15)",
                       borderRight: "3px solid rgba(139,107,84,0.25)",
                       borderRadius: "1px 0 0 1px",
+                      overflow: "hidden",
                     }}
                   >
+                    {/* Gutter shadow - simulates page curving into spine */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: "40px",
+                        background: "linear-gradient(270deg, rgba(60,30,20,0.35) 0%, rgba(80,50,30,0.15) 30%, transparent 100%)",
+                        pointerEvents: "none",
+                        zIndex: 10,
+                      }}
+                    />
                     <div className="relative p-6 h-full flex flex-col items-center justify-center text-center">
                       <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.5rem", color: "#8b6b54", letterSpacing: "0.25em" }}>
                         REQUEST FOR COMMENTS
@@ -588,8 +652,22 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                       border: "1px solid rgba(139,107,84,0.15)",
                       borderLeft: "3px solid rgba(139,107,84,0.25)",
                       borderRadius: "0 1px 1px 0",
+                      overflow: "hidden",
                     }}
                   >
+                    {/* Gutter shadow - simulates page curving into spine */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: "40px",
+                        background: "linear-gradient(90deg, rgba(60,30,20,0.35) 0%, rgba(80,50,30,0.15) 30%, transparent 100%)",
+                        pointerEvents: "none",
+                        zIndex: 10,
+                      }}
+                    />
                     <div className="relative p-5 h-full flex flex-col">
                       <div className="self-end mb-3 px-2 py-1 rounded" style={{ fontFamily: "var(--font-mono)", fontSize: "0.5rem", letterSpacing: "0.15em", color: "#6b5040", background: "rgba(139,107,84,0.1)", border: "1px solid rgba(139,107,84,0.2)" }}>
                         {rfc.layer.toUpperCase()} LAYER
