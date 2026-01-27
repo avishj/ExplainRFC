@@ -410,10 +410,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     className={isClosing ? 'page-unflip-left-1' : 'page-flip-left-1'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 17}px`,
-                      height: `${pageHeight - 17}px`,
-                      right: "calc(50% + 3px)",
-                      top: "22px",
+                      width: `${pageWidth + 15}px`,
+                      height: `${pageHeight - 20}px`,
+                      right: "calc(50% + 5px)",
+                      top: "10px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(135deg, #faf6f0 0%, #f5ebe0 40%, #ede3d4 100%)",
@@ -426,10 +426,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     className={isClosing ? 'page-unflip-left-2' : 'page-flip-left-2'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 18}px`,
-                      height: `${pageHeight - 18}px`,
-                      right: "calc(50% + 4px)",
-                      top: "23px",
+                      width: `${pageWidth + 10}px`,
+                      height: `${pageHeight - 20}px`,
+                      right: "calc(50% + 5px)",
+                      top: "14px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(135deg, #f7f2ea 0%, #f0e6d5 40%, #e8dcc8 100%)",
@@ -442,10 +442,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     className={isClosing ? 'page-unflip-left-3' : 'page-flip-left-3'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 19}px`,
-                      height: `${pageHeight - 19}px`,
-                      right: "calc(50% + 4px)",
-                      top: "24px",
+                      width: `${pageWidth + 5}px`,
+                      height: `${pageHeight - 20}px`,
+                      right: "calc(50% + 5px)",
+                      top: "18px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(135deg, #f5efe5 0%, #ebe1d0 40%, #e3d7c5 100%)",
@@ -458,10 +458,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     className={isClosing ? 'page-unflip-left-4' : 'page-flip-left-4'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 20}px`,
+                      width: `${pageWidth}px`,
                       height: `${pageHeight - 20}px`,
                       right: "calc(50% + 5px)",
-                      top: "25px",
+                      top: "22px",
                       transformOrigin: "right center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(135deg, #f2ebe0 0%, #e6dcc8 40%, #ded2c0 100%)",
@@ -476,10 +476,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     className={isClosing ? 'page-unflip-right-1' : 'page-flip-right-1'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 17}px`,
-                      height: `${pageHeight - 17}px`,
-                      left: "calc(50% + 3px)",
-                      top: "22px",
+                      width: `${pageWidth + 15}px`,
+                      height: `${pageHeight - 20}px`,
+                      left: "calc(50% + 5px)",
+                      top: "10px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(225deg, #faf6f0 0%, #f5ebe0 40%, #ede3d4 100%)",
@@ -492,10 +492,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     className={isClosing ? 'page-unflip-right-2' : 'page-flip-right-2'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 18}px`,
-                      height: `${pageHeight - 18}px`,
-                      left: "calc(50% + 4px)",
-                      top: "23px",
+                      width: `${pageWidth + 10}px`,
+                      height: `${pageHeight - 20}px`,
+                      left: "calc(50% + 5px)",
+                      top: "14px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(225deg, #f7f2ea 0%, #f0e6d5 40%, #e8dcc8 100%)",
@@ -508,10 +508,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     className={isClosing ? 'page-unflip-right-3' : 'page-flip-right-3'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 19}px`,
-                      height: `${pageHeight - 19}px`,
-                      left: "calc(50% + 4px)",
-                      top: "24px",
+                      width: `${pageWidth + 5}px`,
+                      height: `${pageHeight - 20}px`,
+                      left: "calc(50% + 5px)",
+                      top: "18px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(225deg, #f5efe5 0%, #ebe1d0 40%, #e3d7c5 100%)",
@@ -524,10 +524,10 @@ export function VaultDrawers({ baseUrl = '' }: VaultDrawersProps) {
                     className={isClosing ? 'page-unflip-right-4' : 'page-flip-right-4'}
                     style={{
                       position: "absolute",
-                      width: `${pageWidth - 20}px`,
+                      width: `${pageWidth}px`,
                       height: `${pageHeight - 20}px`,
                       left: "calc(50% + 5px)",
-                      top: "25px",
+                      top: "22px",
                       transformOrigin: "left center",
                       transformStyle: "preserve-3d",
                       background: "linear-gradient(225deg, #f2ebe0 0%, #e6dcc8 40%, #ded2c0 100%)",
