@@ -472,18 +472,18 @@ export function FoundryHero() {
                 <span className="rfc-doc-number text-[10px] sm:text-xs font-mono font-bold text-amber/80">
                   {RFC_VARIATIONS[0].rfcNumber}
                 </span>
-                <span className="rfc-doc-section text-[9px] sm:text-[10px] font-mono text-amber/40">
+                <span className="rfc-doc-section text-[9px] sm:text-[10px] font-mono text-amber/60">
                   {RFC_VARIATIONS[0].section}
                 </span>
               </div>
-              <span className="text-[8px] sm:text-[9px] font-mono text-text-muted/40 tracking-wider">
+              <span className="text-[8px] sm:text-[9px] font-mono text-text-secondary/70 tracking-wider">
                 IETF
               </span>
             </div>
 
             {/* Title */}
             <div className="px-3 py-1.5" style={{ borderBottom: "1px solid rgba(255, 170, 0, 0.08)" }}>
-              <div className="rfc-doc-title text-[9px] sm:text-[11px] font-mono text-amber/50">
+              <div className="rfc-doc-title text-[9px] sm:text-[11px] font-mono text-amber/70">
                 {RFC_VARIATIONS[0].title}
               </div>
             </div>
@@ -491,7 +491,7 @@ export function FoundryHero() {
             {/* Prose body */}
             <div className="px-3 py-2 space-y-2">
               <div
-                className="rfc-prose-heading font-mono text-[9px] sm:text-[11px] font-bold text-amber/60 leading-relaxed"
+                className="rfc-prose-heading font-mono text-[9px] sm:text-[11px] font-bold text-amber/80 leading-relaxed"
                 style={{ opacity: 0 }}
               >
                 {RFC_VARIATIONS[0].prose.heading}
@@ -499,7 +499,7 @@ export function FoundryHero() {
               {RFC_VARIATIONS[0].prose.paragraphs.map((para, i) => (
                 <p
                   key={i}
-                  className="rfc-prose-para font-mono text-[8px] sm:text-[10px] text-amber/30 leading-relaxed"
+                  className="rfc-prose-para font-mono text-[8px] sm:text-[10px] text-amber/50 leading-relaxed"
                   style={{ opacity: 0 }}
                 >
                   {para}
