@@ -226,7 +226,7 @@ export function FoundryHero() {
       const streamParticles = stage.querySelectorAll(".stream-particle");
 
       // Reset initial states
-      gsap.set(rfcDoc, { opacity: 0, scale: 0.92, filter: "blur(4px)", visibility: "visible" });
+      gsap.set(rfcDoc, { opacity: 0, scale: 0.92, x: 0, filter: "blur(4px)", visibility: "visible" });
       gsap.set(diagram, { opacity: 0, scale: 0.9, visibility: "visible" });
       gsap.set(".diagram-node", { opacity: 0, scale: 0.3 });
       gsap.set(".diagram-line", { opacity: 0, strokeDashoffset: 200 });
@@ -272,31 +272,59 @@ export function FoundryHero() {
         duration: 0.4, ease: "power2.in",
       });
 
-      // Particles stream across
+      // Particle stream: smooth continuous flow with sine-curved density
+      // Inter-particle delay follows inverted sine — large gaps at edges, tiny gaps at center
+      const streamStart = tl.duration();
+      const n = streamParticles.length;
+      const minDelay = 0.005;
+      const maxDelay = 0.14;
+
+      // Compute cumulative spawn times using per-particle delay
+      // sin² gives a sharper bell peak — more dramatic sparse→dense→sparse
+      const spawnTimes: number[] = [];
+      let cumTime = 0;
+      for (let i = 0; i < n; i++) {
+        spawnTimes.push(cumTime);
+        const t = i / (n - 1);
+        const s = Math.sin(Math.PI * t);
+        const delay = minDelay + (maxDelay - minDelay) * (1 - s * s);
+        cumTime += delay;
+      }
+
       streamParticles.forEach((el, i) => {
-        const yWave = (Math.random() - 0.5) * 60;
-        const delay = i === 0 ? "-=0.1" : "-=0.35";
-        tl.to(el, { opacity: 1, duration: 0.1 }, delay);
+        const spawnTime = streamStart + spawnTimes[i];
+        const yWave = ((i * 17 + 7) % 11 - 5) * 3;
+        const travelDur = 0.6 + (i % 5) * 0.06;
+
+        tl.to(el, { opacity: 1, duration: 0.1 }, spawnTime);
         tl.to(el, {
-          left: "calc(50% + 28vw)",
-          top: `calc(50% + ${yWave}px)`,
-          duration: 0.6 + Math.random() * 0.3,
-          ease: "power2.in",
-        }, "<");
-        tl.to(el, { opacity: 0, duration: 0.2 }, ">-0.15");
+          keyframes: [
+            { left: "50%", top: `calc(50% + ${yWave}px)` },
+            { left: "calc(50% + 28vw)", top: "50%" },
+          ],
+          duration: travelDur,
+          ease: "none",
+        }, spawnTime);
+        tl.to(el, { opacity: 0, duration: 0.2 }, spawnTime + travelDur - 0.15);
       });
 
-      // Document fades as particles leave
+      // Document shakes and fades as particles tear it apart
+      const streamMid = streamStart + cumTime * 0.35;
+      tl.to(rfcDoc, {
+        x: -3, duration: 0.06, ease: "none",
+        yoyo: true, repeat: 5,
+      }, streamMid);
       tl.to(rfcDoc, {
         opacity: 0.15, filter: "blur(3px)", scale: 0.95,
-        duration: 0.6, ease: "power2.in",
-      }, "-=0.8");
+        duration: 0.8, ease: "power2.in",
+      }, streamMid);
 
-      // === Phase 3: Diagram materializes on right ===
+      // === Phase 3: Diagram materializes as burst particles arrive ===
+      const diagramStart = streamStart + cumTime * 0.5;
       tl.to(diagram, {
         opacity: 1, scale: 1,
         duration: 0.5, ease: "power2.out",
-      }, "-=0.3");
+      }, diagramStart);
 
       // Nodes appear with stagger
       tl.to(".diagram-node", {
@@ -304,7 +332,7 @@ export function FoundryHero() {
         duration: 0.5,
         stagger: { each: 0.07, from: "random" },
         ease: "back.out(1.7)",
-      }, "-=0.2");
+      }, diagramStart + 0.2);
 
       // Connection lines draw in
       tl.to(".diagram-line", {
@@ -312,7 +340,7 @@ export function FoundryHero() {
         duration: 0.8,
         stagger: 0.06,
         ease: "power2.inOut",
-      }, "-=0.3");
+      }, diagramStart + 0.4);
 
       // Glow pulse
       tl.to(".diagram-node", {
@@ -481,7 +509,7 @@ export function FoundryHero() {
           </div>
 
           {/* Streaming particles — bridge from doc to diagram */}
-          {Array.from({ length: 12 }).map((_, i) => (
+          {Array.from({ length: 50 }).map((_, i) => (
             <div
               key={`stream-${i}`}
               className="stream-particle absolute w-1.5 h-1.5 rounded-full -translate-x-1/2 -translate-y-1/2"
