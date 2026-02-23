@@ -9,7 +9,7 @@ interface RFCVariation {
   title: string;
   section: string;
   accentHue: "amber" | "cyan" | "emerald" | "violet";
-  prose: string[];
+  prose: { heading: string; paragraphs: string[] };
   terms: { text: string; x: number; y: number }[];
   connections: [number, number][];
   diagramLabel: string;
@@ -22,18 +22,13 @@ const RFC_VARIATIONS: RFCVariation[] = [
     title: "Transmission Control Protocol",
     section: "§3.4",
     accentHue: "amber",
-    prose: [
-      "3.4.  Establishing a Connection",
-      "",
-      "  The three-way handshake is the procedure",
-      "  used to establish a connection. The client",
-      "  sends a SYN segment to the server. The",
-      "  server responds with SYN-ACK. Finally the",
-      "  client sends ACK to complete the sequence.",
-      "",
-      "  Each segment carries a sequence number for",
-      "  reliable, ordered delivery of data.",
-    ],
+    prose: {
+      heading: "3.4. Establishing a Connection",
+      paragraphs: [
+        "The three-way handshake is the procedure used to establish a connection. The client sends a SYN segment to the server. The server responds with SYN-ACK. Finally the client sends ACK to complete the handshake sequence.",
+        "Each segment carries a sequence number for reliable, ordered delivery of data.",
+      ],
+    },
     terms: [
       { text: "SYN", x: 15, y: 25 },
       { text: "SYN-ACK", x: 50, y: 18 },
@@ -51,18 +46,13 @@ const RFC_VARIATIONS: RFCVariation[] = [
     title: "Border Gateway Protocol 4",
     section: "§6.1",
     accentHue: "emerald",
-    prose: [
-      "6.1.  UPDATE Message Handling",
-      "",
-      "  An UPDATE message is used to advertise",
-      "  feasible routes to a peer, or to withdraw",
-      "  unfeasible routes. An UPDATE includes the",
-      "  AS_PATH attribute listing traversed systems.",
-      "",
-      "  LOCAL_PREF indicates the degree of preference",
-      "  for an external route. KEEPALIVE messages are",
-      "  exchanged to confirm peer connectivity.",
-    ],
+    prose: {
+      heading: "6.1. UPDATE Message Handling",
+      paragraphs: [
+        "An UPDATE message is used to advertise feasible routes to a peer, or to withdraw unfeasible routes. An UPDATE includes the AS_PATH attribute listing traversed autonomous systems.",
+        "LOCAL_PREF indicates the degree of preference for an external route. KEEPALIVE messages are exchanged to confirm peer connectivity.",
+      ],
+    },
     terms: [
       { text: "OPEN", x: 15, y: 22 },
       { text: "UPDATE", x: 50, y: 15 },
@@ -80,18 +70,13 @@ const RFC_VARIATIONS: RFCVariation[] = [
     title: "Hypertext Transfer Protocol",
     section: "§5.1",
     accentHue: "cyan",
-    prose: [
-      "5.1.  Request-Line",
-      "",
-      "  The Request-Line begins with a method token",
-      "  such as GET or POST, followed by the URI",
-      "  and the protocol version. The Host header",
-      "  field MUST be included in all requests.",
-      "",
-      "  The server responds with a status code such",
-      "  as 200 OK and includes Content-Type and",
-      "  Cache-Control headers in the response.",
-    ],
+    prose: {
+      heading: "5.1. Request-Line",
+      paragraphs: [
+        "The Request-Line begins with a method token such as GET or POST, followed by the URI and the protocol version. The Host header field MUST be included in all requests.",
+        "The server responds with a status code such as 200 OK and includes Content-Type and Cache-Control headers in the response.",
+      ],
+    },
     terms: [
       { text: "GET", x: 12, y: 22 },
       { text: "POST", x: 12, y: 55 },
@@ -109,18 +94,13 @@ const RFC_VARIATIONS: RFCVariation[] = [
     title: "Domain Name System",
     section: "§4.1",
     accentHue: "violet",
-    prose: [
-      "4.1.  Format",
-      "",
-      "  A QUERY message specifies the QNAME of the",
-      "  domain to resolve. The resolver first checks",
-      "  its local cache. An A record maps a domain",
-      "  to an IPv4 address. CNAME records alias one",
-      "  domain name to another canonical name.",
-      "",
-      "  The TTL field controls how long a record may",
-      "  be cached. NS records delegate subdomains.",
-    ],
+    prose: {
+      heading: "4.1. Format",
+      paragraphs: [
+        "A QUERY message specifies the QNAME of the domain to resolve. The resolver first checks its local cache. An A record maps a domain to an IPv4 address. CNAME records alias one domain name to another canonical name.",
+        "The TTL field controls how long a record may be cached. NS records delegate subdomains.",
+      ],
+    },
     terms: [
       { text: "QUERY", x: 15, y: 20 },
       { text: "A", x: 50, y: 15 },
@@ -202,7 +182,8 @@ export function FoundryHero() {
 
       const rfcDoc = stage.querySelector(".rfc-document");
       const diagram = stage.querySelector(".rfc-diagram");
-      const proseLines = stage.querySelectorAll(".rfc-prose-line");
+      const proseHeading = stage.querySelector(".rfc-prose-heading");
+      const proseParagraphs = stage.querySelectorAll(".rfc-prose-para");
       const termNodes = stage.querySelectorAll(".diagram-node");
       const connLines = stage.querySelectorAll(".diagram-line");
       const diagramLabel = stage.querySelector(".diagram-label");
@@ -217,8 +198,9 @@ export function FoundryHero() {
       rfcTitle?.replaceChildren(variation.title);
       rfcSection?.replaceChildren(variation.section);
       diagramLabel?.replaceChildren(variation.diagramLabel);
-      proseLines.forEach((el, i) => {
-        el.textContent = variation.prose[i] ?? "";
+      if (proseHeading) proseHeading.textContent = variation.prose.heading;
+      proseParagraphs.forEach((el, i) => {
+        el.textContent = variation.prose.paragraphs[i] ?? "";
       });
       termNodes.forEach((el, i) => {
         const term = variation.terms[i];
@@ -268,11 +250,16 @@ export function FoundryHero() {
         duration: 1.0, ease: "power2.out",
       });
 
-      // Prose lines stagger in
-      tl.fromTo(".rfc-prose-line",
+      // Prose heading + paragraphs stagger in
+      tl.fromTo(".rfc-prose-heading",
         { opacity: 0, x: -8 },
-        { opacity: 1, x: 0, duration: 0.5, stagger: 0.04, ease: "power2.out" },
+        { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" },
         "-=0.6"
+      );
+      tl.fromTo(".rfc-prose-para",
+        { opacity: 0, x: -8 },
+        { opacity: 1, x: 0, duration: 0.5, stagger: 0.08, ease: "power2.out" },
+        "-=0.2"
       );
 
       // Hold document
@@ -437,7 +424,7 @@ export function FoundryHero() {
 
           {/* RFC Document — left side */}
           <div
-            className="rfc-document absolute w-[200px] h-[260px] sm:w-[240px] sm:h-[300px] rounded-lg overflow-hidden -translate-x-1/2 -translate-y-1/2"
+            className="rfc-document absolute w-[280px] sm:w-[320px] rounded-lg overflow-hidden -translate-x-1/2 -translate-y-1/2"
             style={{
               opacity: 0,
               visibility: "hidden",
@@ -468,25 +455,27 @@ export function FoundryHero() {
 
             {/* Title */}
             <div className="px-3 py-1.5" style={{ borderBottom: "1px solid rgba(255, 170, 0, 0.08)" }}>
-              <div className="rfc-doc-title text-[9px] sm:text-[11px] font-mono text-text-secondary/60">
+              <div className="rfc-doc-title text-[9px] sm:text-[11px] font-mono text-amber/50">
                 {RFC_VARIATIONS[0].title}
               </div>
             </div>
 
             {/* Prose body */}
-            <div className="px-3 py-2 space-y-0">
-              {RFC_VARIATIONS[0].prose.map((line, i) => (
-                <div
+            <div className="px-3 py-2 space-y-2">
+              <div
+                className="rfc-prose-heading font-mono text-[9px] sm:text-[11px] font-bold text-amber/60 leading-relaxed"
+                style={{ opacity: 0 }}
+              >
+                {RFC_VARIATIONS[0].prose.heading}
+              </div>
+              {RFC_VARIATIONS[0].prose.paragraphs.map((para, i) => (
+                <p
                   key={i}
-                  className={`rfc-prose-line font-mono leading-relaxed ${
-                    line === "" ? "h-2" :
-                    i === 0 ? "text-[9px] sm:text-[11px] font-bold text-amber/60" :
-                    "text-[8px] sm:text-[10px] text-text-muted/50"
-                  }`}
+                  className="rfc-prose-para font-mono text-[8px] sm:text-[10px] text-amber/30 leading-relaxed"
                   style={{ opacity: 0 }}
                 >
-                  {line}
-                </div>
+                  {para}
+                </p>
               ))}
             </div>
           </div>
