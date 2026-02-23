@@ -155,7 +155,7 @@ export function FoundryHero() {
   );
   const skipIntro = skipIntroRef.current;
   
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(skipIntro);
   const [, setTitleVisible] = useState(false);
   const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro);
   const [showDocumentAssembly, setShowDocumentAssembly] = useState(skipIntro);
@@ -172,27 +172,14 @@ export function FoundryHero() {
   useEffect(() => {
     if (!skipAnimationsRef.current) return;
     sessionStorage.removeItem('rfcVisitedAt');
-    setTimeout(() => setIsLoaded(true), 50);
   }, []);
 
   // Effect 1: When document assembly layer mounts, run the fragment animation in a loop
   useEffect(() => {
     if (!showDocumentAssembly) return;
-    if (prefersReducedMotion) {
-      // Skip animation for reduced motion, just show hero
-      setIsLoaded(true);
-      setTitleVisible(true);
-      return;
-    }
+    if (prefersReducedMotion) return;
 
     loopActiveRef.current = true;
-    // When skipping intro, treat as if first run already happened
-    let isFirstRun = !skipAnimationsRef.current;
-    
-    // If skipping, immediately make background transparent (normally happens after first run)
-    if (skipAnimationsRef.current) {
-      gsap.set(".document-assembly-layer", { backgroundColor: "transparent" });
-    }
 
     const runAnimationCycle = (variationIdx: number) => {
       if (!loopActiveRef.current) return;
@@ -299,23 +286,9 @@ export function FoundryHero() {
 
       const mainTl = gsap.timeline({
         onComplete: () => {
-          if (isFirstRun) {
-            setIsLoaded(true);
-            setTitleVisible(true);
-            // Fade the background after first run
-            gsap.to(".document-assembly-layer", {
-              backgroundColor: "transparent",
-              duration: 0.6,
-              ease: "power2.out",
-            });
-            isFirstRun = false;
-          }
-          
-          // Schedule next variation
           if (loopActiveRef.current) {
             const nextIdx = (variationIdx + 1) % DOCUMENT_VARIATIONS.length;
             setCurrentVariationIndex(nextIdx);
-            // Small delay before next cycle
             setTimeout(() => runAnimationCycle(nextIdx), 800);
           }
         }
@@ -537,13 +510,14 @@ export function FoundryHero() {
           onComplete={() => {
             setShowBootOverlay(false);
             setShowDocumentAssembly(true);
+            setIsLoaded(true);
           }}
         />
       )}
 
       {/* Document Assembly Layer - RFC fragments converging into a document, then transforming to visualization */}
       {showDocumentAssembly && (
-        <div className="document-assembly-layer absolute inset-0 z-25 flex items-center justify-center pointer-events-none bg-obsidian">
+        <div className="document-assembly-layer absolute inset-0 z-25 flex items-center justify-center pointer-events-none">
           {/* The document page - positioned with viewport-relative units */}
           <div 
             className="document-page absolute w-44 h-56 sm:w-48 sm:h-64 border-2 rounded -translate-x-1/2 -translate-y-1/2"
