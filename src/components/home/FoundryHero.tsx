@@ -156,10 +156,7 @@ export function FoundryHero() {
   const skipIntro = skipIntroRef.current;
   
   const [isLoaded, setIsLoaded] = useState(skipIntro);
-  const [, setTitleVisible] = useState(false);
   const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro);
-  const [showDocumentAssembly, setShowDocumentAssembly] = useState(skipIntro);
-  const skipAnimationsRef = useRef(skipIntro);
   const [currentVariationIndex, setCurrentVariationIndex] = useState(0);
   const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const loopActiveRef = useRef(false);
@@ -170,13 +167,13 @@ export function FoundryHero() {
 
   // Skip intro if returning from RFC visit
   useEffect(() => {
-    if (!skipAnimationsRef.current) return;
+    if (!skipIntro) return;
     sessionStorage.removeItem('rfcVisitedAt');
   }, []);
 
   // Effect 1: When document assembly layer mounts, run the fragment animation in a loop
   useEffect(() => {
-    if (!showDocumentAssembly) return;
+    if (showBootOverlay) return;
     if (prefersReducedMotion) return;
 
     loopActiveRef.current = true;
@@ -444,7 +441,7 @@ export function FoundryHero() {
         assemblyTimelineRef.current.kill();
       }
     };
-  }, [showDocumentAssembly, prefersReducedMotion]);
+  }, [showBootOverlay, prefersReducedMotion]);
 
   // Effect 3: When hero is loaded, animate in the content
   useEffect(() => {
@@ -509,14 +506,13 @@ export function FoundryHero() {
           exitDuration={0.7}
           onComplete={() => {
             setShowBootOverlay(false);
-            setShowDocumentAssembly(true);
             setIsLoaded(true);
           }}
         />
       )}
 
       {/* Document Assembly Layer - RFC fragments converging into a document, then transforming to visualization */}
-      {showDocumentAssembly && (
+      {!showBootOverlay && (
         <div className="document-assembly-layer absolute inset-0 z-25 flex items-center justify-center pointer-events-none">
           {/* The document page - positioned with viewport-relative units */}
           <div 
