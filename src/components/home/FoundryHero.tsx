@@ -531,8 +531,8 @@ export function FoundryHero() {
               visibility: "hidden",
               left: "calc(50% + 28vw)",
               top: "50%",
-              background: "linear-gradient(135deg, #060610 0%, #0a0a1a 100%)",
-              border: "1px solid rgba(0, 200, 255, 0.2)",
+              background: "linear-gradient(135deg, #0a0a0a 0%, #080808 100%)",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
             }}
           >
             {/* Grid background */}
@@ -540,8 +540,8 @@ export function FoundryHero() {
               className="absolute inset-0"
               style={{
                 backgroundImage: `
-                  linear-gradient(rgba(0, 200, 255, 0.06) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(0, 200, 255, 0.06) 1px, transparent 1px)
+                  linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px)
                 `,
                 backgroundSize: "24px 24px",
               }}
@@ -553,7 +553,7 @@ export function FoundryHero() {
                 <line
                   key={i}
                   className="diagram-line"
-                  stroke="rgba(0, 200, 255, 0.4)"
+                  stroke="rgba(255, 255, 255, 0.25)"
                   strokeWidth="1.5"
                   strokeDasharray="200"
                   strokeDashoffset="200"
