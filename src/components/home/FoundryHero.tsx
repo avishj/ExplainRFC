@@ -1,24 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
-
-interface BootLine {
-  text: string;
-  typingSpeed: number;
-  postDelay: number;
-  isProgressBar?: boolean;
-}
-
-const BOOT_SEQUENCE: BootLine[] = [
-  { text: "> INITIALIZING PROTOCOL MUSEUM v2.0", typingSpeed: 25, postDelay: 200 },
-  { text: "> ESTABLISHING SECURE CHANNEL", typingSpeed: 22, postDelay: 150 },
-  { text: "  SYN ────────────────────────►", typingSpeed: 10, postDelay: 250 },
-  { text: "  ◄──────────────────── SYN-ACK", typingSpeed: 10, postDelay: 250 },
-  { text: "  ACK ────────────────────────►", typingSpeed: 10, postDelay: 180 },
-  { text: "> CONNECTION ESTABLISHED", typingSpeed: 18, postDelay: 200 },
-  { text: "> LOADING RFC ARCHIVE...", typingSpeed: 28, postDelay: 80 },
-  { text: "  [                    ] 0%", typingSpeed: 0, postDelay: 0, isProgressBar: true },
-  { text: "> WELCOME TO THE ARCHIVE!", typingSpeed: 32, postDelay: 400 },
-];
+import { TransitionCLI, TRANSITION_SEQUENCES } from "@components/ui/TransitionCLI";
 
 const RFC_FRAGMENTS = [
   "SYN", "ACK", "FIN", "TCP", "UDP", "HTTP",
@@ -261,14 +243,9 @@ export function FoundryHero() {
   
   const [isLoaded, setIsLoaded] = useState(false);
   const [, setTitleVisible] = useState(false);
-  const [bootComplete, setBootComplete] = useState(skipIntro);
-  const [bootLines, setBootLines] = useState<{ text: string; complete: boolean }[]>([]);
   const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro);
-  const [showInitialCursor, setShowInitialCursor] = useState(!skipIntro);
-  const [, setProgressPercent] = useState(0);
   const [showDocumentAssembly, setShowDocumentAssembly] = useState(skipIntro);
   const [hideCanvas, setHideCanvas] = useState(skipIntro);
-  const bootStartedRef = useRef(false);
   const skipAnimationsRef = useRef(skipIntro);
   const [currentVariationIndex, setCurrentVariationIndex] = useState(0);
   const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -278,173 +255,11 @@ export function FoundryHero() {
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Boot sequence runs immediately on mount, separate from canvas
+  // Skip intro if returning from RFC visit
   useEffect(() => {
-    if (bootStartedRef.current) return;
-    bootStartedRef.current = true;
-
-    // If skipping intro (states already initialized correctly), just clear flag and trigger hero
-    if (skipAnimationsRef.current) {
-      sessionStorage.removeItem('rfcVisitedAt');
-      // Small delay to ensure DOM is ready for GSAP animations
-      setTimeout(() => setIsLoaded(true), 50);
-      return;
-    }
-
-    interface BootState {
-      phase: 'initial-wait' | 'typing' | 'post-delay' | 'progress-bar' | 'final-wait' | 'done';
-      lineIdx: number;
-      charIdx: number;
-      progressStep: number;
-      elapsed: number;
-      nextCharTime: number;
-      charTimings: number[];
-    }
-
-    const generateCharTimings = (text: string, baseSpeed: number): number[] => {
-      return text.split("").map((char, i) => {
-        let delay = baseSpeed;
-        if (char === ' ') delay *= 0.3;
-        else if (char === '>' || char === '[' || char === ']') delay *= 0.5;
-        else if (char === '─' || char === '►' || char === '◄') delay *= 0.15;
-        else delay += (Math.random() - 0.5) * baseSpeed * 1.2;
-        if (i > 0 && i % (5 + Math.floor(Math.random() * 4)) === 0) {
-          delay += 30 + Math.random() * 50;
-        }
-        return Math.max(5, delay);
-      });
-    };
-
-    const state: BootState = {
-      phase: 'initial-wait',
-      lineIdx: 0,
-      charIdx: 0,
-      progressStep: 0,
-      elapsed: 0,
-      nextCharTime: 0,
-      charTimings: [],
-    };
-
-    let lastTime = performance.now();
-
-    const tick = (now: number) => {
-      const dt = now - lastTime;
-      lastTime = now;
-      state.elapsed += dt;
-
-      switch (state.phase) {
-        case 'initial-wait':
-          if (state.elapsed >= 800) {
-            setShowInitialCursor(false);
-            state.elapsed = 0;
-            state.phase = 'typing';
-            const line = BOOT_SEQUENCE[state.lineIdx];
-            if (line.isProgressBar) {
-              setBootLines(prev => [...prev, { text: "  [                    ] 0%", complete: false }]);
-              state.phase = 'progress-bar';
-            } else {
-              setBootLines(prev => [...prev, { text: "", complete: false }]);
-              state.charTimings = generateCharTimings(line.text, line.typingSpeed);
-              state.nextCharTime = state.charTimings[0] || 0;
-            }
-          }
-          break;
-
-        case 'typing': {
-          const line = BOOT_SEQUENCE[state.lineIdx];
-          while (state.elapsed >= state.nextCharTime && state.charIdx < line.text.length) {
-            state.charIdx++;
-            const visibleText = line.text.slice(0, state.charIdx);
-            setBootLines(prev => {
-              const updated = [...prev];
-              updated[updated.length - 1] = { text: visibleText, complete: false };
-              return updated;
-            });
-            if (state.charIdx < line.text.length) {
-              state.nextCharTime += state.charTimings[state.charIdx];
-            }
-          }
-          if (state.charIdx >= line.text.length) {
-            setBootLines(prev => {
-              const updated = [...prev];
-              updated[updated.length - 1] = { ...updated[updated.length - 1], complete: true };
-              return updated;
-            });
-            state.elapsed = 0;
-            state.phase = 'post-delay';
-          }
-          break;
-        }
-
-        case 'post-delay': {
-          const line = BOOT_SEQUENCE[state.lineIdx];
-          if (state.elapsed >= line.postDelay) {
-            state.lineIdx++;
-            state.charIdx = 0;
-            state.elapsed = 0;
-            if (state.lineIdx >= BOOT_SEQUENCE.length) {
-              state.phase = 'final-wait';
-            } else {
-              const nextLine = BOOT_SEQUENCE[state.lineIdx];
-              if (nextLine.isProgressBar) {
-                setBootLines(prev => [...prev, { text: "  [                    ] 0%", complete: false }]);
-                state.progressStep = 0;
-                state.phase = 'progress-bar';
-              } else {
-                setBootLines(prev => [...prev, { text: "", complete: false }]);
-                state.charTimings = generateCharTimings(nextLine.text, nextLine.typingSpeed);
-                state.nextCharTime = state.charTimings[0] || 0;
-                state.phase = 'typing';
-              }
-            }
-          }
-          break;
-        }
-
-        case 'progress-bar': {
-          const progressDuration = 800;
-          const steps = 20;
-          const stepDuration = progressDuration / steps;
-          const targetStep = Math.min(steps, Math.floor(state.elapsed / stepDuration) + 1);
-          
-          while (state.progressStep < targetStep) {
-            state.progressStep++;
-            const filled = "█".repeat(state.progressStep);
-            const empty = " ".repeat(steps - state.progressStep);
-            const percent = Math.round((state.progressStep / steps) * 100);
-            setBootLines(prev => {
-              const updated = [...prev];
-              updated[updated.length - 1] = { 
-                text: `  [${filled}${empty}] ${percent}%`, 
-                complete: state.progressStep === steps 
-              };
-              return updated;
-            });
-            setProgressPercent(percent);
-          }
-          
-          if (state.progressStep >= steps && state.elapsed >= progressDuration + 200) {
-            state.elapsed = 0;
-            state.phase = 'post-delay';
-          }
-          break;
-        }
-
-        case 'final-wait':
-          if (state.elapsed >= 400) {
-            setBootComplete(true);
-            state.phase = 'done';
-          }
-          break;
-
-        case 'done':
-          return;
-      }
-
-      requestAnimationFrame(tick);
-    };
-
-    requestAnimationFrame(tick);
+    if (!skipAnimationsRef.current) return;
+    sessionStorage.removeItem('rfcVisitedAt');
+    setTimeout(() => setIsLoaded(true), 50);
   }, []);
 
   const createParticle = useCallback(
@@ -1037,35 +852,7 @@ export function FoundryHero() {
     };
   }, [createParticle, prefersReducedMotion]);
 
-  // Effect 1: When boot completes, fade out boot overlay and show document assembly
-  useEffect(() => {
-    if (!bootComplete) return;
-    if (skipAnimationsRef.current) return;
-
-    const tl = gsap.timeline();
-    
-    tl.call(() => setHideCanvas(true), []);
-    
-    tl.to(".boot-terminal-content", {
-      opacity: 0,
-      duration: 0.5,
-      ease: "power2.in",
-    });
-
-    tl.to(".boot-overlay", {
-      opacity: 0,
-      duration: 0.4,
-      ease: "power2.out",
-      onComplete: () => {
-        setShowBootOverlay(false);
-        setShowDocumentAssembly(true);
-      },
-    }, "-=0.2");
-
-    return () => { tl.kill(); };
-  }, [bootComplete]);
-
-  // Effect 2: When document assembly layer mounts, run the fragment animation in a loop
+  // Effect 1: When document assembly layer mounts, run the fragment animation in a loop
   useEffect(() => {
     if (!showDocumentAssembly) return;
     if (prefersReducedMotion) {
@@ -1428,46 +1215,18 @@ export function FoundryHero() {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-obsidian pointer-events-none z-10" />
 
       {showBootOverlay && (
-      <div
-        className="boot-overlay absolute inset-0 z-30 bg-obsidian flex items-center justify-center"
-      >
-        <div 
-          className="boot-scanline absolute inset-x-0 top-0 h-full pointer-events-none origin-top"
-          style={{
-            background: "linear-gradient(to bottom, transparent 0%, rgba(255, 170, 0, 0.03) 45%, rgba(255, 170, 0, 0.08) 50%, rgba(255, 170, 0, 0.03) 55%, transparent 100%)",
-            transform: "scaleY(0)",
+        <TransitionCLI
+          sequence={TRANSITION_SEQUENCES.boot()}
+          initialDelay={400}
+          progressDuration={450}
+          finalWait={150}
+          exitDuration={0.7}
+          onComplete={() => {
+            setShowBootOverlay(false);
+            setShowDocumentAssembly(true);
+            setHideCanvas(true);
           }}
         />
-        
-        <div className="boot-terminal-content max-w-2xl w-full px-8 relative">
-          <div className="font-mono text-sm text-amber space-y-1">
-            {showInitialCursor && (
-              <div style={{ textShadow: "0 0 10px rgba(255, 170, 0, 0.5)" }}>
-                <span className="text-amber">&gt; </span>
-                <span className="inline-block w-2 h-4 bg-amber animate-pulse align-middle" />
-              </div>
-            )}
-            {bootLines.map((line, i) => {
-              const isLastLine = i === bootLines.length - 1;
-              const showCursor = isLastLine && !line.complete;
-              return (
-                <div
-                  key={i}
-                  className="boot-line"
-                  style={{
-                    textShadow: "0 0 10px rgba(255, 170, 0, 0.5)",
-                  }}
-                >
-                  {line.text}
-                  {showCursor && (
-                    <span className="inline-block w-2 h-4 bg-amber animate-pulse ml-0.5 align-middle" />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
       )}
 
       {/* Document Assembly Layer - RFC fragments converging into a document, then transforming to visualization */}
