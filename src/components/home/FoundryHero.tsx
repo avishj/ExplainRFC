@@ -268,7 +268,7 @@ export function FoundryHero() {
       // === Phase 2: Streaming particles bridge from left to right ===
       // Document glows brighter as particles emit
       tl.to(rfcDoc, {
-        boxShadow: `0 0 60px ${colors.primary}, 0 0 100px ${colors.secondary}`,
+        boxShadow: `0 0 12px ${colors.glow}, 0 0 2px ${colors.secondary}`,
         duration: 0.4, ease: "power2.in",
       });
 
@@ -460,7 +460,7 @@ export function FoundryHero() {
               top: "50%",
               background: "linear-gradient(180deg, #0c0c0c 0%, #080808 100%)",
               border: "1px solid rgba(255, 170, 0, 0.25)",
-              boxShadow: "0 0 40px rgba(255, 170, 0, 0.08)",
+              boxShadow: "0 0 6px rgba(255, 170, 0, 0.12), 0 0 1px rgba(255, 170, 0, 0.2)",
             }}
           >
             {/* IETF-style header bar */}
