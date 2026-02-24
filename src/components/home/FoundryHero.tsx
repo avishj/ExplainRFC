@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { TransitionCLI, TRANSITION_SEQUENCES } from "@components/ui/TransitionCLI";
+import { OrnateDivider } from "@components/ui/OrnateDivider";
 
 // RFC variation data for the document → diagram morph animation
 interface RFCVariation {
@@ -730,7 +731,7 @@ export function FoundryHero() {
             </h1>
 
             <div className="hero-subtitle opacity-0 mt-8 space-y-4">
-              <div className="incised w-48 mx-auto" />
+              <OrnateDivider variant="bright" />
               <p className="font-display text-xl md:text-2xl text-text-primary/70 max-w-lg mx-auto">
                 The internet's blueprints,
                 <span className="text-brass font-semibold"> deconstructed.</span>
