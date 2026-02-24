@@ -116,28 +116,40 @@ const RFC_VARIATIONS: RFCVariation[] = [
 
 const ACCENT_COLORS = {
   amber: {
-    primary: "rgba(255, 170, 0, 0.8)",
-    secondary: "rgba(255, 140, 0, 0.6)",
-    glow: "rgba(255, 170, 0, 0.4)",
-    text: "#ffaa00",
+    primary: "rgba(230, 160, 30, 0.8)",
+    secondary: "rgba(200, 140, 20, 0.5)",
+    glow: "rgba(230, 160, 30, 0.3)",
+    text: "#e6a01e",
+    border: "rgba(230, 160, 30, 0.25)",
+    borderDim: "rgba(230, 160, 30, 0.10)",
+    particle: "radial-gradient(circle, rgba(240, 190, 80, 0.9) 0%, rgba(200, 140, 20, 0.3) 100%)",
   },
   cyan: {
-    primary: "rgba(0, 200, 255, 0.8)",
-    secondary: "rgba(0, 150, 200, 0.6)",
-    glow: "rgba(0, 200, 255, 0.4)",
-    text: "#00c8ff",
+    primary: "rgba(100, 200, 240, 0.8)",
+    secondary: "rgba(80, 170, 210, 0.5)",
+    glow: "rgba(100, 200, 240, 0.3)",
+    text: "#64c8f0",
+    border: "rgba(100, 200, 240, 0.25)",
+    borderDim: "rgba(100, 200, 240, 0.10)",
+    particle: "radial-gradient(circle, rgba(150, 220, 250, 0.9) 0%, rgba(80, 170, 210, 0.3) 100%)",
   },
   emerald: {
-    primary: "rgba(0, 200, 150, 0.8)",
-    secondary: "rgba(0, 160, 120, 0.6)",
-    glow: "rgba(0, 200, 150, 0.4)",
-    text: "#00c896",
+    primary: "rgba(80, 200, 140, 0.8)",
+    secondary: "rgba(60, 170, 110, 0.5)",
+    glow: "rgba(80, 200, 140, 0.3)",
+    text: "#50c88c",
+    border: "rgba(80, 200, 140, 0.25)",
+    borderDim: "rgba(80, 200, 140, 0.10)",
+    particle: "radial-gradient(circle, rgba(130, 220, 170, 0.9) 0%, rgba(60, 170, 110, 0.3) 100%)",
   },
   violet: {
-    primary: "rgba(160, 100, 255, 0.8)",
-    secondary: "rgba(130, 80, 200, 0.6)",
-    glow: "rgba(160, 100, 255, 0.4)",
-    text: "#a064ff",
+    primary: "rgba(170, 130, 240, 0.8)",
+    secondary: "rgba(140, 100, 210, 0.5)",
+    glow: "rgba(170, 130, 240, 0.3)",
+    text: "#aa82f0",
+    border: "rgba(170, 130, 240, 0.25)",
+    borderDim: "rgba(170, 130, 240, 0.10)",
+    particle: "radial-gradient(circle, rgba(200, 170, 250, 0.9) 0%, rgba(140, 100, 210, 0.3) 100%)",
   },
 };
 
@@ -224,9 +236,35 @@ export function FoundryHero() {
       });
 
       const streamParticles = stage.querySelectorAll(".stream-particle");
+      const headerBar = stage.querySelector(".rfc-header-bar");
+      const titleBar = stage.querySelector(".rfc-title-bar");
+
+      // Apply accent colors for this variation
+      (rfcDoc as HTMLElement).style.borderColor = colors.border;
+      if (headerBar) (headerBar as HTMLElement).style.borderBottomColor = colors.borderDim;
+      if (titleBar) (titleBar as HTMLElement).style.borderBottomColor = colors.borderDim;
+      if (rfcHeader) (rfcHeader as HTMLElement).style.color = colors.text;
+      if (rfcSection) (rfcSection as HTMLElement).style.color = colors.secondary;
+      if (rfcTitle) (rfcTitle as HTMLElement).style.color = colors.secondary;
+      if (proseHeading) (proseHeading as HTMLElement).style.color = colors.text;
+      proseParagraphs.forEach((el) => {
+        (el as HTMLElement).style.color = colors.secondary;
+      });
+      termNodes.forEach((el) => {
+        (el as HTMLElement).style.color = colors.text;
+        (el as HTMLElement).style.textShadow = `0 0 6px ${colors.glow}`;
+      });
+      connLines.forEach((el) => {
+        el.setAttribute("stroke", colors.secondary);
+      });
+      streamParticles.forEach((el) => {
+        (el as HTMLElement).style.background = colors.particle;
+        (el as HTMLElement).style.boxShadow = `0 0 6px ${colors.glow}`;
+      });
+      (diagram as HTMLElement).style.borderColor = colors.border;
 
       // Reset initial states
-      gsap.set(rfcDoc, { opacity: 0, scale: 0.92, x: 0, filter: "blur(4px)", visibility: "visible" });
+      gsap.set(rfcDoc, { opacity: 0, scale: 0.92, x: 0, filter: "blur(4px)", visibility: "visible", boxShadow: `0 0 6px ${colors.glow}, 0 0 1px ${colors.border}` });
       gsap.set(diagram, { opacity: 0, scale: 0.9, visibility: "visible" });
       gsap.set(".diagram-node", { opacity: 0, scale: 0.3 });
       gsap.set(".diagram-line", { opacity: 0, strokeDashoffset: 200 });
@@ -459,14 +497,14 @@ export function FoundryHero() {
               left: "calc(50% - 28vw)",
               top: "50%",
               background: "linear-gradient(180deg, #0c0c0c 0%, #080808 100%)",
-              border: "1px solid rgba(255, 170, 0, 0.25)",
-              boxShadow: "0 0 6px rgba(255, 170, 0, 0.12), 0 0 1px rgba(255, 170, 0, 0.2)",
+              border: `1px solid ${ACCENT_COLORS.amber.border}`,
+              boxShadow: `0 0 6px ${ACCENT_COLORS.amber.glow}, 0 0 1px ${ACCENT_COLORS.amber.border}`,
             }}
           >
             {/* IETF-style header bar */}
             <div
-              className="flex items-center justify-between px-3 py-1.5"
-              style={{ borderBottom: "1px solid rgba(255, 170, 0, 0.15)" }}
+              className="rfc-header-bar flex items-center justify-between px-3 py-1.5"
+              style={{ borderBottom: `1px solid ${ACCENT_COLORS.amber.borderDim}` }}
             >
               <div className="flex items-center gap-2">
                 <span className="rfc-doc-number text-[10px] sm:text-xs font-mono font-bold text-amber/80">
@@ -482,7 +520,7 @@ export function FoundryHero() {
             </div>
 
             {/* Title */}
-            <div className="px-3 py-1.5" style={{ borderBottom: "1px solid rgba(255, 170, 0, 0.08)" }}>
+            <div className="rfc-title-bar px-3 py-1.5" style={{ borderBottom: `1px solid ${ACCENT_COLORS.amber.borderDim}` }}>
               <div className="rfc-doc-title text-[9px] sm:text-[11px] font-mono text-amber/70">
                 {RFC_VARIATIONS[0].title}
               </div>
@@ -517,8 +555,8 @@ export function FoundryHero() {
                 opacity: 0,
                 left: "calc(50% - 28vw)",
                 top: "50%",
-                background: "radial-gradient(circle, rgba(255, 200, 100, 1) 0%, rgba(255, 140, 0, 0.4) 100%)",
-                boxShadow: "0 0 8px rgba(255, 170, 0, 0.6)",
+                background: ACCENT_COLORS.amber.particle,
+                boxShadow: `0 0 6px ${ACCENT_COLORS.amber.glow}`,
               }}
             />
           ))}
@@ -571,8 +609,8 @@ export function FoundryHero() {
                   left: `${term.x}%`,
                   top: `${term.y}%`,
                   opacity: 0,
-                  color: "#ffaa00",
-                  textShadow: "0 0 6px rgba(255, 170, 0, 0.4)",
+                  color: ACCENT_COLORS.amber.text,
+                  textShadow: `0 0 6px ${ACCENT_COLORS.amber.glow}`,
                 }}
               >
                 {term.text}
