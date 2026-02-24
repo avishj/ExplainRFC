@@ -163,7 +163,6 @@ export function FoundryHero() {
   
   const [isLoaded, setIsLoaded] = useState(skipIntro);
   const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro);
-  const [currentVariationIndex, setCurrentVariationIndex] = useState(0);
   const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const loopActiveRef = useRef(false);
 
@@ -277,7 +276,6 @@ export function FoundryHero() {
         onComplete: () => {
           if (!loopActiveRef.current) return;
           const nextIdx = (variationIdx + 1) % RFC_VARIATIONS.length;
-          setCurrentVariationIndex(nextIdx);
           setTimeout(() => runAnimationCycle(nextIdx), 600);
         },
       });
@@ -473,7 +471,7 @@ export function FoundryHero() {
       }, "<0.1");
     };
 
-    const timeout = setTimeout(() => runAnimationCycle(currentVariationIndex), 50);
+    const timeout = setTimeout(() => runAnimationCycle(0), 50);
 
     return () => {
       loopActiveRef.current = false;
