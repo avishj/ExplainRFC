@@ -346,15 +346,19 @@ export function FoundryHero() {
       });
 
       // === Build tear stages from particle timing curve ===
-      // Both tears use the same sin² density curve as particle spawns
-      // so clip progress tracks exactly how much "material" has left/arrived
+      // Use cumulative sin² to get monotonic 0→1 progress with slow→fast→slow timing
       const tearStages = 16;
       const tearTimes: number[] = [];
+      let cumProgress = 0;
       for (let i = 0; i <= tearStages; i++) {
         const t = i / tearStages;
         const s = Math.sin(Math.PI * t);
-        tearTimes.push(s * s); // sin² progress: slow→fast→slow
+        const density = s * s;
+        cumProgress += density;
+        tearTimes.push(cumProgress);
       }
+      const maxProgress = tearTimes[tearStages];
+      const normalizedTearTimes = tearTimes.map(p => p / maxProgress);
 
       // Jagged edge generator: given a base X%, produce polygon points with jitter
       const jag = (baseX: number, points: number, amp: number, seed: number) => {
@@ -375,11 +379,11 @@ export function FoundryHero() {
       }, streamStart);
 
       for (let i = 0; i < tearStages; i++) {
-        const progress = tearTimes[i + 1]; // how much has been torn (0→1)
+        const progress = normalizedTearTimes[i + 1]; // how much has been torn (0→1)
         const edgeX = 100 - progress * 100; // right edge moves from 100→0
         const edge = jag(edgeX, 8, 6, i * 3 + 5);
         const clip = `polygon(0% 0%, ${edge.join(", ")}, 0% 100%)`;
-        const stepDur = (tearTimes[i + 1] - tearTimes[i]) * cumTime;
+        const stepDur = (normalizedTearTimes[i + 1] - normalizedTearTimes[i]) * cumTime;
         const brightness = 1 + progress * 0.8;
         const blur = progress > 0.7 ? (progress - 0.7) * 3.3 : 0;
         const props: gsap.TweenVars = {
@@ -408,7 +412,7 @@ export function FoundryHero() {
       }, streamStart + arrivalOffset);
 
       for (let i = 0; i < tearStages; i++) {
-        const progress = tearTimes[i + 1]; // how much has been revealed (0→1)
+        const progress = normalizedTearTimes[i + 1]; // how much has been revealed (0→1)
         const edgeX = 100 - progress * 100; // left edge moves from 100→0
         const edge = jag(edgeX, 8, 6, i * 5 + 2);
         // Polygon: jagged left edge → top-right → bottom-right → jagged bottom-left
@@ -416,7 +420,7 @@ export function FoundryHero() {
         const clip = `polygon(${topEdge.join(", ")}, 100% 100%, 100% 0%)`;
         // Reverse: we need bottom-to-top for the closing side
         const clipFixed = `polygon(${edge[0].split(" ")[0]} 0%, 100% 0%, 100% 100%, ${edge[edge.length - 1].split(" ")[0]} 100%, ${edge.slice(1, -1).reverse().join(", ")})`;
-        const stepDur = (tearTimes[i + 1] - tearTimes[i]) * cumTime;
+        const stepDur = (normalizedTearTimes[i + 1] - normalizedTearTimes[i]) * cumTime;
         const brightness = 1.5 - progress * 0.5;
         const props: gsap.TweenVars = {
           clipPath: clipFixed,
