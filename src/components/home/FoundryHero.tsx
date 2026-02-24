@@ -366,54 +366,59 @@ export function FoundryHero() {
         duration: 0.15, ease: "power2.out",
       }, tearStart + 0.12);
 
-      // Clip erodes right-to-left — 3 clear steps, opacity stays 1 until final vanish
-      tl.to(rfcDoc, {
-        clipPath: "polygon(0% 0%, 70% 3%, 62% 35%, 75% 55%, 60% 80%, 68% 100%, 0% 100%)",
-        duration: 0.5, ease: "power1.in",
-      }, tearStart);
-      tl.to(rfcDoc, {
-        clipPath: "polygon(0% 0%, 35% 6%, 25% 40%, 40% 55%, 22% 75%, 30% 100%, 0% 100%)",
-        filter: "brightness(1.3)",
-        duration: 0.4, ease: "power1.in",
-      }, ">");
-      tl.to(rfcDoc, {
-        clipPath: "polygon(0% 0%, 8% 10%, 3% 45%, 10% 60%, 2% 80%, 5% 100%, 0% 100%)",
-        opacity: 0.5, filter: "brightness(1.8) blur(1px)",
-        duration: 0.3, ease: "power2.in",
-      }, ">");
-      tl.to(rfcDoc, {
-        opacity: 0, duration: 0.1,
-      }, ">");
+      // Clip erodes right-to-left — 10 stages for smooth tearing
+      const docSteps = [
+        { clip: "polygon(0% 0%, 94% 1%, 91% 12%, 96% 28%, 90% 42%, 95% 58%, 91% 72%, 94% 88%, 92% 100%, 0% 100%)", dur: 0.14 },
+        { clip: "polygon(0% 0%, 86% 2%, 82% 14%, 88% 30%, 80% 44%, 87% 56%, 82% 70%, 85% 86%, 84% 100%, 0% 100%)", dur: 0.13 },
+        { clip: "polygon(0% 0%, 76% 3%, 72% 16%, 78% 32%, 70% 45%, 77% 55%, 71% 68%, 75% 84%, 74% 100%, 0% 100%)", dur: 0.12, filter: "brightness(1.1)" },
+        { clip: "polygon(0% 0%, 65% 4%, 60% 18%, 68% 33%, 58% 46%, 66% 56%, 60% 67%, 64% 82%, 62% 100%, 0% 100%)", dur: 0.11, filter: "brightness(1.15)" },
+        { clip: "polygon(0% 0%, 54% 5%, 48% 19%, 56% 34%, 46% 48%, 55% 57%, 48% 68%, 52% 81%, 50% 100%, 0% 100%)", dur: 0.10, filter: "brightness(1.2)" },
+        { clip: "polygon(0% 0%, 43% 6%, 37% 20%, 45% 35%, 35% 49%, 44% 58%, 37% 69%, 41% 80%, 39% 100%, 0% 100%)", dur: 0.09, filter: "brightness(1.3)" },
+        { clip: "polygon(0% 0%, 32% 7%, 26% 22%, 34% 36%, 24% 50%, 33% 59%, 26% 70%, 30% 80%, 28% 100%, 0% 100%)", dur: 0.08, filter: "brightness(1.4)" },
+        { clip: "polygon(0% 0%, 22% 8%, 16% 24%, 24% 38%, 14% 52%, 22% 61%, 16% 72%, 20% 82%, 18% 100%, 0% 100%)", dur: 0.07, filter: "brightness(1.5) blur(0.5px)" },
+        { clip: "polygon(0% 0%, 12% 10%, 7% 28%, 14% 42%, 6% 55%, 12% 65%, 7% 75%, 10% 85%, 8% 100%, 0% 100%)", dur: 0.06, filter: "brightness(1.7) blur(0.8px)", opacity: 0.7 },
+        { clip: "polygon(0% 0%, 4% 14%, 2% 35%, 5% 50%, 1% 65%, 4% 78%, 2% 88%, 3% 95%, 2% 100%, 0% 100%)", dur: 0.05, filter: "brightness(1.9) blur(1px)", opacity: 0.4 },
+      ];
+      docSteps.forEach((step, i) => {
+        const props: gsap.TweenVars = { clipPath: step.clip, duration: step.dur, ease: "power1.in" };
+        if (step.filter) props.filter = step.filter;
+        if (step.opacity) props.opacity = step.opacity;
+        tl.to(rfcDoc, props, i === 0 ? tearStart : ">");
+      });
+      tl.to(rfcDoc, { opacity: 0, duration: 0.06 }, ">");
 
-      // === Phase 3: Diagram tears open from left as particles arrive ===
-      const diagramStart = streamStart + cumTime * 0.4;
+      // === Phase 3: Diagram tears open from RIGHT to LEFT (particles arrive from left) ===
+      const diagramStart = streamStart + cumTime * 0.35;
 
-      // Pre-set: visible but clipped to ~30% so you see it forming
+      // Pre-set: only right ~15% visible, jagged left edge
       gsap.set(diagram, {
-        clipPath: "polygon(0% 0%, 25% 5%, 18% 35%, 28% 55%, 15% 80%, 22% 100%, 0% 100%)",
-        filter: "brightness(1.4)",
+        clipPath: "polygon(88% 0%, 100% 0%, 100% 100%, 86% 100%, 90% 85%, 84% 70%, 91% 55%, 85% 40%, 89% 25%, 86% 10%)",
+        filter: "brightness(1.5)",
       });
       tl.to(diagram, {
         opacity: 1, scale: 1,
-        duration: 0.2, ease: "power2.out",
+        duration: 0.15, ease: "power2.out",
       }, diagramStart);
 
-      // Tear open in clear sequential steps
-      tl.to(diagram, {
-        clipPath: "polygon(0% 0%, 55% 4%, 48% 30%, 60% 52%, 45% 78%, 52% 100%, 0% 100%)",
-        filter: "brightness(1.2)",
-        duration: 0.5, ease: "power2.out",
-      }, diagramStart + 0.2);
-      tl.to(diagram, {
-        clipPath: "polygon(0% 0%, 85% 2%, 80% 25%, 90% 50%, 78% 78%, 85% 100%, 0% 100%)",
-        filter: "brightness(1.1)",
-        duration: 0.4, ease: "power2.out",
-      }, ">");
-      tl.to(diagram, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-        filter: "brightness(1.0)",
-        duration: 0.3, ease: "power2.out",
-      }, ">");
+      // Tear open rightward in 10 stages — jagged left edge expands left
+      const diagSteps = [
+        { clip: "polygon(78% 0%, 100% 0%, 100% 100%, 76% 100%, 80% 86%, 74% 72%, 81% 56%, 75% 40%, 79% 26%, 77% 12%)", dur: 0.12, filter: "brightness(1.45)" },
+        { clip: "polygon(68% 0%, 100% 0%, 100% 100%, 66% 100%, 70% 85%, 64% 71%, 72% 56%, 65% 41%, 69% 27%, 67% 13%)", dur: 0.12, filter: "brightness(1.4)" },
+        { clip: "polygon(58% 0%, 100% 0%, 100% 100%, 56% 100%, 60% 84%, 54% 70%, 62% 55%, 55% 42%, 59% 28%, 57% 14%)", dur: 0.11, filter: "brightness(1.35)" },
+        { clip: "polygon(48% 0%, 100% 0%, 100% 100%, 46% 100%, 50% 84%, 44% 69%, 52% 54%, 45% 42%, 49% 29%, 47% 15%)", dur: 0.11, filter: "brightness(1.3)" },
+        { clip: "polygon(38% 0%, 100% 0%, 100% 100%, 36% 100%, 40% 83%, 34% 68%, 42% 54%, 35% 43%, 39% 30%, 37% 16%)", dur: 0.10, filter: "brightness(1.25)" },
+        { clip: "polygon(28% 0%, 100% 0%, 100% 100%, 26% 100%, 30% 83%, 24% 68%, 32% 53%, 25% 43%, 29% 30%, 27% 16%)", dur: 0.10, filter: "brightness(1.2)" },
+        { clip: "polygon(19% 0%, 100% 0%, 100% 100%, 17% 100%, 21% 82%, 15% 67%, 23% 53%, 16% 44%, 20% 31%, 18% 17%)", dur: 0.09, filter: "brightness(1.15)" },
+        { clip: "polygon(11% 0%, 100% 0%, 100% 100%, 9% 100%, 13% 82%, 7% 67%, 14% 53%, 8% 44%, 12% 31%, 10% 17%)", dur: 0.08, filter: "brightness(1.1)" },
+        { clip: "polygon(4% 0%, 100% 0%, 100% 100%, 3% 100%, 6% 82%, 2% 68%, 5% 54%, 1% 44%, 4% 32%, 3% 18%)", dur: 0.07, filter: "brightness(1.05)" },
+        { clip: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", dur: 0.06, filter: "brightness(1.0)" },
+      ];
+      diagSteps.forEach((step, i) => {
+        tl.to(diagram, {
+          clipPath: step.clip, filter: step.filter,
+          duration: step.dur, ease: "power2.out",
+        }, i === 0 ? diagramStart + 0.15 : ">");
+      });
 
       // Nodes appear after diagram is mostly open
       tl.to(".diagram-node", {
@@ -421,7 +426,7 @@ export function FoundryHero() {
         duration: 0.5,
         stagger: { each: 0.07, from: "random" },
         ease: "back.out(1.7)",
-      }, diagramStart + 0.6);
+      }, diagramStart + 0.8);
 
       // Connection lines draw in
       tl.to(".diagram-line", {
@@ -429,7 +434,7 @@ export function FoundryHero() {
         duration: 0.8,
         stagger: 0.06,
         ease: "power2.inOut",
-      }, diagramStart + 0.8);
+      }, diagramStart + 1.0);
 
       // Glow pulse
       tl.to(".diagram-node", {
@@ -444,20 +449,13 @@ export function FoundryHero() {
       // Hold diagram
       tl.to({}, { duration: 1.2 });
 
-      // === Phase 4: Diagram tears apart for next cycle ===
-      tl.to(".diagram-node", { opacity: 0, scale: 0.6, duration: 0.25, stagger: 0.02 });
-      tl.to(".diagram-line", { opacity: 0, duration: 0.2 }, "<");
+      // === Phase 4: Diagram fades out for next cycle ===
+      tl.to(".diagram-node", { opacity: 0, duration: 0.4, stagger: 0.03 }, "<0.8");
+      tl.to(".diagram-line", { opacity: 0, duration: 0.3 }, "<0.1");
       tl.to(diagram, {
-        clipPath: "polygon(0% 0%, 55% 5%, 45% 35%, 60% 55%, 40% 80%, 50% 100%, 0% 100%)",
-        filter: "brightness(1.3)",
-        duration: 0.35, ease: "power2.in",
-      }, "<0.05");
-      tl.to(diagram, {
-        clipPath: "polygon(0% 0%, 12% 8%, 5% 40%, 15% 60%, 3% 82%, 8% 100%, 0% 100%)",
-        opacity: 0.3, filter: "brightness(1.6) blur(1px)",
-        duration: 0.3, ease: "power2.in",
-      }, ">");
-      tl.to(diagram, { opacity: 0, duration: 0.1 }, ">");
+        opacity: 0, filter: "blur(2px)",
+        duration: 0.6, ease: "power2.in",
+      }, "<0.1");
     };
 
     const timeout = setTimeout(() => runAnimationCycle(currentVariationIndex), 50);
