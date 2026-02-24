@@ -521,13 +521,6 @@ export function FoundryHero() {
       "-=0.4"
     );
 
-    tl.fromTo(
-      ".hero-status",
-      { opacity: 0 },
-      { opacity: 1, duration: 0.5, ease: "power2.out" },
-      "-=0.3"
-    );
-
     return () => { tl.kill(); };
   }, [isLoaded]);
 
@@ -738,9 +731,9 @@ export function FoundryHero() {
 
             <div className="hero-subtitle opacity-0 mt-8 space-y-4">
               <div className="incised w-48 mx-auto" />
-              <p className="font-display text-xl md:text-2xl text-text-secondary max-w-lg mx-auto">
-                Dense protocols transformed into
-                <span className="text-brass font-semibold"> interactive visualizations</span>
+              <p className="font-display text-xl md:text-2xl text-text-primary/70 max-w-lg mx-auto">
+                The internet's blueprints,
+                <span className="text-brass font-semibold"> deconstructed.</span>
               </p>
             </div>
           </div>
@@ -764,18 +757,12 @@ export function FoundryHero() {
             </a>
             
             <p className="mt-6 font-mono text-xs text-text-muted tracking-wide">
-              FROM RFC TO VISUALIZATION
+              {RFC_VARIATIONS.length} RFCs AND COUNTING
             </p>
           </div>
         </div>
       </div>
 
-      <div className="hero-status absolute bottom-8 left-1/2 -translate-x-1/2 z-20 opacity-0">
-        <div className="flex items-center gap-2 text-text-muted font-mono text-xs">
-          <span className="inline-block w-2 h-2 bg-green-500/60 rounded-full animate-pulse" />
-          <span>TRANSMISSION ACTIVE</span>
-        </div>
-      </div>
     </section>
   );
 }
