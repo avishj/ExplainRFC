@@ -66,6 +66,7 @@ export function TransitionCLI({
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setLines([]);
     const state: AnimState = {
       phase: "initial-wait",
       lineIdx: 0,
