@@ -173,7 +173,7 @@ export function FoundryHero() {
 
   // Skip intro if returning from RFC visit
   useEffect(() => {
-    if (!skipIntro) return;
+    if (!skipIntroRef.current) return;
     sessionStorage.removeItem('rfcVisitedAt');
   }, []);
 
