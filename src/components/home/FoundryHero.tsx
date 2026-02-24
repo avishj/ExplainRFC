@@ -425,14 +425,13 @@ export function FoundryHero() {
           ease: "none",
           filter: `brightness(${brightness.toFixed(2)})`,
         };
+        // Last stage snaps to full rect instead of jagged near-zero edge
+        if (i === tearStages - 1) {
+          props.clipPath = "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)";
+          props.filter = "brightness(1.0)";
+        }
         tl.to(diagram, props, i === 0 ? streamStart + arrivalOffset : ">");
       }
-      // Snap to full rect
-      tl.to(diagram, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-        filter: "brightness(1.0)",
-        duration: 0.05,
-      }, ">");
 
       // Nodes appear after diagram is mostly open
       const diagEndTime = streamStart + arrivalOffset + cumTime;
