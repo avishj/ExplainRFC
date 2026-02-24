@@ -264,8 +264,8 @@ export function FoundryHero() {
       (diagram as HTMLElement).style.borderColor = colors.border;
 
       // Reset initial states
-      gsap.set(rfcDoc, { opacity: 0, scale: 0.92, x: 0, filter: "blur(4px)", visibility: "visible", boxShadow: `0 0 6px ${colors.glow}, 0 0 1px ${colors.border}` });
-      gsap.set(diagram, { opacity: 0, scale: 0.9, visibility: "visible" });
+      gsap.set(rfcDoc, { opacity: 0, scale: 0.92, x: 0, filter: "blur(4px)", visibility: "visible", boxShadow: `0 0 6px ${colors.glow}, 0 0 1px ${colors.border}`, clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" });
+      gsap.set(diagram, { opacity: 0, scale: 0.9, visibility: "visible", clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", filter: "brightness(1.0) blur(0px)" });
       gsap.set(".diagram-node", { opacity: 0, scale: 0.3 });
       gsap.set(".diagram-line", { opacity: 0, strokeDashoffset: 200 });
       gsap.set(".stream-particle", { opacity: 0, left: "calc(50% - 28vw)", top: "50%" });
@@ -346,31 +346,82 @@ export function FoundryHero() {
         tl.to(el, { opacity: 0, duration: 0.2 }, spawnTime + travelDur - 0.15);
       });
 
-      // Document shakes and fades as particles tear it apart
-      const streamMid = streamStart + cumTime * 0.35;
-      tl.to(rfcDoc, {
-        x: -3, duration: 0.06, ease: "none",
-        yoyo: true, repeat: 5,
-      }, streamMid);
-      tl.to(rfcDoc, {
-        opacity: 0.15, filter: "blur(3px)", scale: 0.95,
-        duration: 0.8, ease: "power2.in",
-      }, streamMid);
+      // === Document tears apart as particles rip through it ===
+      // Starts immediately with particles — doc stays full opacity so tear is visible
+      const tearStart = streamStart + 0.1;
 
-      // === Phase 3: Diagram materializes as burst particles arrive ===
-      const diagramStart = streamStart + cumTime * 0.5;
+      // Shake while tearing
+      tl.to(rfcDoc, {
+        x: -2, duration: 0.05, ease: "none",
+        yoyo: true, repeat: 8,
+      }, tearStart);
+
+      // Brightness flash on leading edge
+      tl.to(rfcDoc, {
+        filter: "brightness(1.6)",
+        duration: 0.12, ease: "power2.in",
+      }, tearStart);
+      tl.to(rfcDoc, {
+        filter: "brightness(1.0)",
+        duration: 0.15, ease: "power2.out",
+      }, tearStart + 0.12);
+
+      // Clip erodes right-to-left — 3 clear steps, opacity stays 1 until final vanish
+      tl.to(rfcDoc, {
+        clipPath: "polygon(0% 0%, 70% 3%, 62% 35%, 75% 55%, 60% 80%, 68% 100%, 0% 100%)",
+        duration: 0.5, ease: "power1.in",
+      }, tearStart);
+      tl.to(rfcDoc, {
+        clipPath: "polygon(0% 0%, 35% 6%, 25% 40%, 40% 55%, 22% 75%, 30% 100%, 0% 100%)",
+        filter: "brightness(1.3)",
+        duration: 0.4, ease: "power1.in",
+      }, ">");
+      tl.to(rfcDoc, {
+        clipPath: "polygon(0% 0%, 8% 10%, 3% 45%, 10% 60%, 2% 80%, 5% 100%, 0% 100%)",
+        opacity: 0.5, filter: "brightness(1.8) blur(1px)",
+        duration: 0.3, ease: "power2.in",
+      }, ">");
+      tl.to(rfcDoc, {
+        opacity: 0, duration: 0.1,
+      }, ">");
+
+      // === Phase 3: Diagram tears open from left as particles arrive ===
+      const diagramStart = streamStart + cumTime * 0.4;
+
+      // Pre-set: visible but clipped to ~30% so you see it forming
+      gsap.set(diagram, {
+        clipPath: "polygon(0% 0%, 25% 5%, 18% 35%, 28% 55%, 15% 80%, 22% 100%, 0% 100%)",
+        filter: "brightness(1.4)",
+      });
       tl.to(diagram, {
         opacity: 1, scale: 1,
-        duration: 0.5, ease: "power2.out",
+        duration: 0.2, ease: "power2.out",
       }, diagramStart);
 
-      // Nodes appear with stagger
+      // Tear open in clear sequential steps
+      tl.to(diagram, {
+        clipPath: "polygon(0% 0%, 55% 4%, 48% 30%, 60% 52%, 45% 78%, 52% 100%, 0% 100%)",
+        filter: "brightness(1.2)",
+        duration: 0.5, ease: "power2.out",
+      }, diagramStart + 0.2);
+      tl.to(diagram, {
+        clipPath: "polygon(0% 0%, 85% 2%, 80% 25%, 90% 50%, 78% 78%, 85% 100%, 0% 100%)",
+        filter: "brightness(1.1)",
+        duration: 0.4, ease: "power2.out",
+      }, ">");
+      tl.to(diagram, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        filter: "brightness(1.0)",
+        duration: 0.3, ease: "power2.out",
+      }, ">");
+
+      // Nodes appear after diagram is mostly open
       tl.to(".diagram-node", {
         opacity: 1, scale: 1,
         duration: 0.5,
         stagger: { each: 0.07, from: "random" },
         ease: "back.out(1.7)",
-      }, diagramStart + 0.2);
+      }, diagramStart + 0.6);
 
       // Connection lines draw in
       tl.to(".diagram-line", {
@@ -378,7 +429,7 @@ export function FoundryHero() {
         duration: 0.8,
         stagger: 0.06,
         ease: "power2.inOut",
-      }, diagramStart + 0.4);
+      }, diagramStart + 0.8);
 
       // Glow pulse
       tl.to(".diagram-node", {
@@ -390,21 +441,23 @@ export function FoundryHero() {
         duration: 0.3, ease: "power2.out",
       });
 
-      // Fully fade out document during diagram hold
-      tl.to(rfcDoc, {
-        opacity: 0, duration: 0.3, ease: "power2.in",
-      }, "-=0.3");
-
       // Hold diagram
       tl.to({}, { duration: 1.2 });
 
-      // === Phase 4: Fade out for next cycle ===
+      // === Phase 4: Diagram tears apart for next cycle ===
+      tl.to(".diagram-node", { opacity: 0, scale: 0.6, duration: 0.25, stagger: 0.02 });
+      tl.to(".diagram-line", { opacity: 0, duration: 0.2 }, "<");
       tl.to(diagram, {
-        opacity: 0, scale: 0.95,
-        duration: 0.5, ease: "power2.in",
-      });
-      tl.to(".diagram-node", { opacity: 0, duration: 0.3 }, "<");
-      tl.to(".diagram-line", { opacity: 0, duration: 0.3 }, "<");
+        clipPath: "polygon(0% 0%, 55% 5%, 45% 35%, 60% 55%, 40% 80%, 50% 100%, 0% 100%)",
+        filter: "brightness(1.3)",
+        duration: 0.35, ease: "power2.in",
+      }, "<0.05");
+      tl.to(diagram, {
+        clipPath: "polygon(0% 0%, 12% 8%, 5% 40%, 15% 60%, 3% 82%, 8% 100%, 0% 100%)",
+        opacity: 0.3, filter: "brightness(1.6) blur(1px)",
+        duration: 0.3, ease: "power2.in",
+      }, ">");
+      tl.to(diagram, { opacity: 0, duration: 0.1 }, ">");
     };
 
     const timeout = setTimeout(() => runAnimationCycle(currentVariationIndex), 50);
