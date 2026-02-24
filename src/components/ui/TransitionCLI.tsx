@@ -58,7 +58,7 @@ export function TransitionCLI({
   initialDelay = 150,
   progressDuration = 350,
   finalWait = 120,
-  exitDuration = 0.5,
+  exitDuration = 500,
 }: TransitionCLIProps) {
   const [lines, setLines] = useState<{ text: string; complete: boolean }[]>([]);
   const [showInitialCursor, setShowInitialCursor] = useState(true);
@@ -123,14 +123,14 @@ export function TransitionCLI({
       });
       exitTl.to(contentRef.current, {
         opacity: 0,
-        duration: exitDuration * 0.6,
+        duration: (exitDuration / 1000) * 0.6,
         ease: "power2.in",
       });
       exitTl.to(overlayRef.current, {
         opacity: 0,
-        duration: exitDuration * 0.5,
+        duration: (exitDuration / 1000) * 0.5,
         ease: "power2.out",
-      }, `-=${exitDuration * 0.15}`);
+      }, `-=${(exitDuration / 1000) * 0.15}`);
     }
 
     const tick = (now: number) => {

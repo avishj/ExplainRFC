@@ -535,7 +535,7 @@ export function FoundryHero() {
           initialDelay={400}
           progressDuration={450}
           finalWait={150}
-          exitDuration={0.7}
+          exitDuration={700}
           onComplete={() => {
             setShowBootOverlay(false);
             setIsLoaded(true);
