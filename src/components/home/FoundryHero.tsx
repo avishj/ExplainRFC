@@ -741,13 +741,14 @@ export function FoundryHero() {
           <div className="hero-cta mt-12 opacity-0">
             <a
               href="#vault"
-              className="group inline-flex items-center gap-4 px-8 py-4 border border-patina/50 rounded-full hover:border-gold/80 hover:bg-gold/5 transition-all duration-300"
+              className="hero-cta-btn group relative inline-flex items-center gap-3 px-8 py-4 rounded-full transition-transform duration-300 hover:scale-105"
             >
-              <span className="font-mono text-sm tracking-wider text-text-secondary group-hover:text-gold transition-colors">
+              <span className="hero-cta-border" />
+              <span className="relative font-mono text-sm tracking-wider text-text-secondary group-hover:text-gold transition-colors duration-300">
                 START EXPLORING
               </span>
               <svg 
-                className="w-5 h-5 text-amber group-hover:text-gold group-hover:translate-y-1 transition-all duration-300"
+                className="relative w-4 h-4 text-amber group-hover:text-gold transition-colors duration-300"
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor"

@@ -675,4 +675,62 @@ body::before {
   html {
     scroll-behavior: auto;
   }
+
+  .hero-cta-border {
+    animation: none;
+  }
+  .hero-cta-border::before {
+    animation: none;
+  }
+}
+
+/* === Hero CTA rotating border === */
+@property --cta-border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.hero-cta-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+}
+
+.hero-cta-border {
+  position: absolute;
+  inset: -1px;
+  border-radius: 9999px;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--cta-border-angle),
+    rgba(139, 115, 85, 0.08),
+    rgba(255, 170, 0, 0.4),
+    rgba(139, 115, 85, 0.08)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cta-rotate-border 3s linear infinite;
+  will-change: --cta-border-angle;
+  pointer-events: none;
+}
+
+.hero-cta-btn:hover .hero-cta-border {
+  background: conic-gradient(
+    from var(--cta-border-angle),
+    rgba(139, 115, 85, 0.12),
+    rgba(255, 199, 31, 0.6),
+    rgba(139, 115, 85, 0.12)
+  );
+}
+
+@keyframes cta-rotate-border {
+  to {
+    --cta-border-angle: 360deg;
+  }
 }
