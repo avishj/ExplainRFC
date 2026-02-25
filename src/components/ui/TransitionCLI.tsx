@@ -67,6 +67,7 @@ export function TransitionCLI({
 
   useEffect(() => {
     setLines([]);
+    setShowInitialCursor(true);
     const state: AnimState = {
       phase: "initial-wait",
       lineIdx: 0,
