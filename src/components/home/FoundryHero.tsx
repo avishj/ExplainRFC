@@ -169,6 +169,7 @@ export function FoundryHero() {
   const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro && !prefersReducedMotion);
   const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const loopActiveRef = useRef(false);
+  const cycleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Skip intro if returning from RFC visit
   useEffect(() => {
@@ -276,7 +277,7 @@ export function FoundryHero() {
         onComplete: () => {
           if (!loopActiveRef.current) return;
           const nextIdx = (variationIdx + 1) % RFC_VARIATIONS.length;
-          setTimeout(() => runAnimationCycle(nextIdx), 600);
+          cycleTimeoutRef.current = setTimeout(() => runAnimationCycle(nextIdx), 600);
         },
       });
       assemblyTimelineRef.current = tl;
@@ -477,6 +478,8 @@ export function FoundryHero() {
     return () => {
       loopActiveRef.current = false;
       clearTimeout(timeout);
+      clearTimeout(cycleTimeoutRef.current ?? undefined);
+      cycleTimeoutRef.current = null;
       if (assemblyTimelineRef.current) assemblyTimelineRef.current.kill();
     };
   }, [showBootOverlay, prefersReducedMotion]);
