@@ -273,9 +273,9 @@ export function FoundryHero() {
       // Reset initial states
       gsap.set(rfcDoc, { opacity: 0, scale: 0.92, x: 0, filter: "blur(4px)", visibility: "visible", boxShadow: `0 0 6px ${colors.glow}, 0 0 1px ${colors.border}`, clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" });
       gsap.set(diagram, { opacity: 0, scale: 0.9, visibility: "visible", clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", filter: "brightness(1.0) blur(0px)" });
-      gsap.set(".diagram-node", { opacity: 0, scale: 0.3 });
-      gsap.set(".diagram-line", { opacity: 0, strokeDashoffset: 200 });
-      gsap.set(".stream-particle", { opacity: 0, left: "calc(50% - 28vw)", top: "50%" });
+      gsap.set(termNodes, { opacity: 0, scale: 0.3 });
+      gsap.set(connLines, { opacity: 0, strokeDashoffset: 200 });
+      gsap.set(streamParticles, { opacity: 0, left: "calc(50% - 28vw)", top: "50%" });
 
       if (assemblyTimelineRef.current) assemblyTimelineRef.current.kill();
 
@@ -295,12 +295,14 @@ export function FoundryHero() {
       });
 
       // Prose heading + paragraphs stagger in
-      tl.fromTo(".rfc-prose-heading",
-        { opacity: 0, x: -8 },
-        { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" },
-        "-=0.6"
-      );
-      tl.fromTo(".rfc-prose-para",
+      if (proseHeading) {
+        tl.fromTo(proseHeading,
+          { opacity: 0, x: -8 },
+          { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" },
+          "-=0.6"
+        );
+      }
+      tl.fromTo(proseParagraphs,
         { opacity: 0, x: -8 },
         { opacity: 1, x: 0, duration: 0.5, stagger: 0.08, ease: "power2.out" },
         "-=0.2"
@@ -442,7 +444,7 @@ export function FoundryHero() {
 
       // Nodes appear after diagram is mostly open
       const diagEndTime = streamStart + arrivalOffset + cumTime;
-      tl.to(".diagram-node", {
+      tl.to(termNodes, {
         opacity: 1, scale: 1,
         duration: 0.5,
         stagger: { each: 0.07, from: "random" },
@@ -450,7 +452,7 @@ export function FoundryHero() {
       }, diagEndTime - 0.3);
 
       // Connection lines draw in
-      tl.to(".diagram-line", {
+      tl.to(connLines, {
         opacity: 0.6, strokeDashoffset: 0,
         duration: 0.8,
         stagger: 0.06,
@@ -458,11 +460,11 @@ export function FoundryHero() {
       }, diagEndTime);
 
       // Glow pulse
-      tl.to(".diagram-node", {
+      tl.to(termNodes, {
         textShadow: `0 0 12px ${colors.primary}, 0 0 24px ${colors.glow}`,
         duration: 0.3, ease: "power2.in",
       });
-      tl.to(".diagram-node", {
+      tl.to(termNodes, {
         textShadow: `0 0 6px ${colors.glow}`,
         duration: 0.3, ease: "power2.out",
       });
@@ -471,8 +473,8 @@ export function FoundryHero() {
       tl.to({}, { duration: 1.2 });
 
       // === Phase 4: Diagram fades out for next cycle ===
-      tl.to(".diagram-node", { opacity: 0, duration: 0.4, stagger: 0.03 }, "<0.8");
-      tl.to(".diagram-line", { opacity: 0, duration: 0.3 }, "<0.1");
+      tl.to(termNodes, { opacity: 0, duration: 0.4, stagger: 0.03 }, "<0.8");
+      tl.to(connLines, { opacity: 0, duration: 0.3 }, "<0.1");
       tl.to(diagram, {
         opacity: 0, filter: "blur(2px)",
         duration: 0.6, ease: "power2.in",
