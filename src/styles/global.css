@@ -713,7 +713,7 @@ body::before {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   animation: cta-rotate-border 3s linear infinite;
-  will-change: --cta-border-angle;
+  will-change: background;
   pointer-events: none;
 }
 
