@@ -155,21 +155,27 @@ const ACCENT_COLORS = {
 };
 
 export function FoundryHero() {
-  // Check skip condition once to set correct initial states (avoids flash)
   const skipIntroRef = useRef(
     typeof window !== "undefined" && !!sessionStorage.getItem('rfcVisitedAt')
   );
   const skipIntro = skipIntroRef.current;
 
-  const prefersReducedMotion =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const [isLoaded, setIsLoaded] = useState(skipIntro || prefersReducedMotion);
-  const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro && !prefersReducedMotion);
+  const prefersReducedMotionRef = useRef(false);
+  const [isLoaded, setIsLoaded] = useState(skipIntro);
+  const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro);
   const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const loopActiveRef = useRef(false);
   const cycleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    prefersReducedMotionRef.current =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    
+    if (prefersReducedMotionRef.current) {
+      setIsLoaded(true);
+      setShowBootOverlay(false);
+    }
+  }, []);
 
   // Skip intro if returning from RFC visit
   useEffect(() => {
@@ -180,7 +186,7 @@ export function FoundryHero() {
   // Effect 1: Morph animation loop — RFC document → diagram
   useEffect(() => {
     if (showBootOverlay) return;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotionRef.current) return;
 
     loopActiveRef.current = true;
 
@@ -482,7 +488,7 @@ export function FoundryHero() {
       cycleTimeoutRef.current = null;
       if (assemblyTimelineRef.current) assemblyTimelineRef.current.kill();
     };
-  }, [showBootOverlay, prefersReducedMotion]);
+  }, [showBootOverlay]);
 
   // Effect 3: When hero is loaded, animate in the content
   useEffect(() => {
