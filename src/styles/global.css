@@ -679,9 +679,6 @@ body::before {
   .hero-cta-border {
     animation: none;
   }
-  .hero-cta-border::before {
-    animation: none;
-  }
 }
 
 /* === Hero CTA rotating border === */
