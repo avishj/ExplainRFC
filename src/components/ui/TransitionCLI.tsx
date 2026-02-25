@@ -64,6 +64,11 @@ export function TransitionCLI({
   const [showInitialCursor, setShowInitialCursor] = useState(true);
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     setLines([]);
@@ -119,7 +124,7 @@ export function TransitionCLI({
       exitTl = gsap.timeline({
         onComplete: () => {
           state.phase = "done";
-          onComplete();
+          onCompleteRef.current();
         },
       });
       exitTl.to(contentRef.current, {
@@ -145,7 +150,7 @@ export function TransitionCLI({
             setShowInitialCursor(false);
             if (sequence.length === 0) {
               state.phase = "done";
-              onComplete();
+              onCompleteRef.current();
               return;
             }
             state.elapsed = 0;
@@ -212,7 +217,7 @@ export function TransitionCLI({
       cancelAnimationFrame(rafId);
       exitTl?.kill();
     };
-  }, [sequence, onComplete, initialDelay, progressDuration, finalWait, exitDuration]);
+  }, [sequence, initialDelay, progressDuration, finalWait, exitDuration]);
 
   return (
     <div ref={overlayRef} className="fixed inset-0 z-[9999] bg-obsidian flex items-center justify-center">
