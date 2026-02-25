@@ -142,6 +142,11 @@ export function TransitionCLI({
         case "initial-wait":
           if (state.elapsed >= initialDelay) {
             setShowInitialCursor(false);
+            if (sequence.length === 0) {
+              state.phase = "done";
+              onComplete();
+              return;
+            }
             state.elapsed = 0;
             beginLine(sequence[0]);
           }
