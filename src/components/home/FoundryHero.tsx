@@ -160,15 +160,15 @@ export function FoundryHero() {
     typeof window !== "undefined" && !!sessionStorage.getItem('rfcVisitedAt')
   );
   const skipIntro = skipIntroRef.current;
-  
-  const [isLoaded, setIsLoaded] = useState(skipIntro);
-  const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro);
-  const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
-  const loopActiveRef = useRef(false);
 
   const prefersReducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const [isLoaded, setIsLoaded] = useState(skipIntro || prefersReducedMotion);
+  const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro && !prefersReducedMotion);
+  const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const loopActiveRef = useRef(false);
 
   // Skip intro if returning from RFC visit
   useEffect(() => {
