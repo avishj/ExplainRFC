@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { TransitionCLI, TRANSITION_SEQUENCES } from "@components/ui/TransitionCLI";
 import { OrnateDivider } from "@components/ui/OrnateDivider";
@@ -165,7 +165,7 @@ export function FoundryHero() {
   const [showBootOverlay, setShowBootOverlay] = useState(!skipIntro);
   const assemblyTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const loopActiveRef = useRef(false);
-  const cycleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cycleTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     prefersReducedMotionRef.current =
@@ -484,8 +484,8 @@ export function FoundryHero() {
     return () => {
       loopActiveRef.current = false;
       clearTimeout(timeout);
-      clearTimeout(cycleTimeoutRef.current ?? undefined);
-      cycleTimeoutRef.current = null;
+      clearTimeout(cycleTimeoutRef.current);
+      cycleTimeoutRef.current = undefined;
       if (assemblyTimelineRef.current) assemblyTimelineRef.current.kill();
     };
   }, [showBootOverlay]);
@@ -533,6 +533,11 @@ export function FoundryHero() {
     return () => { tl.kill(); };
   }, [isLoaded]);
 
+  const handleTransitionComplete = useCallback(() => {
+    setShowBootOverlay(false);
+    setIsLoaded(true);
+  }, []);
+
   return (
     <section className="relative min-h-screen flex overflow-hidden bg-obsidian">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-obsidian pointer-events-none z-10" />
@@ -544,10 +549,7 @@ export function FoundryHero() {
           progressDuration={450}
           finalWait={150}
           exitDuration={700}
-          onComplete={() => {
-            setShowBootOverlay(false);
-            setIsLoaded(true);
-          }}
+          onComplete={handleTransitionComplete}
         />
       )}
 
