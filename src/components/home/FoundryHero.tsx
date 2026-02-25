@@ -415,9 +415,6 @@ export function FoundryHero() {
         const progress = normalizedTearTimes[i + 1]; // how much has been revealed (0→1)
         const edgeX = 100 - progress * 100; // left edge moves from 100→0
         const edge = jag(edgeX, 8, 6, i * 5 + 2);
-        // Polygon: jagged left edge → top-right → bottom-right → jagged bottom-left
-        const topEdge = edge.map(p => p); // top-to-bottom along left edge
-        const clip = `polygon(${topEdge.join(", ")}, 100% 100%, 100% 0%)`;
         // Reverse: we need bottom-to-top for the closing side
         const clipFixed = `polygon(${edge[0].split(" ")[0]} 0%, 100% 0%, 100% 100%, ${edge[edge.length - 1].split(" ")[0]} 100%, ${edge.slice(1, -1).reverse().join(", ")})`;
         const stepDur = (normalizedTearTimes[i + 1] - normalizedTearTimes[i]) * cumTime;
