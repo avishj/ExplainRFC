@@ -183,7 +183,7 @@ export const init: SceneInitFn = async (
       }
 
       if (step.scene?.highlight) {
-        highlightNodes(entities, step.scene.highlight, currentTimeline, primaryColor);
+        highlightNodes(entities, step.scene.highlight, currentTimeline);
       }
     },
 
@@ -870,8 +870,7 @@ function animateWithdrawal(
 function highlightNodes(
   entities: Entities,
   highlights: string[],
-  timeline: gsap.core.Timeline,
-  color: string
+  timeline: gsap.core.Timeline
 ) {
   entities.asNodes.forEach((node, id) => {
     const core = node.mesh.children[0] as THREE.Mesh;
