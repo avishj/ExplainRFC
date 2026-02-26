@@ -753,7 +753,7 @@ export function FoundryHero() {
 
           <div className="hero-cta mt-12 opacity-0">
             <a
-              href="#vault"
+              href={`${import.meta.env.BASE_URL}#vault`}
               className="hero-cta-btn group relative inline-flex items-center gap-3 px-8 py-4 rounded-full transition-transform duration-300 hover:scale-105"
             >
               <span className="hero-cta-border" />
