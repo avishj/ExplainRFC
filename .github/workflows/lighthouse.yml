@@ -1,0 +1,14 @@
+name: Lighthouse Audit (Scheduled)
+
+on:
+  schedule:
+    - cron: '0 1 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  lighthouse:
+    uses: ./.github/workflows/_lighthouse.yml

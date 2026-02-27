@@ -1,0 +1,63 @@
+name: Lighthouse Audit
+
+on:
+  workflow_call:
+    inputs:
+      urls:
+        description: Newline-separated URLs to audit
+        type: string
+        required: false
+        default: |-
+          https://explainrfc.avishj.dev/
+          https://explainrfc.avishj.dev/rfc/793/
+          https://explainrfc.avishj.dev/rfc/4271/
+      wait-seconds:
+        description: Seconds to wait before auditing (e.g. deployment propagation)
+        type: number
+        required: false
+        default: 0
+
+jobs:
+  audit:
+    name: Audit (${{ matrix.profile }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [mobile, tablet, desktop]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Wait for propagation
+        if: inputs.wait-seconds > 0
+        run: sleep ${{ inputs.wait-seconds }}
+
+      - name: Run AutoLighthouse
+        uses: avishj/AutoLighthouse@main
+        with:
+          mode: audit
+          urls: ${{ inputs.urls }}
+          profile: ${{ matrix.profile }}
+          preset: strict
+
+  report:
+    name: Report
+    needs: audit
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Run AutoLighthouse Report
+        uses: avishj/AutoLighthouse@main
+        with:
+          mode: report
