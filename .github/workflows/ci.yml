@@ -6,6 +6,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,3 +27,12 @@ jobs:
 
       - name: Build
         run: bun run build
+
+  lighthouse:
+    uses: ./.github/workflows/_lighthouse.yml
+    permissions:
+      contents: write
+      issues: write
+    with:
+      url: http://localhost:3000
+      local-server: true

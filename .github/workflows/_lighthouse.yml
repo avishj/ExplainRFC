@@ -3,14 +3,16 @@ name: Lighthouse Audit
 on:
   workflow_call:
     inputs:
-      urls:
-        description: Newline-separated URLs to audit
+      url:
+        description: URL to audit
         type: string
         required: false
-        default: |-
-          https://explainrfc.avishj.dev/
-          https://explainrfc.avishj.dev/rfc/793/
-          https://explainrfc.avishj.dev/rfc/4271/
+        default: https://explainrfc.avishj.dev
+      local-server:
+        description: Start local test server before auditing
+        type: boolean
+        required: false
+        default: false
       wait-seconds:
         description: Seconds to wait before auditing (e.g. deployment propagation)
         type: number
@@ -31,6 +33,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
+      - name: Setup Bun
+        if: inputs.local-server
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        if: inputs.local-server
+        run: bun install --frozen-lockfile
+
+      - name: Start test server
+        if: inputs.local-server
+        run: |
+          bun run build
+          bun run preview -- --host 0.0.0.0 --port 3000 &
+          for _ in $(seq 1 10); do
+            curl -s http://localhost:3000 > /dev/null && exit 0
+            sleep 1
+          done
+          echo "::error::Test server failed to start on localhost:3000"
+          exit 1
+
       - name: Wait for propagation
         if: inputs.wait-seconds > 0
         run: sleep ${{ inputs.wait-seconds }}
@@ -39,7 +63,7 @@ jobs:
         uses: avishj/AutoLighthouse@main
         with:
           mode: audit
-          urls: ${{ inputs.urls }}
+          urls: ${{ inputs.url }}
           profile: ${{ matrix.profile }}
           preset: strict
 

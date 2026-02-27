@@ -55,10 +55,13 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
 
   lighthouse:
     needs: deploy
     if: needs.deploy.result == 'success'
     uses: ./.github/workflows/_lighthouse.yml
     with:
+      url: ${{ needs.deploy.outputs.page_url }}
       wait-seconds: 30
