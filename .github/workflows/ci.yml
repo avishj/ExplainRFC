@@ -3,8 +3,10 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    paths-ignore: ['docs/**', '*.md', 'LICENSE', '.lighthouse/**']
   push:
     branches: [main]
+    paths-ignore: ['docs/**', '*.md', 'LICENSE', '.lighthouse/**']
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -13,12 +15,14 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@3d267786b128fe76c2f16a390aa2448b815359f3 # v2.1.2
         with:
           bun-version: latest
 
