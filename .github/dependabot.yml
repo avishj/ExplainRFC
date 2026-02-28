@@ -1,8 +1,8 @@
 version: 2
 
 updates:
-  # ── npm (package.json) ─────────────────────────────────────────────
-  - package-ecosystem: "npm"
+  # ── bun (package.json + bun.lock) ─────────────────────────────────
+  - package-ecosystem: "bun"
     directory: "/"
     schedule:
       interval: "weekly"
