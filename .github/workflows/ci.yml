@@ -35,7 +35,7 @@ jobs:
       - name: Check for code changes
         id: filter
         run: |
-          BASE="${{ github.event.pull_request.base.sha || 'HEAD~1' }}"
+          BASE="${{ github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}"
           CHANGED=$(git diff --name-only "$BASE" HEAD)
           if [ -z "$CHANGED" ]; then
             echo "code=false" >> "$GITHUB_OUTPUT"
