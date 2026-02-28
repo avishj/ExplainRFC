@@ -16,7 +16,7 @@ YOU MUST use the edit tool instead of create tool unless the vast majority of th
 ## Git Conventions
 - **Format:** `<type>: <short-desc>` (4-5 words max, use shortforms)
 - **Types:** `feat:`, `fix:`, `refactor:`, `docs:`, `style:`, `test:`, `chore:`, `ci`
-- **Sign-off:** Always use `-s --author="Avish <avish.j@protonmail.com>"`
+- **Sign-off:** Always use `-s`
 - **Examples:** `feat: add jwt auth impl`, `fix: null ptr in parser`
 - Only stage files related to current logical block—never batch unrelated changes
 - **Push after commit** — always `git push` after committing
