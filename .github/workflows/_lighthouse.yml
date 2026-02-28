@@ -18,6 +18,11 @@ on:
         type: number
         required: false
         default: 0
+      save-history:
+        description: Commit Lighthouse history file after report (set false for CI PR runs)
+        type: boolean
+        required: false
+        default: true
 
 jobs:
   audit:
@@ -66,6 +71,7 @@ jobs:
           urls: ${{ inputs.url }}
           profile: ${{ matrix.profile }}
           preset: strict
+          history-path: ${{ inputs.save-history && '.lighthouse/history.json' || '' }}
 
   report:
     name: Report
@@ -85,3 +91,4 @@ jobs:
         uses: avishj/AutoLighthouse@main
         with:
           mode: report
+          history-path: ${{ inputs.save-history && '.lighthouse/history.json' || '' }}
