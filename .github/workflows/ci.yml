@@ -3,8 +3,10 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    paths-ignore: ['docs/**', '*.md', 'LICENSE', '.lighthouse/**']
   push:
     branches: [main]
+    paths-ignore: ['docs/**', '*.md', 'LICENSE', '.lighthouse/**']
 
 concurrency:
   group: ci-${{ github.ref }}
