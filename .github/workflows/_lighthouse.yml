@@ -35,18 +35,17 @@ jobs:
         profile: [mobile, tablet, desktop]
 
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Setup Bun
+      - name: Setup Bun environment
         if: inputs.local-server
-        uses: oven-sh/setup-bun@3d267786b128fe76c2f16a390aa2448b815359f3 # v2.1.2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        if: inputs.local-server
-        run: bun install --frozen-lockfile
+        uses: ./.github/actions/setup-bun
 
       - name: Start test server
         if: inputs.local-server
@@ -84,6 +83,11 @@ jobs:
       issues: write
 
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 

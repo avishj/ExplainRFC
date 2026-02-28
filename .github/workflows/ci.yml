@@ -1,38 +1,83 @@
 name: CI
 
 on:
-  pull_request:
-    branches: [main]
-    paths-ignore: ['docs/**', '*.md', 'LICENSE', '.lighthouse/**']
   push:
     branches: [main]
-    paths-ignore: ['docs/**', '*.md', 'LICENSE', '.lighthouse/**']
+  pull_request:
+    branches: [main]
+
+permissions: {}
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Check for code changes
+        id: filter
+        run: |
+          BASE_REF="${{ github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}"
+          if [ "$BASE_REF" = "0000000000000000000000000000000000000000" ]; then
+            BASE_REF="HEAD~1"
+          fi
+          CHANGED=$(git diff --name-only "$BASE_REF" HEAD)
+          if [ -z "$CHANGED" ]; then
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          elif echo "$CHANGED" | grep -qvE '^(docs/|\.lighthouse/|\.vscode/|\.DS_Store$|LICENSE$|CNAME$)|\.md$'; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          fi
+          if echo "$CHANGED" | grep -qE '^(src/|public/|astro\.config\.mjs)'; then
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "frontend=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    name: Build
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@3d267786b128fe76c2f16a390aa2448b815359f3 # v2.1.2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Setup Bun environment
+        uses: ./.github/actions/setup-bun
 
       - name: Build
         run: bun run build
 
   lighthouse:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     uses: ./.github/workflows/_lighthouse.yml
     permissions:
       contents: write
