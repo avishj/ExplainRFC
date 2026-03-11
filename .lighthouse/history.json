@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "lastUpdated": "2026-03-01T01:16:38.293Z",
+  "lastUpdated": "2026-03-11T06:24:41.911Z",
   "paths": {
     "desktop:/": {
       "consecutiveFailures": 0,
-      "lastSeen": "2026-03-01T01:16:38.288Z",
+      "lastSeen": "2026-03-11T06:24:41.803Z",
       "runs": [
         {
           "metrics": {
@@ -49,12 +49,23 @@
             "interactive": 1031.9144000000001
           },
           "timestamp": "2026-03-01T01:16:38.288Z"
+        },
+        {
+          "metrics": {
+            "first-contentful-paint": 866.895,
+            "largest-contentful-paint": 908.2208,
+            "cumulative-layout-shift": 0.0007542999469291262,
+            "total-blocking-time": 0,
+            "speed-index": 866.895,
+            "interactive": 912.2208
+          },
+          "timestamp": "2026-03-11T06:24:41.803Z"
         }
       ]
     },
     "mobile:/": {
-      "consecutiveFailures": 2,
-      "lastSeen": "2026-03-01T01:16:38.292Z",
+      "consecutiveFailures": 3,
+      "lastSeen": "2026-03-11T06:24:41.910Z",
       "runs": [
         {
           "metrics": {
@@ -99,12 +110,23 @@
             "interactive": 3627.1477000000004
           },
           "timestamp": "2026-03-01T01:16:38.292Z"
+        },
+        {
+          "metrics": {
+            "first-contentful-paint": 3339.5657,
+            "largest-contentful-paint": 3639.5657,
+            "cumulative-layout-shift": 0.0030914118731389913,
+            "total-blocking-time": 0,
+            "speed-index": 3339.5657,
+            "interactive": 3669.5657
+          },
+          "timestamp": "2026-03-11T06:24:41.910Z"
         }
       ]
     },
     "tablet:/": {
-      "consecutiveFailures": 1,
-      "lastSeen": "2026-03-01T01:16:38.292Z",
+      "consecutiveFailures": 0,
+      "lastSeen": "2026-03-11T06:24:41.910Z",
       "runs": [
         {
           "metrics": {
@@ -149,6 +171,17 @@
             "interactive": 1039.5584
           },
           "timestamp": "2026-03-01T01:16:38.292Z"
+        },
+        {
+          "metrics": {
+            "first-contentful-paint": 951.0409999999999,
+            "largest-contentful-paint": 991.0409999999999,
+            "cumulative-layout-shift": 0.0015875498453776036,
+            "total-blocking-time": 0,
+            "speed-index": 951.0409999999999,
+            "interactive": 995.0409999999999
+          },
+          "timestamp": "2026-03-11T06:24:41.910Z"
         }
       ]
     }
